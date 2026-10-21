@@ -10,7 +10,10 @@ Grammar (semicolons are optional; a lone `;` is an empty statement):
     stmt_list  : stmt_list stmt | <empty>
     stmt       : var_decl | input_decl | assign | block | SEMI
     var_decl   : VAR IDENT EQUALS expr
-    input_decl : INPUT IDENT | INPUT IDENT FROM IDENT
+    input_decl : INPUT IDENT [FROM IDENT] [COLON type_spec]
+    type_spec  : IDENT | IDENT LPAREN RPAREN | IDENT LPAREN type_args RPAREN
+    type_args  : type_arg | type_args COMMA type_arg
+    type_arg   : STRING | NUMBER | IDENT
     assign     : IDENT EQUALS expr
     block      : (SYSTEM | INSTRUCTION) LBRACE items RBRACE
     items      : items item | <empty>
@@ -25,11 +28,16 @@ block item so that one run reports every syntax error.
 
 String interpolation holes (`"... {x} ..."`) become VarRef nodes, so the
 security checker sees interpolation and `insert(x)` as the same kind of flow.
+
+Input types are checked for shape here (`enum` takes strings, `pattern` one
+string, `int` nothing or two numbers; TL-P009). Whether a type really
+excludes free text (pattern safety, enum sizes) is Module 3's job (TL-S012).
 """
 
 from __future__ import annotations
 
 import io
+import json
 import sys
 from dataclasses import dataclass, field, fields
 from enum import Enum
@@ -117,12 +125,66 @@ class VarDecl(Stmt):
     value: Expr
 
 
+INPUT_TYPE_KINDS = ("enum", "pattern", "int")
+
+
+@dataclass(frozen=True)
+class InputType:
+    """A refinement type on an input: the set of values it may take.
+
+    enum: one of `values`; pattern: re.fullmatch(pattern) in ASCII mode;
+    int: a decimal integer, optionally within [min, max]."""
+
+    kind: str
+    values: tuple[str, ...] = ()
+    pattern: str | None = None
+    min: int | None = None
+    max: int | None = None
+    span: SourceSpan | None = field(default=None, compare=False, repr=False)
+
+    def describe(self) -> str:
+        if self.kind == "enum":
+            return "enum(" + ", ".join(json.dumps(v, ensure_ascii=False) for v in self.values) + ")"
+        if self.kind == "pattern":
+            return f"pattern({json.dumps(self.pattern, ensure_ascii=False)})"
+        return "int" if self.min is None else f"int({self.min}, {self.max})"
+
+    def to_dict(self) -> dict:
+        if self.kind == "enum":
+            return {"kind": "enum", "values": list(self.values)}
+        if self.kind == "pattern":
+            return {"kind": "pattern", "pattern": self.pattern}
+        return {"kind": "int", "min": self.min, "max": self.max}
+
+    @classmethod
+    def from_dict(cls, data) -> InputType:
+        """Inverse of to_dict(); raises ValueError on anything else."""
+        if not isinstance(data, dict):
+            raise ValueError("an input type must be an object")
+        kind = data.get("kind")
+        if kind == "enum" and set(data) == {"kind", "values"}:
+            values = data["values"]
+            if isinstance(values, list) and all(isinstance(v, str) for v in values):
+                return cls("enum", values=tuple(values))
+        elif kind == "pattern" and set(data) == {"kind", "pattern"}:
+            if isinstance(data["pattern"], str):
+                return cls("pattern", pattern=data["pattern"])
+        elif kind == "int" and set(data) == {"kind", "min", "max"}:
+            low, high = data["min"], data["max"]
+            if low is None and high is None:
+                return cls("int")
+            if type(low) is int and type(high) is int and low <= high:
+                return cls("int", min=low, max=high)
+        raise ValueError(f"malformed input type {data!r}")
+
+
 @node
 class InputDecl(Stmt):
     name: str
     name_span: SourceSpan = field(repr=False)
-    trust: TrustLevel
+    trust: TrustLevel  # from the source tag; Module 3 raises a typed input to VALIDATED
     source_tag: str | None = None
+    type: InputType | None = None
 
 
 @node
@@ -216,6 +278,8 @@ def _label(n: Node) -> str:
         label = f"{type(n).__name__} {n.name}"
     elif isinstance(n, InputDecl):
         label = f"InputDecl {n.name} [{n.trust}]" + (f" from {n.source_tag}" if n.source_tag else "")
+        if n.type is not None:
+            label += f" : {n.type.describe()}"
     elif isinstance(n, Block):
         label = f"Block {n.kind.value}"
     elif isinstance(n, StringLit):
@@ -255,16 +319,18 @@ def dump(n: Node) -> str:
 _TOKEN_NAMES = {
     "IDENT": "identifier", "STRING": "string", "$end": "end of file",
     "LBRACE": "`{`", "RBRACE": "`}`", "LPAREN": "`(`", "RPAREN": "`)`",
-    "EQUALS": "`=`", "PLUS": "`+`", "SEMI": "`;`",
+    "EQUALS": "`=`", "PLUS": "`+`", "SEMI": "`;`", "COLON": "`:`", "COMMA": "`,`", "NUMBER": "number",
 }
 _TOKEN_ORDER = [
-    "PLUS", "RPAREN", "IDENT", "STRING", "SANITIZE", "LPAREN", "EQUALS", "FROM", "INSERT", "RBRACE",
+    "PLUS", "RPAREN", "COMMA", "IDENT", "STRING", "NUMBER", "SANITIZE", "LPAREN", "EQUALS", "FROM", "COLON",
+    "INSERT", "RBRACE",
     "VAR", "INPUT", "SYSTEM", "INSTRUCTION", "SEMI", "LBRACE", "$end",
 ]
 # Tokens accepted in a context only by error productions; never suggest them.
 _STMT_ERROR_ONLY = {"INSERT", "STRING"}
 _ITEM_ERROR_ONLY = {"IDENT", "SYSTEM", "INSTRUCTION", "SANITIZE"}
 _STMT_KEYWORDS = {"VAR", "INPUT", "SYSTEM", "INSTRUCTION"}
+_TYPE_HINT = 'valid input types: enum("a", "b"), pattern("[A-Z0-9]{8}"), int, int(min, max)'
 
 
 def _token_name(type_: str) -> str:
@@ -276,6 +342,8 @@ def _describe(tok: TLToken) -> str:
         return f"identifier `{tok.value}`"
     if tok.type == "STRING":
         return "string literal"
+    if tok.type == "NUMBER":
+        return f"number {tok.value}"
     return _token_name(tok.type)
 
 
@@ -400,15 +468,89 @@ class TrustParser:
 
     def p_input_decl(self, p):
         """input_decl : INPUT IDENT
-                      | INPUT IDENT FROM IDENT"""
+                      | INPUT IDENT FROM IDENT
+                      | INPUT IDENT COLON type_spec
+                      | INPUT IDENT FROM IDENT COLON type_spec"""
         name_tok = p.slice[2]
-        tag = p[4] if len(p) == 5 else None
+        tag = p[4] if len(p) > 3 and p.slice[3].type == "FROM" else None
+        input_type = p[len(p) - 1] if p.slice[len(p) - 2].type == "COLON" else None
         if tag is not None and tag not in SOURCE_TAGS:
             self._report(
                 "TL-P004", f"unknown input source `{tag}`", self._span(p, 4),
                 hint=f"valid sources are: {', '.join(SOURCE_TAGS)}; unknown sources are treated as UNTRUSTED",
             )
-        p[0] = InputDecl(p[2], name_tok.span, name_tok.provenance.trust, tag, span=self._cover(p, 1, len(p) - 1))
+        last = len(p) - 1 if p[len(p) - 1] is not None else len(p) - 2  # a malformed type is None
+        p[0] = InputDecl(p[2], name_tok.span, name_tok.provenance.trust, tag, input_type,
+                         span=self._cover(p, 1, last))
+
+    # ---- input types ----
+
+    def p_type_spec_bare(self, p):
+        "type_spec : IDENT"
+        p[0] = self._input_type(p[1], None, self._span(p, 1))
+
+    def p_type_spec_empty(self, p):
+        "type_spec : IDENT LPAREN RPAREN"
+        p[0] = self._input_type(p[1], [], self._cover(p, 1, 3))
+
+    def p_type_spec_args(self, p):
+        "type_spec : IDENT LPAREN type_args RPAREN"
+        p[0] = self._input_type(p[1], p[3], self._cover(p, 1, 4))
+
+    def p_type_args_one(self, p):
+        "type_args : type_arg"
+        p[0] = [p[1]]
+
+    def p_type_args(self, p):
+        "type_args : type_args COMMA type_arg"
+        p[0] = p[1] + [p[3]]
+
+    def p_type_arg(self, p):
+        """type_arg : STRING
+                    | NUMBER
+                    | IDENT"""
+        p[0] = p.slice[1]
+
+    def _input_type(self, name: str, args: list[TLToken] | None, span: SourceSpan) -> InputType | None:
+        """Check a type's shape (`args` is None without parentheses). Report
+        TL-P009 and return None if it is malformed."""
+        def bad(message, hint=_TYPE_HINT):
+            self._report("TL-P009", message, span, hint=hint)
+
+        if name not in INPUT_TYPE_KINDS:
+            bad(f"unknown input type `{name}`")
+            return None
+        if name == "int":
+            if args is None:
+                return InputType("int", span=span)
+            if len(args) != 2 or any(a.type != "NUMBER" for a in args):
+                bad("int takes no arguments or a range: int(min, max)", hint="for example: int(1, 100)")
+                return None
+            low, high = args[0].value, args[1].value
+            if low > high:
+                bad(f"empty range int({low}, {high})", hint=f"the minimum comes first: int({high}, {low})")
+                return None
+            return InputType("int", min=low, max=high, span=span)
+        if args is None:
+            example = 'enum("en", "fr")' if name == "enum" else 'pattern("[A-Z0-9]{8}")'
+            bad(f"`{name}` needs arguments", hint=f"for example: {example}")
+            return None
+        other = next((a for a in args if a.type != "STRING"), None)
+        if other is not None:
+            bad(f"{name} arguments must be string literals, not {_describe(other)}",
+                hint=f'quote the value: "{other.value}"')
+            return None
+        if any(not a.value.is_plain for a in args):
+            bad(f"{name} arguments cannot interpolate variables",
+                hint="the allowed values are fixed when the program is compiled; write them out literally")
+            return None
+        if name == "pattern":
+            if len(args) != 1:
+                bad("pattern takes exactly one regular expression",
+                    hint='combine alternatives with `|`: pattern("[a-z]{2}|[0-9]{3}")')
+                return None
+            return InputType("pattern", pattern=args[0].value.text, span=span)
+        return InputType("enum", values=tuple(a.value.text for a in args), span=span)
 
     def p_assign(self, p):
         "assign : IDENT EQUALS expr"
@@ -537,7 +679,14 @@ class TrustParser:
 
         expected = self._expected()
         hint = None
-        if tok.type in _STMT_KEYWORDS and "RBRACE" in expected:
+        after = self._parser.symstack[-1] if self._parser.symstack else None
+        if getattr(after, "type", None) == "COLON":
+            self.diagnostics.error("TL-P009", f"expected an input type after `:`, found {_describe(tok)}", tok.span,
+                                   hint=_TYPE_HINT)
+            return
+        if tok.type == "NUMBER":
+            hint = "numbers are only valid in input types such as int(1, 100); quote other numbers as strings"
+        elif tok.type in _STMT_KEYWORDS and "RBRACE" in expected:
             hint = "is a `}` missing before this? declarations and blocks cannot appear inside a block"
         elif expected:
             hint = "expected " + self._format_expected(expected)

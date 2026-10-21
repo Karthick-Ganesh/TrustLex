@@ -1,0 +1,18 @@
+# about: Validated inputs (enum / pattern / int) may enter the system prompt without sanitize()
+# expect: ok
+input reply_language : enum("en", "fr", "ta")
+input order_id : pattern("[A-Z0-9]{8}")
+input max_items : int(1, 20)
+input question
+
+system {
+    "You are an order-tracking assistant. Always reply in {reply_language}."
+    "The customer is asking about order {order_id}."
+    "List at most"
+    insert(max_items)
+    "items."
+}
+
+instruction {
+    insert(question)
+}

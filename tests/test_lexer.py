@@ -251,3 +251,36 @@ def test_lex_errors_example():
     assert codes(lexer) == [
         "TL-L001", "TL-L001", "TL-L004", "TL-L002", "TL-L005", "TL-L006", "TL-L001", "TL-L003",
     ]
+
+
+# ---- input-type tokens (validated inputs) ----
+
+def test_type_punctuation_and_numbers():
+    _, toks = lex('input q : int(1, -100)')
+    assert types(toks) == ["INPUT", "IDENT", "COLON", "IDENT", "LPAREN", "NUMBER", "COMMA", "NUMBER", "RPAREN"]
+    assert [t.value for t in toks if t.type == "NUMBER"] == [1, -100]
+    assert [t.span.text for t in toks if t.type == "NUMBER"] == ["1", "-100"]
+
+
+def test_type_names_are_contextual_identifiers():
+    lexer, toks = lex('var enum = "a"\nvar pattern = enum\nvar int = pattern')
+    assert types(toks).count("IDENT") == 5 and not lexer.diagnostics
+
+
+def test_pattern_argument_is_a_raw_string():
+    lexer, toks = lex(r'input d : pattern("\d{3}[A-Z]{2}\"x") var s = "\{y\}"')
+    pattern, plain = [t for t in toks if t.type == "STRING"]
+    assert pattern.value.text == r'\d{3}[A-Z]{2}\"x' and pattern.value.is_plain
+    assert plain.value.text == "{y}" and not lexer.diagnostics  # ordinary strings still decode escapes
+
+
+def test_unterminated_pattern_string():
+    lexer, _ = lex('input d : pattern("[a-z]\n')
+    assert codes(lexer) == ["TL-L002"]
+
+
+def test_digits_glued_to_letters_are_one_lexical_error():
+    lexer, toks = lex("var x = 12abc")
+    assert codes(lexer) == ["TL-L001"] and "cannot start with a digit" in lexer.diagnostics.items[0].hint
+    assert lexer.diagnostics.items[0].message == "illegal characters '12abc'"
+    assert types(toks) == ["VAR", "IDENT", "EQUALS"]

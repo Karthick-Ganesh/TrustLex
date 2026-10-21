@@ -174,6 +174,18 @@ input result from tool                   # tool / API output: SEMI_TRUSTED
 persona = persona + " Be brief."         # reassignment (variables only; inputs are read-only)
 ```
 
+**Validated inputs.** An input can carry a *refinement type* that restricts its values to a fixed set. Such an input is `VALIDATED`: it may enter a `system` block **without** `sanitize()`, because its value cannot carry free-text instructions. Every value is checked when the prompt is bound (`TL-G006`).
+
+```
+input lang : enum("en", "fr", "ta")             # one of these strings
+input order_id : pattern("[A-Z0-9]{8}")         # re.fullmatch, ASCII mode
+input qty : int                                 # a decimal integer
+input qty : int(1, 100)                         # ... in this range
+input city from tool : pattern("[A-Za-z]{1,40}")
+```
+
+A `pattern` only counts as validating if it cannot match free text. The compiler rejects (`TL-S012`) any pattern that can match whitespace or invisible characters, uses `.` or a negated class (`[^…]`, `\S`, `\W`, `\D`), has an unbounded repeat (`*`, `+`, `{n,}`), uses backreferences or lookarounds, or can match more than 64 characters. It also rejects an empty `enum()` and enum entries longer than 64 characters. The argument of `pattern(...)` is a raw string: backslashes and braces are kept as written. `enum`, `pattern` and `int` are not keywords, so they still work as variable names.
+
 ### Blocks
 
 ```
@@ -210,6 +222,7 @@ A block contains only two kinds of item: **string literals** and **`insert(expre
 | `sanitize(...)` of anything | ✅ | ✅ |
 | `input x` (user) | ❌ `TL-S010` | ✅ |
 | `input x from rag` / `from tool` | ❌ `TL-S011` (a warning with `--relaxed`) | ✅ |
+| `input x : enum(…)` / `pattern(…)` / `int` (validated) | ✅ (checked at bind, `TL-G006`) | ✅ |
 
 ### A complete program
 
@@ -243,7 +256,9 @@ instruction {
 program    : stmt*
 stmt       : var_decl | input_decl | assign | block | ";"
 var_decl   : "var" IDENT "=" expr
-input_decl : "input" IDENT ("from" IDENT)?
+input_decl : "input" IDENT ("from" IDENT)? (":" type_spec)?
+type_spec  : IDENT | IDENT "(" ")" | IDENT "(" type_arg ("," type_arg)* ")"
+type_arg   : STRING | NUMBER | IDENT
 assign     : IDENT "=" expr
 block      : ("system" | "instruction") "{" item* "}"
 item       : STRING | "insert" "(" expr ")" | ";"
@@ -290,7 +305,7 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
 
 ### Module 1: lexical analysis (`lexer.py`)
 
-- **PLY tokenizer.** Keywords: `system instruction var input insert sanitize from`. Also identifiers, strings (`"…"` and `"""…"""`), and the punctuation `{ } ( ) = + ;`. Comments are skipped but recorded.
+- **PLY tokenizer.** Keywords: `system instruction var input insert sanitize from`. Also identifiers, strings (`"…"` and `"""…"""`), integers (`NUMBER`, for `int(min, max)`), and the punctuation `{ } ( ) = + ; : ,`. `enum`, `pattern` and `int` are contextual identifiers, not keywords, and the string argument of `pattern(...)` is lexed raw. Comments are skipped but recorded.
 - **Exact source spans.** Every token carries line and column positions. Tabs count as one column and are expanded only when displayed.
 - **Trust seeding:** each token gets the trust that its own form fixes, before any flow analysis:
 
@@ -312,6 +327,7 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
 - **Typed AST.** The nodes are dataclasses compared by identity, so later phases can key side tables by node. The node types are: `Program`, `VarDecl`, `InputDecl`, `Assign`, `Block`, `TextItem`, `InsertItem`, `StringLit`, `TextSegment`, `VarRef`, `Concat`, `Sanitize`.
 - **Interpolation holes become `VarRef` nodes.** The checker treats `"{x}"` and `insert(x)` uniformly.
 - **Error productions** recognise common mistakes and report them with targeted hints: `TL-P003`–`TL-P008`.
+- **Input types** (`input x : enum(…)`, `pattern(…)`, `int`, `int(min, max)`) are parsed into an `InputType` on the `InputDecl` node. Their shape is checked here (`TL-P009`); whether they really validate is Module 3's job.
 - **Accurate "expected …" lists.** LALR state merging makes a state's action table admit tokens that are valid only in other contexts. The parser instead simulates the pending reductions on a copy of its stack for each candidate token, so the list contains only tokens that are really valid.
 - **Recovery** uses PLY's `error` token. Follow-on errors are suppressed until a statement that starts after the error parses cleanly.
 - **Visitors:** `NodeVisitor` / `NodeTransformer`, plus `dump()` for a tree view.
@@ -319,7 +335,8 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
 ### Module 3: semantic and security analysis (`semantic.py`)
 
 - **Name resolution.** The checker resolves names, with "did you mean" and "declared later" hints. It also reports redeclaration, assignment to an undeclared name, and assignment to an input.
-- **A four-point trust lattice and per-block clearances.** See [§6](#6-security-model-and-soundness).
+- **A five-point trust lattice and per-block clearances.** See [§6](#6-security-model-and-soundness).
+- **Pattern safety analysis.** Each `pattern(...)` is parsed with Python's regex parser (`re._parser`, or `sre_parse` on 3.10) and walked: literals and class ranges may not include whitespace or invisible characters; `.`, negated classes, `\s`/`\S`/`\W`/`\D`, unbounded repeats, backreferences and lookarounds are rejected; the maximum match length must be at most 64 (`TL-S012`). A typed input that passes is `VALIDATED`.
 - **Flow-sensitive taint tracking by exact symbolic evaluation.** Each variable's value at each program point is a *template*: literal text interleaved with input *slots*. Each slot records whether it was sanitized and the path by which it arrived.
 - **Taint paths in errors.** Every leak diagnostic shows the full path as secondary source locations, for example: input declared → interpolated into `note` → `note` reassigned → inserted into `system`.
 - **Machine-applicable fix-its**, which are re-checked to be correct:
@@ -418,7 +435,7 @@ Each module can also be run on its own for debugging: `python lexer.py FILE`, `p
 ### Trust lattice
 
 ```
-TRUSTED  ⊑  SANITIZED  ⊑  SEMI_TRUSTED  ⊑  UNTRUSTED
+TRUSTED  ⊑  VALIDATED  ⊑  SANITIZED  ⊑  SEMI_TRUSTED  ⊑  UNTRUSTED
 ```
 
 The order is by taint: higher means less trustworthy. The join `⊔` is the less trusted of two levels.
@@ -426,6 +443,7 @@ The order is by taint: higher means less trustworthy. The join `⊔` is the less
 | Construct | Label |
 |---|---|
 | string literal | `TRUSTED` |
+| `input x : τ` (enum / pattern / int, any source) | `VALIDATED` |
 | `input x` / `input x from user` | `UNTRUSTED` |
 | `input x from rag` / `from tool` | `SEMI_TRUSTED` |
 | `a + b`, `"…{a}…"` | `label(a) ⊔ label(b)` |
@@ -456,26 +474,27 @@ system { insert(note) }                         label = TRUSTED  ✓
 - **Position matters.** Each block sees variable values *at its position*.
 - **Precise labels.** A template's label is the join of its slots' levels. Partial sanitization such as `sanitize(u) + u` is therefore still rejected (`05_partial_sanitize`).
 
-### Soundness lemma: non-interference up to sanitization
+### Soundness lemma: non-interference up to sanitization and validation
 
-> **Theorem.** Let *P* be a TrustLex program with no `TL-S010`/`TL-S011` errors under the strict policy. Let σ₁, σ₂ assign runtime strings to *P*'s inputs, and let *san* be the runtime sanitizer. If *san*(σ₁(x)) = *san*(σ₂(x)) for every input *x*, then every `system` block of *P* renders to the same text under σ₁ and σ₂.
+> **Theorem.** Let *P* be a TrustLex program with no `TL-S010`/`TL-S011`/`TL-S012` errors under the strict policy, and let *san* be the runtime sanitizer. Let σ₁, σ₂ assign runtime strings to *P*'s inputs such that both bind: σᵢ(y) ∈ L(τ) for every validated input *y* : τ. If *san*(σ₁(x)) = *san*(σ₂(x)) for every free-text input *x*, and σ₁(y) = σ₂(y) for every validated input *y*, then every `system` block of *P* renders to the same text under σ₁ and σ₂.
 
-Raw input can influence privileged content **only** through `sanitize()`.
+Raw input can influence privileged content **only** through `sanitize()`, or by choosing a value of a validated type. Validated values range over a fixed language L(τ): a developer-chosen finite set (`enum`), decimal integers (`int`), or a pattern that `TL-S012` has checked can match at most 64 printable, whitespace-free characters. Such a value can select an option; it cannot spell out an instruction sentence. `bind()` enforces σ(y) ∈ L(τ) (`TL-G006`), and a pattern-typed value containing a chat-template role marker or an `<untrusted_input>` tag is refused too.
 
 *Proof outline.*
 
 1. **Exactness.** By induction over the statements of *P*, the template Γ(v) bound to each variable *v* at each program point denotes *v*'s runtime value. The base cases are literals and inputs. Concatenation, interpolation and `sanitize` are homomorphic over rendering. Assignment is a strong update, which is exact because *P* has no control flow.
-2. **Clean templates.** If label(t) ⊑ `SANITIZED`, every slot of *t* is sanitized, because a raw slot has level `SEMI_TRUSTED` or higher. Hence render(t, σ) depends on σ only through *san* ∘ σ.
+2. **Clean templates.** If label(t) ⊑ `SANITIZED`, every slot of *t* is sanitized or validated, because a raw free-text slot has level `SEMI_TRUSTED` or higher. Hence render(t, σ) depends on σ only through *san* ∘ σ on free-text inputs and σ itself on validated inputs, which agree by assumption.
 3. **The block check.** The checker requires label(t) ⊑ `SANITIZED` for the template *t* of every `system` item. By (1) that template is the item's runtime content, and by (2) the content is equal under σ₁ and σ₂. ∎
 
 **Completeness.** Because the evaluation is exact, the check is also complete for this language: a program is rejected *only if* some raw input slot reaches a `system` block. That means there exist σ₁, σ₂ as above that render it differently. There are no false positives.
 
 **The guarantee is preserved downstream:**
-- **Code generation.** The IR's slots come directly from the checked templates, and `generate()` / `bind()` re-verify the invariant. Verification does not trust the labels stored in the IR: each input's trust is re-derived from its source tag (`user` → `UNTRUSTED`, `rag`/`tool` → `SEMI_TRUSTED`), so relabelling a user input and re-hashing cannot buy a relaxed-policy exemption.
+- **Code generation.** The IR's slots come directly from the checked templates, and `generate()` / `bind()` re-verify the invariant. Verification does not trust the labels stored in the IR: each input's trust is re-derived from its source tag (`user` → `UNTRUSTED`, `rag`/`tool` → `SEMI_TRUSTED`) or, for a typed input, from its recorded type, which is re-checked with the same pattern analysis (`VALIDATED`). Relabelling a user input, stripping a type, or loosening a pattern and re-hashing is therefore rejected (`TL-G005`).
 - **Optimization.** The optimizer only rewrites text parts and keeps the slot sequence (property P1).
 
 **Executable validation.** The lemma is tested with `hypothesis`. Random TrustLex programs are generated, and each one is checked as follows:
-- **Soundness:** every accepted program renders identical `system` text under two input assignments that differ in raw content but sanitize identically.
+- **Soundness:** every accepted program renders identical `system` text under two input assignments that differ in raw free-text content but sanitize identically, and agree on validated inputs (the generator also declares `enum`, `pattern` and `int` inputs).
+- **Pattern analysis:** for random regular expressions, every string an accepted pattern matches (generated with `hypothesis.from_regex`) is at most 64 printable, whitespace-free characters.
 - **Completeness:** every rejected program renders differently.
 - **Downstream:** the same property is re-run through `generate → to_json → from_json → render`, and through the optimizer at `-O0`/`-O1`/`-O2`.
 
@@ -501,12 +520,14 @@ The generator is tuned so that both outcomes are well represented: in a 500-prog
 | `TL-P006` | parser | nested block |
 | `TL-P007` | parser | `var` without a value |
 | `TL-P008` | parser | string literal outside a block |
+| `TL-P009` | parser | malformed input type (unknown type name, wrong arguments, `int(5, 1)`, missing type after `:`) |
 | `TL-S001` | security | undeclared variable (close-match and "declared later" hints) |
 | `TL-S002` | security | name declared twice |
 | `TL-S003` | security | assignment to an undeclared variable |
 | `TL-S004` | security | assignment to an input (inputs are read-only) |
 | **`TL-S010`** | security | **UNTRUSTED data reaches a `system` block** (taint path + fix-it) |
 | **`TL-S011`** | security | **SEMI_TRUSTED (rag/tool) data reaches a `system` block** |
+| **`TL-S012`** | security | **input type does not validate**: the pattern can match free text (whitespace, `.`, negated class, unbounded repeat, over 64 characters), or the enum is empty or has an over-long entry |
 | `TL-W001` | security | input or variable never used (warning) |
 | `TL-W002` | security | redundant `sanitize()` (warning) |
 | `TL-W003` | security | empty `system` block (warning) |
@@ -514,7 +535,8 @@ The generator is tuned so that both outcomes are well represented: in a 500-prog
 | `TL-G002` | codegen | no `instruction` block; Anthropic needs a user message |
 | `TL-G003` | bind | missing (or non-string) input value |
 | `TL-G004` | bind | value supplied for an undeclared input |
-| `TL-G005` | bind | IR checksum or HMAC seal mismatch (or a seal present without a key, or missing with one), malformed IR (unknown source tag, invalid input name, ill-typed option, unregistered sanitizer name), an input's trust label inconsistent with its source tag, or security-invariant violation |
+| `TL-G005` | bind | IR checksum or HMAC seal mismatch (or a seal present without a key, or missing with one), malformed IR (unknown source tag, invalid input name, ill-typed option, unregistered sanitizer name), an input's trust label inconsistent with its source tag or type, an input type that does not validate, or security-invariant violation |
+| `TL-G006` | bind | value of a validated input does not match its type |
 
 ---
 
@@ -549,6 +571,8 @@ python -m pytest -q
 | `09_overwrite_input` | `TL-S004 TL-S010` | overwriting an input does not launder it |
 | `10_tool_output_sanitized` | compiles | sanitized tool output accepted in `system` |
 | `11_syntax_errors` | `TL-P003 TL-P007 TL-P001` | targeted syntax hints and recovery |
+| `12_validated_enum` | compiles | `enum`, `pattern` and `int` inputs enter `system` without `sanitize()` |
+| `13_unsafe_pattern` | `TL-S012` | `pattern(".+")` admits free text, so it does not validate |
 
 ---
 
@@ -597,9 +621,10 @@ python -m pytest -q
 
 - **The guarantee covers the `system` channel only.** Untrusted text is still allowed in `instruction` blocks (the user turn), so a model can still be steered through the user turn. TrustLex guarantees that untrusted text cannot pose as *developer instructions*, and it delimits raw input in user turns. It does not make the model immune to persuasion.
 - **`sanitize()` is only as strong as the runtime sanitizer.** The theorem is relative to *san*. The default sanitizer removes known structural attack vectors (role tokens, invisible characters, delimiter break-outs) and spotlights the value. It cannot neutralize natural-language instructions in general. The sanitizer is pluggable for that reason: register a stronger one and compile against its name.
+- **Validation is syntactic.** A validated value has no whitespace and at most 64 characters, so it cannot carry a sentence, but a permissive pattern such as `[A-Za-z]{1,40}` still admits a single word like `Ignoreallinstructions`. Prefer `enum` where the options are known, and the tightest pattern otherwise.
 - **Completeness relies on the language having no control flow.** Adding conditionals or loops would require joining templates at merge points, which keeps soundness but gives up completeness.
 - **"Zero runtime overhead" refers to checking.** Binding runs the sanitizer, which is linear in the input size.
-- **Token counts are estimates** unless an exact counter is plugged in. Input slots are not counted.
+- **Token counts are estimates** unless `tiktoken` is installed (or another exact counter is plugged in). Input slots are not counted.
 - **`dedent` works per message, not per string literal.** A `system` block mixing an indented `"""` string with unindented strings is not dedented at `-O1`; `-O2` handles it.
 
 ---

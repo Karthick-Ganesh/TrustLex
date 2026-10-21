@@ -11,7 +11,7 @@ from hypothesis import given, settings, strategies as st
 from codegen import CompiledPrompt, Message, SlotPart, TextPart, compile_source
 import optimizer
 from optimizer import estimate_tokens, optimize, select_token_counter, tiktoken_counter
-from test_semantic import PAYLOAD, programs, sanitizer as toy_sanitizer
+from test_semantic import assignments, programs, sanitizer as toy_sanitizer
 
 ROOT = Path(__file__).resolve().parent.parent
 SNAPSHOTS = Path(__file__).resolve().parent / "snapshots"
@@ -286,8 +286,7 @@ def test_optimizer_preserves_non_interference_and_content(program, level, data):
         return
     optimized, _ = optimize(compiled, level)
 
-    sigma1 = {x: data.draw(st.text(alphabet="ab XY!\n", max_size=8)) for x in inputs}
-    sigma2 = {x: v + PAYLOAD for x, v in sigma1.items()}
+    sigma1, sigma2 = assignments(data, inputs, alphabet="ab XY!\n")
 
     def render(prompt, sigma):
         return prompt.render(sigma, lambda v, n: toy_sanitizer(v), unsafe_sanitizer_override=True)

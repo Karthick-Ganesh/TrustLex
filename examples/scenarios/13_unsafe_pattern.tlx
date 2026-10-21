@@ -1,0 +1,12 @@
+# about: A pattern that admits free text does not validate: `.` and unbounded repeats are rejected
+# expect: TL-S012
+input question
+input nickname : pattern(".+")
+
+system {
+    "You are a friendly assistant. Address the user as {nickname}."
+}
+
+instruction {
+    insert(question)
+}

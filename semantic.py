@@ -2,13 +2,15 @@
 TrustLex - Module 3: Semantic and Security Analysis.
 
 Checks name resolution and enforces the TrustLex security rule: no data from
-an `input` may reach a `system` block unless it passed through sanitize().
+an `input` may reach a `system` block unless it passed through sanitize() or
+the input is validated (refinement-typed with enum / pattern / int).
 
 Trust lattice (a chain, ordered by taint):
 
-    TRUSTED  ⊑  SANITIZED  ⊑  SEMI_TRUSTED  ⊑  UNTRUSTED
+    TRUSTED  ⊑  VALIDATED  ⊑  SANITIZED  ⊑  SEMI_TRUSTED  ⊑  UNTRUSTED
 
     string literals            TRUSTED
+    input x [from t] : τ       VALIDATED (τ = enum / pattern / int, checked at bind)
     input x from rag | tool    SEMI_TRUSTED
     input x [from user]        UNTRUSTED
     a + b, "...{a}..."         join (⊔): the less trusted operand
@@ -29,13 +31,21 @@ each variable's value at the block's position. A template's label is the join
 of its slots' levels (Text is TRUSTED). The checked block templates are handed
 to code generation, which never re-evaluates the program.
 
-Soundness: non-interference up to sanitization
-----------------------------------------------
-Let P be a program with no TL-S010/TL-S011 errors under the strict policy.
-Let σ1, σ2 assign runtime strings to P's inputs, and let san be the runtime
-sanitizer. If san(σ1(x)) = san(σ2(x)) for every input x, then every system
-block of P renders to the same text under σ1 and σ2. Raw input can influence
-privileged content only through sanitize().
+Soundness: non-interference up to sanitization and validation
+--------------------------------------------------------------
+Let P be a program with no TL-S010/TL-S011/TL-S012 errors under the strict
+policy, and let san be the runtime sanitizer. Let σ1, σ2 assign runtime
+strings to P's inputs that bind, i.e. σi(y) ∈ L(τ) for every validated input
+y : τ (bind() enforces this, TL-G006). If san(σ1(x)) = san(σ2(x)) for every
+free-text input x, and σ1(y) = σ2(y) for every validated input y, then every
+system block of P renders to the same text under σ1 and σ2.
+
+Raw input can therefore influence privileged content only through sanitize()
+or by choosing a value of a validated type. Validated values range over a
+fixed language L(τ): a developer-chosen finite set (enum), decimal integers
+(int), or a pattern that TL-S012 has checked can only match at most 64
+printable, whitespace-free characters (no `.`, negated classes or unbounded
+repeats). Such a value can name an option; it cannot spell out a sentence.
 
 Proof outline.
   (1) Exactness. By induction over the statements of P, the template Γ(v)
@@ -45,8 +55,9 @@ Proof outline.
       homomorphic over rendering; assignment is a strong update, which is
       exact because P has no control flow.
   (2) Clean templates. If label(t) ⊑ SANITIZED then every slot of t is
-      sanitized (a raw slot has level SEMI_TRUSTED or UNTRUSTED). So
-      render(t, σ) depends on σ only through san ∘ σ.
+      sanitized or validated (a raw free-text slot has level SEMI_TRUSTED
+      or UNTRUSTED). So render(t, σ) depends on σ only through san ∘ σ on
+      free-text inputs and σ itself on validated ones.
   (3) The block check requires label(t) ⊑ SANITIZED for the template t of
       every system block item. By (1) that template is the item's runtime
       content, and by (2) the content is equal under σ1 and σ2.        ∎
@@ -54,13 +65,16 @@ Proof outline.
 Because the evaluation is exact, the check is also complete for this
 language: a program is rejected only if some raw input slot reaches a system
 block, i.e. there exist σ1, σ2 as above that render it differently. Both
-directions are exercised by the property-based test in tests/test_semantic.py.
+directions are exercised by the property-based test in tests/test_semantic.py,
+whose random programs include validated inputs; a second property checks that
+every string an accepted pattern matches is short and whitespace-free.
 """
 
 from __future__ import annotations
 
 import difflib
 import functools
+import re
 import sys
 from dataclasses import dataclass, field, replace
 
@@ -69,9 +83,162 @@ from diagnostics import (
 )
 from lexer import TrustLevel
 from parser_ast import (
-    Assign, Block, BlockKind, Concat, Expr, InputDecl, InsertItem, Node, ParseResult,
+    Assign, Block, BlockKind, Concat, Expr, InputDecl, InputType, InsertItem, Node, ParseResult,
     Program, Sanitize, StringLit, TextItem, TextSegment, VarDecl, VarRef, parse,
 )
+
+try:  # Python 3.11+
+    import re._constants as _sre
+    import re._parser as _sre_parse
+except ImportError:  # Python 3.10
+    import sre_constants as _sre
+    import sre_parse as _sre_parse
+
+
+# --------------------------------------------------------------------------
+# Validated input types
+# --------------------------------------------------------------------------
+
+MAX_VALIDATED_LENGTH = 64
+_TYPE_FIX_HINT = 'restrict the input with enum("a", "b") or a tighter pattern, e.g. pattern("[A-Z0-9]{8}")'
+
+
+class _UnsafePattern(Exception):
+    pass
+
+
+class _UnsupportedPattern(Exception):
+    pass
+
+
+def _forbidden_char(c: str) -> bool:
+    """Whitespace and invisible characters could separate or hide words."""
+    return c.isspace() or not c.isprintable()
+
+
+def _check_char(code: int):
+    if _forbidden_char(chr(code)):
+        raise _UnsafePattern(f"it can match the whitespace or invisible character {chr(code)!r}")
+
+
+def _check_class(items):
+    for op, av in items:
+        if op == _sre.NEGATE:
+            raise _UnsafePattern("it uses a negated character class `[^...]`, which matches whitespace")
+        if op == _sre.LITERAL:
+            _check_char(av)
+        elif op == _sre.RANGE:
+            low, high = av
+            bad = next((c for c in range(low, high + 1) if _forbidden_char(chr(c))), None)
+            if bad is not None:
+                raise _UnsafePattern(f"the range {chr(low)!r}-{chr(high)!r} includes {chr(bad)!r}")
+        elif op == _sre.CATEGORY:
+            if av not in (_sre.CATEGORY_DIGIT, _sre.CATEGORY_WORD):
+                raise _UnsafePattern("it uses `\\s`, `\\S`, `\\D` or `\\W`, which match or admit whitespace")
+        else:
+            raise _UnsupportedPattern(f"an unsupported character-class construct ({op})")
+
+
+_REPEATS = {_sre.MAX_REPEAT, _sre.MIN_REPEAT} | ({_sre.POSSESSIVE_REPEAT} if hasattr(_sre, "POSSESSIVE_REPEAT") else set())
+_UNSUPPORTED = {
+    _sre.GROUPREF: "backreferences", _sre.GROUPREF_EXISTS: "conditional groups",
+    _sre.ASSERT: "lookarounds", _sre.ASSERT_NOT: "lookarounds",
+}
+
+
+def _max_width(items) -> int:
+    """The longest string the parsed pattern `items` can match."""
+    width = 0
+    for op, av in items:
+        if op == _sre.LITERAL:
+            _check_char(av)
+            width += 1
+        elif op == _sre.NOT_LITERAL:
+            raise _UnsafePattern("it uses a negated character `[^x]`, which matches whitespace")
+        elif op == _sre.ANY:
+            raise _UnsafePattern("`.` matches any character, including whitespace")
+        elif op == _sre.IN:
+            _check_class(av)
+            width += 1
+        elif op in _REPEATS:
+            low, high, sub = av
+            if high == _sre.MAXREPEAT:
+                raise _UnsafePattern("it has an unbounded repeat (`*`, `+` or `{n,}`)")
+            width += high * _max_width(sub)
+        elif op == _sre.SUBPATTERN:
+            width += _max_width(av[-1])
+        elif hasattr(_sre, "ATOMIC_GROUP") and op == _sre.ATOMIC_GROUP:
+            width += _max_width(av)
+        elif op == _sre.BRANCH:
+            width += max(_max_width(branch) for branch in av[1])
+        elif op == _sre.AT:
+            pass  # anchors match no characters
+        else:
+            raise _UnsupportedPattern(_UNSUPPORTED.get(op, f"an unsupported construct ({op})"))
+    return width
+
+
+def pattern_problem(pattern: str) -> str | None:
+    """Why `pattern` does not restrict values to a free-text-free language, or
+    None if it does: no whitespace or invisible characters, no `.` or negated
+    classes, no unbounded repeats, and at most MAX_VALIDATED_LENGTH characters.
+    Patterns are analysed (and matched at runtime) in ASCII mode."""
+    try:
+        tree = _sre_parse.parse(pattern, re.ASCII)
+        width = _max_width(tree)
+    except _UnsafePattern as exc:
+        return f"pattern {pattern!r} can match free text: {exc}"
+    except _UnsupportedPattern as exc:
+        return f"pattern {pattern!r} uses {exc}, which validated patterns do not support"
+    except (re.error, ValueError, OverflowError, RecursionError) as exc:  # ValueError: e.g. (?u) with ASCII
+        return f"pattern {pattern!r} is not a valid regular expression: {exc}"
+    if width > MAX_VALIDATED_LENGTH:
+        return f"pattern {pattern!r} can match up to {width} characters; validated values are limited to {MAX_VALIDATED_LENGTH}"
+    return None
+
+
+def _example(items) -> str:
+    out = []
+    for op, av in items:
+        if op == _sre.LITERAL:
+            out.append(chr(av))
+        elif op == _sre.IN:
+            first_op, first = av[0]
+            if first_op == _sre.CATEGORY:
+                out.append("0" if first == _sre.CATEGORY_DIGIT else "a")
+            else:
+                out.append(chr(first[0] if first_op == _sre.RANGE else first))
+        elif op in _REPEATS:
+            out.append(_example(av[2]) * av[0])
+        elif op == _sre.SUBPATTERN:
+            out.append(_example(av[-1]))
+        elif op == _sre.BRANCH:
+            out.append(_example(av[1][0]))
+    return "".join(out)
+
+
+def example_value(t: InputType) -> str | None:
+    """A value of a valid type, for demos and samples (None if none is found)."""
+    if t.kind == "enum":
+        return t.values[0] if t.values else None
+    if t.kind == "int":
+        return str(t.min if t.min is not None else 1)
+    value = _example(_sre_parse.parse(t.pattern, re.ASCII))
+    return value if re.fullmatch(t.pattern, value, re.ASCII) else None
+
+
+def input_type_problem(t: InputType) -> str | None:
+    """Why `t` does not validate its input, or None. Shared by the checker
+    (TL-S012) and by IR verification at bind time (TL-G005)."""
+    if t.kind == "pattern":
+        return pattern_problem(t.pattern)
+    if t.kind == "enum":
+        if not t.values:
+            return "enum() has no values, so no value could ever be bound"
+        long = next((v for v in t.values if len(v) > MAX_VALIDATED_LENGTH), None)
+        if long is not None:
+            return f"enum value {long[:20]!r}… is longer than {MAX_VALIDATED_LENGTH} characters"
+    return None
 
 
 # --------------------------------------------------------------------------
@@ -210,6 +377,7 @@ class Symbol:
     span: SourceSpan
     trust: TrustLevel | None = None  # inputs only
     source_tag: str | None = None
+    input_type: InputType | None = None  # typed (VALIDATED) inputs only
     used: bool = False
     implicit: bool = False  # created by an assignment to an undeclared name
 
@@ -301,6 +469,7 @@ class SecurityChecker:
         self._target: str | None = None
         self._declared_later: dict[str, SourceSpan] = {}
         self._all_names: set[str] = set()
+        self._invalid_types: set[str] = set()  # inputs whose type got TL-S012
 
     def check(self, program: Program) -> CheckedProgram:
         for stmt in program.statements:
@@ -334,9 +503,23 @@ class SecurityChecker:
     def _input(self, stmt: InputDecl):
         if self._redeclared(stmt.name, stmt.name_span):
             return
-        self.symbols[stmt.name] = Symbol(stmt.name, "input", stmt.name_span, stmt.trust, stmt.source_tag)
-        origin = f"`{stmt.name}` is {stmt.trust} input" + (f" (from {stmt.source_tag})" if stmt.source_tag else "")
-        template = Template((Slot(stmt.name, stmt.trust, path=(FlowStep(origin, stmt.name_span),)),))
+        trust = stmt.trust
+        if stmt.type is not None:
+            problem = input_type_problem(stmt.type)
+            if problem:
+                self.diagnostics.error("TL-S012", f"the type of input `{stmt.name}` does not validate it",
+                                       stmt.type.span, label=problem, hint=_TYPE_FIX_HINT)
+                # The input keeps its source label, but its leaks are not
+                # reported again: they all have this one root cause.
+                self._invalid_types.add(stmt.name)
+            else:
+                trust = TrustLevel.VALIDATED
+        self.symbols[stmt.name] = Symbol(stmt.name, "input", stmt.name_span, trust, stmt.source_tag,
+                                         stmt.type if trust is TrustLevel.VALIDATED else None)
+        origin = f"`{stmt.name}` is {trust} input" + (f" (from {stmt.source_tag})" if stmt.source_tag else "")
+        if stmt.type is not None:
+            origin += f" of type {stmt.type.describe()}"
+        template = Template((Slot(stmt.name, trust, path=(FlowStep(origin, stmt.name_span),)),))
         self.env[stmt.name] = template
         self._record(stmt, template, f"input {stmt.name}")
 
@@ -402,7 +585,8 @@ class SecurityChecker:
         elif isinstance(expr, Sanitize):
             inner = self._eval(expr.expr)
             if inner.label.leq(TrustLevel.SANITIZED):
-                what = "trusted data" if inner.label is TrustLevel.TRUSTED else "data that is already sanitized"
+                what = {TrustLevel.TRUSTED: "trusted data", TrustLevel.VALIDATED: "validated data"}.get(
+                    inner.label, "data that is already sanitized")
                 self.diagnostics.warning(
                     "TL-W002", f"sanitize() applied to {what} has no effect", expr.span,
                     hint=f"remove the call: {_short(expr.expr.span.text, 40)}",
@@ -479,7 +663,7 @@ class SecurityChecker:
         block's clearance. `site` is an InsertItem or an interpolated VarRef."""
         leaks: dict[str, Slot] = {}
         for slot in template.slots:
-            if not slot.level.leq(clearance):
+            if not slot.level.leq(clearance) and slot.input not in self._invalid_types:
                 leaks.setdefault(slot.input, slot)
 
         for name, slot in leaks.items():

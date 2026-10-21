@@ -49,8 +49,9 @@ from dataclasses import dataclass, field
 
 from diagnostics import DiagnosticBag
 from lexer import _IDENT_RE, SOURCE_TAGS
-from parser_ast import BlockKind
-from semantic import CheckedProgram, SecurityPolicy, Slot, Text, analyze
+from lexer import TrustLevel
+from parser_ast import BlockKind, InputType
+from semantic import MAX_VALIDATED_LENGTH, CheckedProgram, SecurityPolicy, Slot, Text, analyze, input_type_problem
 
 FORMAT = "trustlex-ir/1"
 TARGETS = ("ir", "openai", "anthropic")
@@ -198,6 +199,28 @@ def register_sanitizer(name: str, factory: Callable) -> None:
 
 
 register_sanitizer(SanitizerConfig.name, default_sanitizer)
+
+
+_INT_VALUE = re.compile(r"-?(?:0|[1-9][0-9]*)")
+
+
+def conforms(input_type: InputType, value: str) -> bool:
+    """Does `value` belong to the language of `input_type`? Patterns match
+    in ASCII mode, as Module 3 analysed them."""
+    if len(value) > MAX_VALIDATED_LENGTH:
+        return False
+    if input_type.kind == "enum":
+        return value in input_type.values
+    if input_type.kind == "pattern":
+        # A whitespace-free pattern can still admit a chat-template marker
+        # such as `<|im_start|>system`; refuse those values as well.
+        if _ROLE_TOKENS.search(value) or _DELIMITER.search(value):
+            return False
+        return re.fullmatch(input_type.pattern, value, re.ASCII) is not None
+    if not _INT_VALUE.fullmatch(value):
+        return False
+    n = int(value)
+    return input_type.min is None or input_type.min <= n <= input_type.max
 
 
 # --------------------------------------------------------------------------
@@ -361,8 +384,10 @@ class CompiledPrompt:
 
     def verify(self):
         """Every slot must name a declared input, and every slot in a system
-        message must be sanitized. Under the relaxed policy (recorded in the
-        IR) a SEMI_TRUSTED slot may be unsanitized; UNTRUSTED never.
+        message must be sanitized, unless its input is VALIDATED (it has a
+        type that excludes free text, re-checked here and enforced at bind
+        time). Under the relaxed policy (recorded in the IR) a SEMI_TRUSTED
+        slot may also be unsanitized; UNTRUSTED never.
 
         Without an HMAC key, anyone can edit the IR and recompute its checksum.
         verify() therefore never takes a stored label on faith: each input's
@@ -379,7 +404,8 @@ class CompiledPrompt:
                 if isinstance(p, SlotPart):
                     if p.input not in self.inputs:
                         raise BindError("TL-G005", f"slot `{p.input}` does not name a declared input")
-                    exempt = self.policy == "relaxed" and self.inputs[p.input]["trust"] == "SEMI_TRUSTED"
+                    trust = self.inputs[p.input]["trust"]
+                    exempt = trust == "VALIDATED" or (self.policy == "relaxed" and trust == "SEMI_TRUSTED")
                     if m.role == "system" and not p.sanitize and not exempt:
                         raise BindError(
                             "TL-G005",
@@ -398,13 +424,31 @@ class CompiledPrompt:
             source, trust = info.get("source"), info.get("trust")
             if not isinstance(source, str) or source not in SOURCE_TAGS:
                 raise BindError("TL-G005", f"input `{name}` has unknown source {source!r} in IR")
-            expected = SOURCE_TAGS[source].name
+            if set(info) - {"source", "trust", "type"}:
+                raise BindError("TL-G005", f"malformed IR: input `{name}` has unknown fields")
+            if "type" in info:
+                input_type = self._input_type(name)
+                problem = input_type_problem(input_type)
+                if problem:
+                    raise BindError("TL-G005", f"the type of input `{name}` in the IR does not validate it: {problem}")
+                expected = TrustLevel.VALIDATED.name
+            else:
+                expected = SOURCE_TAGS[source].name
             if trust != expected:
                 raise BindError(
                     "TL-G005",
                     f"IR trust label mismatch: input `{name}` from {source} must be {expected}, "
                     f"but the IR says {trust!r}",
                 )
+
+    def _input_type(self, name: str) -> InputType | None:
+        info = self.inputs[name]
+        if "type" not in info:
+            return None
+        try:
+            return InputType.from_dict(info["type"])
+        except ValueError as exc:
+            raise BindError("TL-G005", f"malformed IR: input `{name}`: {exc}") from exc
 
     def _verify_options(self):
         from optimizer import LEVELS  # optimizer imports this module
@@ -457,6 +501,11 @@ class CompiledPrompt:
         for name, value in values.items():
             if not isinstance(value, str):
                 raise BindError("TL-G003", f"the value of input `{name}` must be a string, not {type(value).__name__}")
+            input_type = self._input_type(name)
+            if input_type is not None and not conforms(input_type, value):
+                shown = value if len(value) <= 40 else value[:39] + "…"
+                raise BindError("TL-G006", f"the value {shown!r} of input `{name}` does not match its type "
+                                           f"{input_type.describe()}")
 
         rendered = []
         for m in self.messages:
@@ -466,6 +515,8 @@ class CompiledPrompt:
                     chunks.append(p.text)
                 elif p.sanitize:
                     chunks.append(sanitize(values[p.input], p.input))
+                elif self.inputs[p.input]["trust"] == "VALIDATED":
+                    chunks.append(values[p.input])  # checked against its type above; no delimiters needed
                 elif self.delimit_untrusted:
                     chunks.append(spotlight(values[p.input], p.input, self.inputs[p.input]["source"]))
                 else:
@@ -528,10 +579,12 @@ def generate(checked: CheckedProgram, sanitizer: SanitizerConfig | None = None,
     if sanitizer is not None and sanitizer.name not in _SANITIZERS:
         raise CodegenError(f"unknown sanitizer {sanitizer.name!r}; register it with register_sanitizer() first")
 
-    inputs = {
-        sym.name: {"trust": sym.trust.name, "source": sym.source_tag or "user"}
-        for sym in checked.symbols.values() if sym.kind == "input"
-    }
+    inputs = {}
+    for sym in checked.symbols.values():
+        if sym.kind == "input":
+            inputs[sym.name] = {"trust": sym.trust.name, "source": sym.source_tag or "user"}
+            if sym.input_type is not None:
+                inputs[sym.name]["type"] = sym.input_type.to_dict()
 
     messages = []
     for cb in checked.blocks:

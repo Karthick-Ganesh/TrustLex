@@ -7,7 +7,7 @@ import pytest
 
 from lexer import TrustLevel
 from parser_ast import (
-    Assign, Block, BlockKind, Concat, InputDecl, InsertItem, NodeTransformer, NodeVisitor,
+    Assign, Block, BlockKind, Concat, InputDecl, InputType, InsertItem, NodeTransformer, NodeVisitor,
     Sanitize, StringLit, TextItem, TextSegment, VarDecl, VarRef, dump, grammar_report, parse,
 )
 
@@ -246,3 +246,67 @@ def test_example_ast_snapshots(name):
         snapshot.parent.mkdir(exist_ok=True)
         snapshot.write_text(tree)
     assert tree == snapshot.read_text()
+
+
+# ---- input types (validated inputs) ----
+
+@pytest.mark.parametrize("src, expected", [
+    ('input lang : enum("en", "fr", "ta")', InputType("enum", values=("en", "fr", "ta"))),
+    ('input order_id : pattern("[A-Z0-9]{8}")', InputType("pattern", pattern="[A-Z0-9]{8}")),
+    ("input qty : int", InputType("int")),
+    ("input qty : int(1, 100)", InputType("int", min=1, max=100)),
+    ("input t : int(-5, 5)", InputType("int", min=-5, max=5)),
+    ('input city from tool : pattern("[A-Za-z]{1,40}")', InputType("pattern", pattern="[A-Za-z]{1,40}")),
+    ("input e : enum()", InputType("enum")),  # shape is fine; Module 3 rejects it (TL-S012)
+])
+def test_typed_input_forms(src, expected):
+    [decl] = ok(src).statements
+    assert isinstance(decl, InputDecl) and decl.type == expected
+    assert decl.trust is (TrustLevel.SEMI_TRUSTED if "from tool" in src else TrustLevel.UNTRUSTED)
+    assert decl.type.span.text == src.split(" : ")[1]
+    assert decl.span.text == src
+
+
+def test_typed_input_dump_and_round_trip():
+    [decl] = ok('input lang from rag : enum("en", "fr")').statements
+    assert dump(decl).startswith('InputDecl lang [SEMI_TRUSTED] from rag : enum("en", "fr") @1:1')
+    assert InputType.from_dict(decl.type.to_dict()) == decl.type
+
+
+@pytest.mark.parametrize("src, message", [
+    ("input x : string", "unknown input type `string`"),
+    ("input x : int(5, 1)", "empty range int(5, 1)"),
+    ("input x : int(5)", "int takes no arguments or a range"),
+    ('input x : int("1", "2")', "int takes no arguments or a range"),
+    ("input x : enum", "`enum` needs arguments"),
+    ("input x : pattern", "`pattern` needs arguments"),
+    ("input x : enum(en, fr)", "enum arguments must be string literals, not identifier `en`"),
+    ("input x : enum(1)", "enum arguments must be string literals, not number 1"),
+    ('input x : enum("{y}")', "enum arguments cannot interpolate variables"),
+    ('input x : pattern("a", "b")', "pattern takes exactly one regular expression"),
+    ('input x :\nvar y = "a"', "expected an input type after `:`, found `var`"),
+])
+def test_malformed_input_types(src, message):
+    result = parse(src, "test.tlx")
+    [diag] = result.diagnostics.items
+    assert diag.code == "TL-P009" and diag.message.startswith(message) and diag.hint
+
+
+def test_parser_recovers_after_a_malformed_type():
+    assert codes('input x : string\ninput y : int(3, 1)\nvar z = "ok"') == ["TL-P009", "TL-P009"]
+
+
+def test_stray_number_has_a_hint():
+    [diag] = parse("var x = 5", "test.tlx").diagnostics.items
+    assert diag.code == "TL-P001" and "int(1, 100)" in diag.hint
+
+
+@pytest.mark.parametrize("data", [
+    None, [], {"kind": "enum"}, {"kind": "enum", "values": "en"}, {"kind": "enum", "values": [1]},
+    {"kind": "pattern", "pattern": 5}, {"kind": "int", "min": 1}, {"kind": "int", "min": 3, "max": 1},
+    {"kind": "int", "min": True, "max": 2}, {"kind": "int", "min": None, "max": 4}, {"kind": "regex", "pattern": "a"},
+    {"kind": "enum", "values": ["a"], "extra": 1},
+])
+def test_input_type_from_dict_rejects_malformed_data(data):
+    with pytest.raises(ValueError):
+        InputType.from_dict(data)

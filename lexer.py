@@ -12,6 +12,14 @@ virtue of what it is, independent of control flow.
     var NAME                -> unresolved    (as trusted as its value; Module 3)
     any other identifier    -> unresolved    (decided by Module 3)
 
+A typed input (`input lang : enum("en", "fr")`) is still seeded from its
+source here; Module 3 raises it to VALIDATED once the type is checked. The
+type names `enum`, `pattern` and `int` are contextual identifiers, not
+keywords, so existing variables with those names keep working. The string
+argument of `pattern(...)` is raw, like a Python r-string: backslashes and
+braces are kept as written, so `pattern("[A-Z0-9]{8}")` and `pattern("\\d{3}")`
+mean what they say.
+
 The lexer only seeds trust at sites where it is fixed by the grammar. Trust
 that depends on assignments and interpolation (`x = x + user_msg`) is computed
 later by the flow-sensitive analysis in Module 3, starting from the
@@ -40,21 +48,25 @@ from diagnostics import DiagnosticBag, SourceFile, SourceSpan
 # --------------------------------------------------------------------------
 
 class TrustLevel(IntEnum):
-    """Trust lattice: TRUSTED ⊑ SANITIZED ⊑ SEMI_TRUSTED ⊑ UNTRUSTED.
+    """Trust lattice: TRUSTED ⊑ VALIDATED ⊑ SANITIZED ⊑ SEMI_TRUSTED ⊑ UNTRUSTED.
 
     The order is by taint: higher means less trustworthy. The join of two
     levels is the less trusted one, so combining trusted and untrusted text
     yields untrusted text.
 
-    SANITIZED is never produced by the lexer. It is the level of external
-    data that passed through sanitize(): still distinguishable from
-    developer-authored text, but cleared for privileged blocks.
+    VALIDATED and SANITIZED are never produced by the lexer. VALIDATED is
+    the level of a typed input (enum, pattern, int): its value is checked at
+    bind time against a fixed language that cannot carry free text.
+    SANITIZED is external data that passed through sanitize(): still
+    distinguishable from developer-authored text, but cleared for
+    privileged blocks.
     """
 
     TRUSTED = 0
-    SANITIZED = 1
-    SEMI_TRUSTED = 2
-    UNTRUSTED = 3
+    VALIDATED = 1
+    SANITIZED = 2
+    SEMI_TRUSTED = 3
+    UNTRUSTED = 4
 
     @classmethod
     def bottom(cls) -> TrustLevel:
@@ -201,7 +213,8 @@ class _PartBuilder:
 
 _ESCAPES = {"n": "\n", "t": "\t", "r": "\r", "\\": "\\", '"': '"', "{": "{", "}": "}"}
 _IDENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
-_TOKEN_START = re.compile(r'[\sA-Za-z_"#{}()=+;]|/\*')
+_TOKEN_START = re.compile(r'[\sA-Za-z0-9_"#{}()=+;:,]|/\*')
+_WORD_RUN = re.compile(r"[A-Za-z0-9_]+")
 _BRACE_HINT = "for a literal brace write `{{` or `}}` (or `\\{` / `\\}`)"
 
 
@@ -227,8 +240,8 @@ class TrustLexer:
     }
 
     tokens = (
-        "IDENT", "STRING",
-        "LBRACE", "RBRACE", "LPAREN", "RPAREN", "EQUALS", "PLUS", "SEMI",
+        "IDENT", "STRING", "NUMBER",
+        "LBRACE", "RBRACE", "LPAREN", "RPAREN", "EQUALS", "PLUS", "SEMI", "COLON", "COMMA",
     ) + tuple(reserved.values())
 
     t_ignore = " \t\r"
@@ -240,6 +253,8 @@ class TrustLexer:
     t_EQUALS = r"="
     t_PLUS = r"\+"
     t_SEMI = r";"
+    t_COLON = r":"
+    t_COMMA = r","
 
     def __init__(self, filename: str = "<input>", diagnostics: DiagnosticBag | None = None):
         self.filename = filename
@@ -276,7 +291,14 @@ class TrustLexer:
 
     def t_STRING(self, t):
         r'"(?:"")?'
+        if self._raw_history == [("IDENT", "pattern"), ("LPAREN", "(")]:
+            return self._scan_raw_string(t)
         return self._scan_string(t)
+
+    def t_NUMBER(self, t):
+        r"-?[0-9]+(?![A-Za-z0-9_])"
+        t.value = int(t.value)
+        return t
 
     def t_IDENT(self, t):
         r"[A-Za-z_][A-Za-z0-9_]*"
@@ -286,6 +308,8 @@ class TrustLexer:
     def t_error(self, t):
         data = t.lexer.lexdata
         start = end = t.lexpos
+        if data[start] in "0123456789":  # a digit run glued to letters, e.g. `9lives`
+            end = _WORD_RUN.match(data, start).end()
         while end < len(data) and not _TOKEN_START.match(data, end):
             end += 1
         bad = data[start:end]
@@ -378,6 +402,39 @@ class TrustLexer:
         t.lexer.lexpos = i
         return t
 
+    def _scan_raw_string(self, t):
+        """The argument of pattern(...): text kept verbatim. A backslash only
+        keeps the next character from ending the string."""
+        data = t.lexer.lexdata
+        n = len(data)
+        start = t.lexpos
+        opener = t.value
+        triple = opener == '"""'
+        i = start + len(opener)
+        closed = False
+        while i < n:
+            c = data[i]
+            if c == '"' and (not triple or data.startswith('"""', i)):
+                closed = True
+                break
+            if c == "\n" and not triple:
+                break
+            i += 2 if c == "\\" and i + 1 < n and data[i + 1] != "\n" else 1
+        text = data[start + len(opener):i]
+        if closed:
+            i += len(opener)
+        else:
+            self.diagnostics.error(
+                "TL-L002", "unterminated string literal", self._span(start, i),
+                hint='close the pattern string with a matching `"`', label="string starts here",
+            )
+        parts = (TextPart(text, self._span(start + len(opener), start + len(opener) + len(text))),) if text else ()
+        raw = data[start:i]
+        t.value = InterpolatedString(parts, raw, triple)
+        t.lexer.lineno += raw.count("\n")
+        t.lexer.lexpos = i
+        return t
+
     def _scan_hole(self, data: str, i: int, parts: _PartBuilder) -> int:
         """Scan `{name}` starting at data[i] == '{'; return the position after it."""
         j = i + 1
@@ -416,6 +473,7 @@ class TrustLexer:
         self.declarations: dict[str, list[Provenance]] = {}
         self._pending: deque[TLToken] = deque()
         self._prev_type: str | None = None
+        self._raw_history: list[tuple[str, object]] = []  # last two raw tokens, for pattern("...")
         self._lexer.input(text)
         self._lexer.lineno = 1
 
@@ -444,8 +502,9 @@ class TrustLexer:
         raw = self._lexer.token()
         if raw is None:
             return None
-        length = len(raw.value.raw) if raw.type == "STRING" else len(raw.value)
-        span = self._span(raw.lexpos, raw.lexpos + length)
+        self._raw_history = (self._raw_history + [(raw.type, raw.value)])[-2:]
+        end = self._lexer.lexpos if raw.type in ("STRING", "NUMBER") else raw.lexpos + len(raw.value)
+        span = self._span(raw.lexpos, end)
         return TLToken(raw.type, raw.value, span.line, raw.lexpos, span)
 
     def _peek(self, k: int) -> TLToken | None:
