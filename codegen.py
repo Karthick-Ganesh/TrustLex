@@ -80,8 +80,7 @@ _DELIMITER = re.compile(r"<(\s*/?\s*untrusted_input)", re.IGNORECASE)
 _TRUNCATED = "…[truncated]"
 
 
-def clean(value: str, max_length: int = 4000) -> str:
-    """The cleaning steps of the default sanitizer."""
+def _strip_once(value: str) -> str:
     value = unicodedata.normalize("NFKC", value)
     # Control characters (Cc) other than newline/tab, and invisible format
     # characters (Cf): zero-width spaces/joiners, bidi overrides, BOM.
@@ -89,7 +88,28 @@ def clean(value: str, max_length: int = 4000) -> str:
         c for c in value
         if c in _KEEP_CONTROLS or unicodedata.category(c) not in ("Cc", "Cf")
     )
-    value = _ROLE_TOKENS.sub("", value)
+    return _ROLE_TOKENS.sub("", value)
+
+
+def clean(value: str, max_length: int = 4000) -> str:
+    """The cleaning steps of the default sanitizer.
+
+    Deleting a role marker can splice its neighbours into a new one
+    ("<|im_<|x|>start|>" -> "<|im_start|>") or into a sequence NFKC would
+    still change, so the strip steps run until nothing changes. After the
+    first pass, a pass can only change the value if the previous one deleted
+    something, so the loop is bounded by the length; the fallback after it is
+    unreachable in practice and only keeps the guarantee (no role marker in
+    the output) unconditional.
+    """
+    value = _strip_once(value)
+    for _ in range(len(value) + 1):
+        stripped = _strip_once(value)
+        if stripped == value:
+            break
+        value = stripped
+    else:  # pragma: no cover - see docstring
+        value = value.replace("<", "").replace("[", "")
     value = _TRANSCRIPT_TURN.sub(lambda m: f"{m[1]}{m[2]}> {m[3]}{m[4]}", value)
     if len(value) > max_length:
         value = value[: max(max_length - len(_TRUNCATED), 0)] + _TRUNCATED
