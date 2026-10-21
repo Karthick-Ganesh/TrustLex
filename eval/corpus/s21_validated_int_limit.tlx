@@ -1,0 +1,7 @@
+# about: a validated int controls the answer length
+# expect: ok
+# category: realistic
+input max_words : int(10, 200)
+input article
+system { "Summarise in at most" insert(max_words) "words." }
+instruction { insert(article) }

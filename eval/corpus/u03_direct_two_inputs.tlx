@@ -1,0 +1,11 @@
+# about: two user fields inserted raw into system
+# expect: TL-S010 TL-S010
+# category: direct-insert
+input first_name
+input last_name
+system {
+    "Address the customer by name."
+    insert(first_name)
+    insert(last_name)
+}
+instruction { "Greet the customer." }

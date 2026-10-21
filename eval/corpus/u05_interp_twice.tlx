@@ -1,0 +1,6 @@
+# about: the same input interpolated twice in one system string
+# expect: TL-S010 TL-S010
+# category: interp-normal
+input topic
+system { "Only discuss {topic}. If asked about anything except {topic}, refuse." }
+instruction { "Start the conversation." }

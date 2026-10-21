@@ -1,0 +1,7 @@
+# about: concatenation stored in a variable, then inserted
+# expect: TL-S010
+# category: concat
+input order_note
+var header = "Order notes follow. " + order_note + " End of notes."
+system { "You are a fulfilment assistant." insert(header) }
+instruction { "Summarise the notes." }

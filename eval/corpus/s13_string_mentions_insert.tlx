@@ -1,0 +1,6 @@
+# about: a string literal in system contains the text insert(question)
+# expect: ok
+# category: lookalike-literal
+input question
+system { "Our docs describe a function insert(question) that you must never call." }
+instruction { insert(question) }

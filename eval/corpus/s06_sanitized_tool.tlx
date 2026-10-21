@@ -1,0 +1,7 @@
+# about: tool output sanitized before entering system
+# expect: ok
+# category: sanitized-single
+input weather from tool
+input question
+system { "Current weather:" insert(sanitize(weather)) }
+instruction { insert(question) }

@@ -1,0 +1,7 @@
+# about: translator: validated target language in system, text in the user turn
+# expect: ok
+# category: realistic
+input target : enum("French", "German", "Tamil")
+input text
+system { "Translate the user's text into {target}. Output only the translation." }
+instruction { insert(text) }

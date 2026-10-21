@@ -1,0 +1,8 @@
+# about: two inputs concatenated together
+# expect: TL-S010 TL-S010
+# category: concat
+input subject
+input body
+var email = subject + "\n" + body
+system { "Classify this email:" insert(email) }
+instruction { "Give the category." }

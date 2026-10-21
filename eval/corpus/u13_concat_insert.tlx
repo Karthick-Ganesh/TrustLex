@@ -1,0 +1,6 @@
+# about: literal prefix concatenated with raw input
+# expect: TL-S010
+# category: concat
+input query
+system { insert("Search query: " + query) }
+instruction { "Explain the results." }

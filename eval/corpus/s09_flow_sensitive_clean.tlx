@@ -1,0 +1,9 @@
+# about: a tainted variable is overwritten with trusted text before use
+# expect: ok
+# category: sanitized-multi-hop
+input draft
+var note = "Draft: {draft}"
+note = note + " (unreviewed)"
+note = "Always answer in English."
+system { insert(note) }
+instruction { insert(draft) }

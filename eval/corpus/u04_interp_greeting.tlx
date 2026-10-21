@@ -1,0 +1,6 @@
+# about: user name interpolated into a system sentence
+# expect: TL-S010
+# category: interp-normal
+input name
+system { "You are talking to {name}. Be friendly." }
+instruction { "Say hello." }

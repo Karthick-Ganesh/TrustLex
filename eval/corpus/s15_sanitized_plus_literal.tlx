@@ -1,0 +1,6 @@
+# about: sanitized input concatenated with literals
+# expect: ok
+# category: sanitized-concat
+input query
+system { insert("Search query: " + sanitize(query) + ". Use the catalogue.") }
+instruction { "Explain the results." }

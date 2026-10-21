@@ -1,0 +1,8 @@
+# about: a sanitized variable is later overwritten with raw input
+# expect: TL-S010
+# category: reassign-after-sanitize
+input msg
+var safe_msg = sanitize(msg)
+safe_msg = msg
+system { "Message:" insert(safe_msg) }
+instruction { "Reply." }

@@ -1,0 +1,6 @@
+# about: user text only in the user turn
+# expect: ok
+# category: instruction-only
+input user_msg
+system { "You are a support assistant. Be concise." }
+instruction { insert(user_msg) }

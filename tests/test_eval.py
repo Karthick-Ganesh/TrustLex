@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "eval"))
 
 from codegen import compile_source  # noqa: E402
+from corpus_loader import SAFE_CATEGORIES, UNSAFE_CATEGORIES, load_corpus  # noqa: E402
 from main import SCENARIOS, load_scenario  # noqa: E402
 from naive import naive_render  # noqa: E402
 from parser_ast import InputType  # noqa: E402
@@ -38,9 +39,13 @@ def benign_values(compiled):
     }
 
 
+CORPUS = load_corpus()
+
+
 def safe_programs():
     paths = [ROOT / "examples" / "safe.tlx", *sorted(SCENARIOS.glob("*.tlx"))]
-    return [p for p in paths if (s := load_scenario(p)) is None or s.expect == ["ok"]]
+    examples = [p for p in paths if (s := load_scenario(p)) is None or s.expect == ["ok"]]
+    return examples + [c.path for c in CORPUS if not c.unsafe]
 
 
 # ---- §2 naive renderer ----
@@ -68,3 +73,21 @@ def test_naive_render_ignores_every_trust_rule():
 def test_naive_render_rejects_syntax_errors():
     with pytest.raises(ValueError, match="syntax errors"):
         naive_render("system {", {})
+
+
+# ---- §3 corpus ----
+
+@pytest.mark.parametrize("program", CORPUS, ids=lambda c: c.name)
+def test_corpus_expectations_match_trustlex(program):
+    checked, compiled = compile_source(program.source, program.path.name)
+    codes = tuple(d.code for d in checked.diagnostics.errors)
+    assert (compiled is not None) == (not program.unsafe)
+    assert codes == (() if program.expect == ("ok",) else program.expect), checked.diagnostics.render()
+
+
+def test_corpus_is_balanced_and_covers_every_category():
+    assert len(CORPUS) >= 40
+    unsafe = sum(c.unsafe for c in CORPUS)
+    assert 0.4 <= unsafe / len(CORPUS) <= 0.6
+    for category in UNSAFE_CATEGORIES + SAFE_CATEGORIES:
+        assert sum(c.category == category for c in CORPUS) >= 2, category

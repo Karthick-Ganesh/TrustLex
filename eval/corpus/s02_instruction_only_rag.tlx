@@ -1,0 +1,12 @@
+# about: retrieved document and question both in the user turn
+# expect: ok
+# category: instruction-only
+input doc from rag
+input question
+system { "Answer only from the provided context." }
+instruction {
+    "Context:"
+    insert(doc)
+    "Question:"
+    insert(question)
+}

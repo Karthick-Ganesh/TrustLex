@@ -1,0 +1,7 @@
+# about: retrieved document placed raw in the system prompt
+# expect: TL-S011
+# category: rag-tool-system
+input doc from rag
+input question
+system { "Ground your answer in this document:" insert(doc) }
+instruction { insert(question) }

@@ -1,0 +1,6 @@
+# about: user message sanitized before entering system
+# expect: ok
+# category: sanitized-single
+input user_msg
+system { "Customer message:" insert(sanitize(user_msg)) }
+instruction { "Reply to the customer." }

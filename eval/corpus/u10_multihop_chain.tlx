@@ -1,0 +1,9 @@
+# about: taint travels through three variables before reaching system
+# expect: TL-S010
+# category: multi-hop
+input msg
+var a = msg
+var b = a
+var c = b
+system { "Context:" insert(c) }
+instruction { "Reply." }

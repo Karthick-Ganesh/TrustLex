@@ -1,0 +1,7 @@
+# about: interpolation of user data in the user turn is allowed
+# expect: ok
+# category: instruction-only
+input name
+input request
+system { "You are a polite concierge." }
+instruction { "Guest {name} asks: {request}" }

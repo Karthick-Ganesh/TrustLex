@@ -1,0 +1,6 @@
+# about: escaped braces {{user_msg}} are literal text, not interpolation
+# expect: ok
+# category: lookalike-literal
+input user_msg
+system { "Templates use placeholders like {{user_msg}}; never fill them in yourself." }
+instruction { insert(user_msg) }

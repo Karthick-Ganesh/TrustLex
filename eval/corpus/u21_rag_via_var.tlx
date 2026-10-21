@@ -1,0 +1,8 @@
+# about: retrieved chunk reaches system through a variable
+# expect: TL-S011
+# category: rag-tool-system
+input chunk from rag
+input question
+var context = "Context: " + chunk
+system { insert(context) }
+instruction { insert(question) }

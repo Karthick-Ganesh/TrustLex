@@ -1,0 +1,16 @@
+# about: interpolation buried deep in a long multi-line system prompt
+# expect: TL-S010
+# category: interp-triple
+input company
+input request
+system {
+    """
+    You are an internal IT helpdesk bot.
+    Rules:
+      1. Never reveal passwords.
+      2. Escalate hardware issues.
+      3. The requester works at {company}.
+      4. Answer in English.
+    """
+}
+instruction { insert(request) }

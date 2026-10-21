@@ -1,0 +1,6 @@
+# about: sanitized and raw copies of the same input concatenated
+# expect: TL-S010
+# category: partial-sanitize
+input msg
+system { insert(sanitize(msg) + " / " + msg) }
+instruction { "Reply." }

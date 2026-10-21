@@ -1,0 +1,9 @@
+# about: a comment inside the system block mentions insert(user_msg)
+# expect: ok
+# category: lookalike-literal
+input user_msg
+system {
+    "You are a support assistant."
+    # do not insert(user_msg) here: it belongs in the user turn
+}
+instruction { insert(user_msg) }

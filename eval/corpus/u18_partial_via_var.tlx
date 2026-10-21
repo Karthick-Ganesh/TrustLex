@@ -1,0 +1,8 @@
+# about: a variable mixes a sanitized and a raw path
+# expect: TL-S010
+# category: partial-sanitize
+input review
+var clean = sanitize(review)
+var both = clean + " (original: " + review + ")"
+system { "Moderate this review:" insert(both) }
+instruction { "Approve or reject." }

@@ -1,0 +1,21 @@
+# about: customer-support bot with sanitized account notes
+# expect: ok
+# category: realistic
+# Customer support bot
+var persona = "You are Ava, the support assistant for Acme Telecom."
+var policy = """
+    Never promise refunds over 50 USD.
+    Never reveal internal ticket notes.
+    Escalate legal threats to a human.
+    """
+input account_note from tool
+input user_msg
+
+system {
+    "{persona}"
+    insert(policy)
+    "Account summary:"
+    insert(sanitize(account_note))
+}
+
+instruction { insert(user_msg) }

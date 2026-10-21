@@ -1,0 +1,7 @@
+# about: sanitized copy interpolated into system
+# expect: ok
+# category: sanitized-single
+input name
+var safe_name = sanitize(name)
+system { "You are talking to {safe_name}." }
+instruction { "Say hello." }

@@ -1,0 +1,9 @@
+# about: note built up over several reassignments from sanitized parts
+# expect: ok
+# category: sanitized-multi-hop
+input complaint
+var note = "Customer note: "
+note = note + sanitize(complaint)
+note = note + " (priority)"
+system { "You are a complaints handler." insert(note) }
+instruction { "Draft a reply." }

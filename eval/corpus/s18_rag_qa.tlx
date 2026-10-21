@@ -1,0 +1,15 @@
+# about: RAG question answering with retrieved passages in the user turn
+# expect: ok
+# category: realistic
+var rules = "Answer only from the passages. Cite passage numbers. Say 'I don't know' otherwise."
+input passages from rag
+input question
+
+system { insert(rules) }
+
+instruction {
+    "Passages:"
+    insert(passages)
+    "Question:"
+    insert(question)
+}

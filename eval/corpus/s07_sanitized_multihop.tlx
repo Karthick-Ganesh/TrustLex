@@ -1,0 +1,9 @@
+# about: sanitized value travels through three variables
+# expect: ok
+# category: sanitized-multi-hop
+input msg
+var a = sanitize(msg)
+var b = a
+var c = "Note: {b}"
+system { insert(c) }
+instruction { "Reply." }

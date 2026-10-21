@@ -1,0 +1,7 @@
+# about: interpolates a variable that holds an input
+# expect: TL-S010
+# category: interp-normal
+input city
+var where = city
+system { "The customer lives in {where}. Recommend local stores." }
+instruction { "List three stores." }

@@ -1,0 +1,6 @@
+# about: sanitize() wraps a concatenation containing input
+# expect: ok
+# category: sanitized-concat
+input subject
+system { insert(sanitize("Re: " + subject)) }
+instruction { "Draft a reply." }

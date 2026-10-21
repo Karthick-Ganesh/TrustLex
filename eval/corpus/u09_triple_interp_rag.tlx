@@ -1,0 +1,12 @@
+# about: retrieved FAQ interpolated into a multi-line system prompt
+# expect: TL-S011
+# category: interp-triple
+input faq from rag
+input question
+system {
+    """
+    Answer using only this FAQ:
+    {faq}
+    """
+}
+instruction { insert(question) }

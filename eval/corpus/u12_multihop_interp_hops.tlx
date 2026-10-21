@@ -1,0 +1,9 @@
+# about: three hops mixing interpolation and assignment
+# expect: TL-S010
+# category: multi-hop
+input product
+var line1 = "Product: {product}"
+var line2 = "{line1}."
+var summary = "Order summary. " + line2
+system { "{summary} Confirm the order politely." }
+instruction { "Confirm." }

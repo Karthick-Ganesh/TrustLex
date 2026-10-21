@@ -1,0 +1,10 @@
+# about: web-search tool output placed raw in the system prompt
+# expect: TL-S011
+# category: rag-tool-system
+input search_results from tool
+input question
+system {
+    "You are a research assistant. Latest search results:"
+    insert(search_results)
+}
+instruction { insert(question) }

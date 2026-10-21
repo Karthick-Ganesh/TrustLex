@@ -1,0 +1,9 @@
+# about: tool output reaches system after concatenation and hops
+# expect: TL-S011
+# category: rag-tool-system
+input api_response from tool
+var raw = api_response
+var shown = "API said: " + raw
+var final_ctx = shown + " (cached)"
+system { insert(final_ctx) }
+instruction { "Explain the response." }

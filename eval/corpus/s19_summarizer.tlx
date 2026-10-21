@@ -1,0 +1,14 @@
+# about: document summarizer with a sanitized title in system
+# expect: ok
+# category: realistic
+input title
+input document
+var style = "three bullet points, plain English"
+system {
+    """
+    You summarise documents in {style}.
+    """
+    "Document title:"
+    insert(sanitize(title))
+}
+instruction { insert(document) }

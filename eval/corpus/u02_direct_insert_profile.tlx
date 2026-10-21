@@ -1,0 +1,10 @@
+# about: user-editable profile bio placed in the system prompt
+# expect: TL-S010
+# category: direct-insert
+input bio
+input question
+system {
+    "You are a writing coach. The user describes themselves as:"
+    insert(bio)
+}
+instruction { insert(question) }

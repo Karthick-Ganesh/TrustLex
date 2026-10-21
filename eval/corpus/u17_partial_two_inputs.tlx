@@ -1,0 +1,12 @@
+# about: one input sanitized, the other forgotten
+# expect: TL-S010
+# category: partial-sanitize
+input title
+input description
+system {
+    "Ticket title:"
+    insert(sanitize(title))
+    "Ticket description:"
+    insert(description)
+}
+instruction { "Triage the ticket." }

@@ -1,0 +1,8 @@
+# about: support bot whose language and order id are validated types
+# expect: ok
+# category: realistic
+input lang : enum("en", "fr", "ta")
+input order_id : pattern("[A-Z0-9]{8}")
+input user_msg
+system { "You are the order-tracking assistant. Reply in {lang}. The order is {order_id}." }
+instruction { insert(user_msg) }

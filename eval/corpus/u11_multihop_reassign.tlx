@@ -1,0 +1,10 @@
+# about: a note variable is built up over several reassignments
+# expect: TL-S010
+# category: multi-hop
+input complaint
+var note = "Customer note: "
+note = note + complaint
+note = note + " (priority)"
+note = "[" + note + "]"
+system { "You are a complaints handler." insert(note) }
+instruction { "Draft a reply." }

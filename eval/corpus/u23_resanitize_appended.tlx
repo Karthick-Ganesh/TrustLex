@@ -1,0 +1,8 @@
+# about: raw input appended to a variable after it was sanitized
+# expect: TL-S010
+# category: reassign-after-sanitize
+input bio
+var profile = sanitize(bio)
+profile = profile + " " + bio
+system { "Profile:" insert(profile) }
+instruction { "Write a greeting." }

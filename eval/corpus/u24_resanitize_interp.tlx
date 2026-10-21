@@ -1,0 +1,8 @@
+# about: sanitized copy re-tainted through interpolation
+# expect: TL-S010
+# category: reassign-after-sanitize
+input feedback
+var fb = sanitize(feedback)
+fb = "Original feedback: {feedback}"
+system { "{fb}" "Summarise the sentiment." }
+instruction { "Go." }

@@ -1,0 +1,8 @@
+# about: two inputs concatenated inside sanitize()
+# expect: ok
+# category: sanitized-concat
+input subject
+input body
+var email = sanitize(subject + " / " + body)
+system { "Classify this email:" insert(email) }
+instruction { "Give the category." }

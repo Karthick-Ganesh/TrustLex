@@ -1,0 +1,12 @@
+# about: user goal interpolated inside a multi-line system prompt
+# expect: TL-S010
+# category: interp-triple
+input goal
+system {
+    """
+    You are a fitness planner.
+    The user's goal is: {goal}
+    Never recommend supplements.
+    """
+}
+instruction { "Write a weekly plan." }

@@ -1,0 +1,14 @@
+# about: an alias of the input is interpolated in a multi-line prompt
+# expect: TL-S010
+# category: multi-hop
+input persona_hint
+var h1 = persona_hint
+var h2 = h1
+var h3 = "Persona hint: " + h2
+system {
+    """
+    You are a role-play assistant.
+    {h3}
+    """
+}
+instruction { "Begin." }

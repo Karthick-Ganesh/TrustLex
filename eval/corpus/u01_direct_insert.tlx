@@ -1,0 +1,9 @@
+# about: user message inserted raw into the system prompt
+# expect: TL-S010
+# category: direct-insert
+input user_msg
+system {
+    "You are a support assistant for Acme."
+    insert(user_msg)
+}
+instruction { "Help the customer." }
