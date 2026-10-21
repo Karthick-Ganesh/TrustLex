@@ -37,6 +37,11 @@ Known limitation: dedent works per message, not per string literal, because
 code generation merges the text of adjacent block items. A block mixing an
 indented triple-quoted string with unindented strings is not dedented at -O1.
 
+Token counts use tiktoken's o200k_base encoding when tiktoken is installed
+(the CLIs pick it automatically; --tokenizer chooses explicitly) and a
+regex pre-tokenizer estimate otherwise. The optimize() API takes an explicit
+counter, so library results do not depend on what happens to be installed.
+
 Comments never reach the IR; the lexer drops them. They are therefore not
 savings: the report lists them separately, for information only, and never
 adds them to the character or token totals.
@@ -45,6 +50,7 @@ adds them to the character or token totals.
 from __future__ import annotations
 
 import argparse
+import functools
 import os
 import re
 import sys
@@ -74,6 +80,45 @@ _PRETOKEN = re.compile(
 
 def estimate_tokens(text: str) -> int:
     return len(_PRETOKEN.findall(text))
+
+
+TOKENIZERS = ("estimate", "tiktoken")
+TIKTOKEN_ENCODING = "o200k_base"
+
+
+@functools.lru_cache(maxsize=None)
+def tiktoken_counter():
+    """An exact `o200k_base` token counter, or None when tiktoken is not
+    installed or its encoding (downloaded on first use) cannot be loaded."""
+    try:
+        import tiktoken
+        encoding = tiktoken.get_encoding(TIKTOKEN_ENCODING)
+    except Exception:  # missing package, or no network for the first download
+        return None
+
+    def count(text: str) -> int:
+        # Role markers such as <|endoftext|> in developer text are ordinary text here.
+        return len(encoding.encode(text, disallowed_special=()))
+
+    count.__name__ = f"tiktoken {TIKTOKEN_ENCODING} (exact)"
+    return count
+
+
+def select_token_counter(name: str | None = None):
+    """Resolve a --tokenizer choice to a counter for optimize().
+
+    "estimate" gives the regex estimate, "tiktoken" requires tiktoken, and
+    None picks tiktoken when it is available and the estimate otherwise.
+    Returns None for the estimate (optimize()'s default)."""
+    if name not in (None, *TOKENIZERS):
+        raise ValueError(f"unknown tokenizer {name!r}; expected one of: {', '.join(TOKENIZERS)}")
+    if name == "estimate":
+        return None
+    counter = tiktoken_counter()
+    if counter is None and name == "tiktoken":
+        raise ValueError(f"--tokenizer tiktoken needs the tiktoken package and its {TIKTOKEN_ENCODING} "
+                         "encoding (pip install tiktoken)")
+    return counter
 
 
 # --------------------------------------------------------------------------
@@ -338,7 +383,13 @@ def main(argv: list[str]) -> int:
     parser.add_argument("file")
     parser.add_argument("-O", dest="level", type=int, choices=LEVELS, default=1)
     parser.add_argument("--ir", action="store_true", help="print the optimized IR instead of a before/after view")
+    parser.add_argument("--tokenizer", choices=TOKENIZERS,
+                        help="token counter for the report (default: tiktoken if installed, else estimate)")
     args = parser.parse_args(argv[1:])
+    try:
+        token_counter = select_token_counter(args.tokenizer)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     with open(args.file, encoding="utf-8") as f:
         checked, compiled = compile_source(f.read(), args.file)
@@ -347,7 +398,7 @@ def main(argv: list[str]) -> int:
         print("\n" + checked.diagnostics.summary(), file=sys.stderr)
         return 1
 
-    optimized, report = optimize(compiled, args.level, comments=checked.comments)
+    optimized, report = optimize(compiled, args.level, token_counter, comments=checked.comments)
     if args.ir:
         print(optimized.to_json(indent=2))
         return 0

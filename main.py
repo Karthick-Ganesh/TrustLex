@@ -25,6 +25,8 @@ Compile options:
     --no-delimit                   do not wrap raw untrusted values in <untrusted_input> tags
     --openai-developer-role        send OpenAI system messages as "developer"
     --stages                       print every stage's output and timing to stderr
+    --tokenizer estimate|tiktoken  token counter for the report (default: tiktoken
+                                   if installed, else a regex estimate)
     -o FILE                        write the output to FILE instead of stdout
 
 Set TRUSTLEX_IR_KEY to HMAC-seal the IR; without it the IR carries only an
@@ -51,7 +53,7 @@ from codegen import (
 )
 from diagnostics import apply_edits
 from lexer import TrustLexer, format_tokens
-from optimizer import LEVELS, OptimizationReport, optimize
+from optimizer import LEVELS, TOKENIZERS, OptimizationReport, optimize, select_token_counter
 from parser_ast import default_parser, dump, parse
 from semantic import CheckedProgram, SecurityPolicy, analyze, check
 
@@ -121,8 +123,9 @@ def _timed(fn):
 
 
 def run_pipeline(text: str, filename: str, policy: SecurityPolicy, level: int = 1,
-                 delimit_untrusted: bool = True) -> PipelineResult:
-    """Run every compiler stage, recording each stage's output and timing."""
+                 delimit_untrusted: bool = True, token_counter=None) -> PipelineResult:
+    """Run every compiler stage, recording each stage's output and timing.
+    `token_counter` is passed to optimize() (None: the regex estimate)."""
     stages = []
     _, setup_ms = _timed(default_parser)  # one-time LALR table construction, not a per-compile cost
 
@@ -150,7 +153,7 @@ def run_pipeline(text: str, filename: str, policy: SecurityPolicy, level: int = 
     slots = sum(1 for m in compiled.messages for p in m.parts if isinstance(p, SlotPart))
     stages.append(Stage("Code generation", ms, f"{len(compiled.messages)} messages, {slots} input slots"))
 
-    (optimized, report), ms = _timed(lambda: optimize(compiled, level, comments=checked.comments))
+    (optimized, report), ms = _timed(lambda: optimize(compiled, level, token_counter, comments=checked.comments))
     stages.append(Stage(f"Optimization -O{level}", ms,
                         f"{report.chars_before} -> {report.chars_after} chars", report.format()))
     result.compiled, result.report = optimized, report
@@ -196,7 +199,11 @@ def _values(args) -> dict[str, str]:
 def cmd_compile(args) -> int:
     text = read_source(args.file)
     color = use_color(sys.stderr, args.no_color)
-    result = run_pipeline(text, args.file, _policy(args), args.level, not args.no_delimit)
+    try:
+        token_counter = select_token_counter(args.tokenizer)
+    except ValueError as exc:
+        raise UsageError(str(exc)) from exc
+    result = run_pipeline(text, args.file, _policy(args), args.level, not args.no_delimit, token_counter)
     diagnostics = result.checked.diagnostics
 
     if args.stages:
@@ -512,6 +519,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-delimit", action="store_true")
     p.add_argument("--openai-developer-role", action="store_true")
     p.add_argument("--stages", action="store_true", help="print every stage's output and timing to stderr")
+    p.add_argument("--tokenizer", choices=TOKENIZERS,
+                   help="token counter for the optimizer report (default: tiktoken if installed, else estimate)")
     p.add_argument("-o", "--output", metavar="FILE")
     common(p)
     p.set_defaults(handler=cmd_compile)

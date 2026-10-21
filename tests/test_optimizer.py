@@ -9,7 +9,8 @@ import pytest
 from hypothesis import given, settings, strategies as st
 
 from codegen import CompiledPrompt, Message, SlotPart, TextPart, compile_source
-from optimizer import estimate_tokens, optimize
+import optimizer
+from optimizer import estimate_tokens, optimize, select_token_counter, tiktoken_counter
 from test_semantic import PAYLOAD, programs, sanitizer as toy_sanitizer
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -156,6 +157,34 @@ def test_comments_are_reported_but_not_counted_as_savings():
     assert [r.chars_saved for r in with_comments.rules] == [r.chars_saved for r in without.rules]
 
 
+def test_estimate_tokenizer_selects_the_builtin_estimate():
+    assert select_token_counter("estimate") is None
+    _, compiled = compile_source('instruction { "hi there" }', "t.tlx")
+    assert "regex pre-tokenizer estimate" in optimize(compiled, 1, select_token_counter("estimate"))[1].format()
+
+
+def test_tokenizer_falls_back_to_the_estimate_without_tiktoken(monkeypatch):
+    monkeypatch.setattr(optimizer, "tiktoken_counter", lambda: None)
+    assert select_token_counter() is None
+    with pytest.raises(ValueError, match="pip install tiktoken"):
+        select_token_counter("tiktoken")
+    with pytest.raises(ValueError, match="unknown tokenizer"):
+        select_token_counter("bpe")
+
+
+def test_tiktoken_counter_is_exact_and_used_automatically():
+    pytest.importorskip("tiktoken")
+    count = tiktoken_counter()
+    if count is None:
+        pytest.skip("the o200k_base encoding could not be loaded (offline?)")
+    assert select_token_counter() is count and select_token_counter("tiktoken") is count
+    assert count("hello world") == 2
+    assert count("<|endoftext|>") > 1  # special tokens in text are counted as plain text, not rejected
+    _, compiled = compile_source('instruction { "hello world" }', "t.tlx")
+    _, report = optimize(compiled, 1, count)
+    assert report.tokens_after == 2 and "tiktoken o200k_base (exact)" in report.format()
+
+
 def test_custom_token_counter():
     def words(text):
         return len(text.split())
@@ -281,3 +310,12 @@ def test_rules_run_to_a_fixpoint():
     once, _ = optimize(ir(("system", " ", SU, "\r\t", SU)))
     assert once.messages[0].parts == (SU, TextPart("\n"), SU)
     assert optimize(once)[0].messages == once.messages
+
+
+def test_optimizer_cli_tokenizer_flag(capsys, monkeypatch):
+    assert optimizer.main(["optimizer.py", str(ROOT / "examples" / "safe.tlx"), "--tokenizer", "estimate"]) == 0
+    assert "tokens: ≈ regex pre-tokenizer estimate" in capsys.readouterr().out
+    monkeypatch.setattr(optimizer, "tiktoken_counter", lambda: None)
+    with pytest.raises(SystemExit) as exc:
+        optimizer.main(["optimizer.py", str(ROOT / "examples" / "safe.tlx"), "--tokenizer", "tiktoken"])
+    assert exc.value.code == 2 and "pip install tiktoken" in capsys.readouterr().err

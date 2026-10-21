@@ -37,6 +37,14 @@ def test_compile_hmac_seals_the_ir_when_a_key_is_set(capsys, monkeypatch):
     assert "hmac" in json.loads(out) and CompiledPrompt.from_json(out).optimization == 1
 
 
+def test_compile_tokenizer_flag(capsys, monkeypatch):
+    code, _, err = run(capsys, SAFE, "--stages", "--tokenizer", "estimate", "--no-color")
+    assert code == 0 and "tokens: ≈ regex pre-tokenizer estimate" in err
+    monkeypatch.setattr("optimizer.tiktoken_counter", lambda: None)
+    code, _, err = run(capsys, SAFE, "--tokenizer", "tiktoken")
+    assert code == 2 and "pip install tiktoken" in err
+
+
 def test_compile_explicit_and_optimization_levels(capsys):
     for level in (0, 1, 2):
         code, out, _ = run(capsys, "compile", SAFE, f"-O{level}")

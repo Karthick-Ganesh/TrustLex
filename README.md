@@ -71,6 +71,8 @@ uv pip install --python .venv/bin/python -r requirements.txt
 
 With a system Python, `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt` works too.
 
+Optionally, `pip install tiktoken` gives exact token counts (`o200k_base`) in the optimizer report; without it, a regex estimate is used.
+
 Then, in every new terminal:
 
 ```bash
@@ -367,7 +369,7 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
   | `-O2` | `-O1` plus `strip-indentation`, `collapse-inline-spaces`, `remove-blank-lines` |
 
 - **Proven by tests:** the optimizer keeps slots, preserves whitespace equivalence, is idempotent, never grows a message, keeps the security invariant and checksum, passes values through byte-for-byte, and preserves non-interference.
-- **Report.** Per-rule and per-message savings, an estimated token count (a BPE-style regex pre-tokenizer; any exact counter can be plugged in). Comments are listed separately, as *comments in source (never part of the prompt)*: they never reach the prompt, so they are not counted as savings.
+- **Report.** Per-rule and per-message savings and a token count. If `tiktoken` is installed, the CLIs count tokens exactly with the `o200k_base` encoding; otherwise they fall back to a BPE-style regex pre-tokenizer estimate. `--tokenizer estimate|tiktoken` picks one explicitly (on `main.py compile` and `optimizer.py`), and the `optimize()` API takes any counter. Comments are listed separately, as *comments in source (never part of the prompt)*: they never reach the prompt, so they are not counted as savings.
 - **Measured.** `examples/safe.tlx` goes from 153 to 140 characters at `-O1` (−8%). The first demo scenario goes from 133 to 116 (−13%).
 
 ### Module 6: the driver (`main.py`)
@@ -401,6 +403,7 @@ python main.py repl [--target T] [--model M] interactive mode with options
 | `--no-delimit` | Don't wrap raw untrusted values in `<untrusted_input>` tags |
 | `--openai-developer-role` | Send OpenAI system messages with the `developer` role |
 | `--stages` | Print every stage's output and timing to stderr |
+| `--tokenizer estimate\|tiktoken` | Token counter for the optimizer report (default: `tiktoken` if installed, else the estimate) |
 | `-o FILE` | Write the output to a file |
 | `--no-color` | Disable colors (`NO_COLOR` is also respected) |
 

@@ -1,3 +1,5 @@
 ply==3.11
 pytest>=8
 hypothesis>=6
+# Optional: exact token counts in the optimizer report (o200k_base).
+# tiktoken>=0.7
