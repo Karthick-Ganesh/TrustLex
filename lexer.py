@@ -9,7 +9,7 @@ virtue of what it is, independent of control flow.
     input NAME              -> UNTRUSTED     (external injection vector)
     input NAME from rag|tool-> SEMI_TRUSTED  (retrieved / tool output)
     input NAME from user    -> UNTRUSTED
-    var NAME                -> TRUSTED declaration site
+    var NAME                -> unresolved    (as trusted as its value; Module 3)
     any other identifier    -> unresolved    (decided by Module 3)
 
 The lexer only seeds trust at sites where it is fixed by the grammar. Trust
@@ -471,7 +471,9 @@ class TrustLexer:
                 trust = SOURCE_TAGS.get(tag, TrustLevel.UNTRUSTED)
             prov = Provenance(trust, Origin.INPUT_DECL, tok.span, name, tag)
         elif self._prev_type == "VAR":
-            prov = Provenance(TrustLevel.TRUSTED, Origin.VAR_DECL, tok.span, name)
+            # `var x = user_msg` is as untrusted as its value; only Module 3's
+            # flow analysis can tell, so the declaration site stays unresolved.
+            prov = Provenance(None, Origin.VAR_DECL, tok.span, name)
         elif self._prev_type == "FROM":
             return Provenance(None, Origin.SOURCE_TAG, tok.span, name)
         else:

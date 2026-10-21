@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from lexer import HolePart, Origin, TextPart, TrustLevel, TrustLexer
+from lexer import HolePart, Origin, TextPart, TrustLevel, TrustLexer, format_tokens
 
 EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
 
@@ -124,7 +124,7 @@ def test_trust_seeding():
     def prov(i):
         return idents[i][1]
 
-    assert (prov(0).trust, prov(0).origin) == (TrustLevel.TRUSTED, Origin.VAR_DECL)   # a
+    assert (prov(0).trust, prov(0).origin) == (None, Origin.VAR_DECL)                 # a: decided by Module 3
     assert (prov(1).trust, prov(1).origin) == (TrustLevel.TRUSTED, Origin.LITERAL)    # "lit"
     assert (prov(2).trust, prov(2).origin) == (TrustLevel.UNTRUSTED, Origin.INPUT_DECL)  # u
     assert (prov(3).trust, prov(3).source_tag) == (TrustLevel.SEMI_TRUSTED, "rag")    # d
@@ -139,6 +139,14 @@ def test_trust_seeding():
 
     assert list(lexer.declarations) == ["a", "u", "d", "t", "x", "w"]
     assert lexer.declarations["d"][0].trust is TrustLevel.SEMI_TRUSTED
+
+
+def test_var_declared_from_an_input_is_not_seeded_trusted():
+    lexer, toks = lex("input user_msg\nvar x = user_msg")
+    x = next(t for t in toks if t.value == "x")
+    assert x.provenance.trust is None and x.provenance.origin is Origin.VAR_DECL
+    row = next(line for line in format_tokens(toks).splitlines() if line.endswith(" x"))
+    assert row.split()[1:4] == ["IDENT", "-", "var-decl"]
 
 
 def test_redeclarations_are_all_recorded():

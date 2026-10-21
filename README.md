@@ -297,7 +297,7 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
   | string literal | `TRUSTED` |
   | name after `input` | `UNTRUSTED` |
   | name after `input … from rag/tool` | `SEMI_TRUSTED` |
-  | name after `var` | `TRUSTED` (declaration site) |
+  | name after `var` | unresolved (`-`): `var x = user_msg` is as untrusted as its value, so Module 3 decides |
   | other identifiers | unresolved (decided by Module 3) |
 
 - **Unknown source tags fail closed:** `from web` is treated as `UNTRUSTED`.
