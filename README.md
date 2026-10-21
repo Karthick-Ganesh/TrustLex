@@ -466,7 +466,7 @@ Raw input can influence privileged content **only** through `sanitize()`.
 **Completeness.** Because the evaluation is exact, the check is also complete for this language: a program is rejected *only if* some raw input slot reaches a `system` block. That means there exist σ₁, σ₂ as above that render it differently. There are no false positives.
 
 **The guarantee is preserved downstream:**
-- **Code generation.** The IR's slots come directly from the checked templates, and `generate()` / `bind()` re-verify the invariant.
+- **Code generation.** The IR's slots come directly from the checked templates, and `generate()` / `bind()` re-verify the invariant. Verification does not trust the labels stored in the IR: each input's trust is re-derived from its source tag (`user` → `UNTRUSTED`, `rag`/`tool` → `SEMI_TRUSTED`), so relabelling a user input and re-hashing cannot buy a relaxed-policy exemption.
 - **Optimization.** The optimizer only rewrites text parts and keeps the slot sequence (property P1).
 
 **Executable validation.** The lemma is tested with `hypothesis`. Random TrustLex programs are generated, and each one is checked as follows:
@@ -509,7 +509,7 @@ The generator is tuned so that both outcomes are well represented: in a 500-prog
 | `TL-G002` | codegen | no `instruction` block; Anthropic needs a user message |
 | `TL-G003` | bind | missing (or non-string) input value |
 | `TL-G004` | bind | value supplied for an undeclared input |
-| `TL-G005` | bind | IR seal mismatch, malformed IR, or security-invariant violation |
+| `TL-G005` | bind | IR seal mismatch, malformed IR (unknown source tag, invalid input name, ill-typed option), an input's trust label inconsistent with its source tag, or security-invariant violation |
 
 ---
 

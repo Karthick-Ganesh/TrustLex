@@ -37,6 +37,7 @@ import unicodedata
 from dataclasses import dataclass, field
 
 from diagnostics import DiagnosticBag
+from lexer import _IDENT_RE, SOURCE_TAGS
 from parser_ast import BlockKind
 from semantic import CheckedProgram, SecurityPolicy, Slot, Text, analyze
 
@@ -45,6 +46,7 @@ TARGETS = ("ir", "openai", "anthropic")
 DEFAULT_ANTHROPIC_MODEL = "claude-opus-5"
 DEFAULT_ANTHROPIC_MAX_TOKENS = 16000
 ITEM_SEPARATOR = "\n"
+MAX_SANITIZER_LENGTH = 100_000
 
 
 class CodegenError(Exception):
@@ -244,9 +246,16 @@ class CompiledPrompt:
     def verify(self):
         """Every slot must name a declared input, and every slot in a system
         message must be sanitized. Under the relaxed policy (recorded in the
-        sealed IR) a SEMI_TRUSTED slot may be unsanitized; UNTRUSTED never."""
+        sealed IR) a SEMI_TRUSTED slot may be unsanitized; UNTRUSTED never.
+
+        The checksum has no key, so anyone can edit the IR and recompute it.
+        verify() therefore never takes a stored label on faith: each input's
+        trust is re-derived from its source tag, and the options are
+        type-checked, so an edited `trust` cannot buy an exemption."""
         if self.policy not in ("strict", "relaxed"):
             raise BindError("TL-G005", f"unknown policy {self.policy!r} in IR")
+        self._verify_options()
+        self._verify_inputs()
         for m in self.messages:
             if m.role not in ("system", "user"):
                 raise BindError("TL-G005", f"unknown role {m.role!r} in IR")
@@ -261,6 +270,39 @@ class CompiledPrompt:
                             f"IR violates the security invariant: unsanitized input `{p.input}` "
                             f"in the system message from line {m.line}",
                         )
+
+    def _verify_inputs(self):
+        if not isinstance(self.inputs, dict):
+            raise BindError("TL-G005", "malformed IR: `inputs` must be an object")
+        for name, info in self.inputs.items():
+            if not isinstance(name, str) or not _IDENT_RE.match(name):
+                raise BindError("TL-G005", f"invalid input name {name!r} in IR")
+            if not isinstance(info, dict):
+                raise BindError("TL-G005", f"malformed IR: input `{name}` must be an object")
+            source, trust = info.get("source"), info.get("trust")
+            if not isinstance(source, str) or source not in SOURCE_TAGS:
+                raise BindError("TL-G005", f"input `{name}` has unknown source {source!r} in IR")
+            expected = SOURCE_TAGS[source].name
+            if trust != expected:
+                raise BindError(
+                    "TL-G005",
+                    f"IR trust label mismatch: input `{name}` from {source} must be {expected}, "
+                    f"but the IR says {trust!r}",
+                )
+
+    def _verify_options(self):
+        from optimizer import LEVELS  # optimizer imports this module
+
+        if type(self.delimit_untrusted) is not bool:
+            raise BindError("TL-G005", "malformed IR: `delimit_untrusted` must be a boolean")
+        if type(self.optimization) is not int or self.optimization not in LEVELS:
+            raise BindError("TL-G005", f"unknown optimization level {self.optimization!r} in IR")
+        if not isinstance(self.sanitizer.name, str):
+            raise BindError("TL-G005", "malformed IR: the sanitizer name must be a string")
+        length = self.sanitizer.max_length
+        if type(length) is not int or not 1 <= length <= MAX_SANITIZER_LENGTH:
+            raise BindError(
+                "TL-G005", f"sanitizer max_length must be an integer in 1..{MAX_SANITIZER_LENGTH}, not {length!r}")
 
     # ---- runtime binding ----
 

@@ -1,6 +1,7 @@
 """Tests for TrustLex Module 4: IR generation, sealing, the runtime sanitizer,
 and OpenAI / Anthropic payload binding."""
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -12,7 +13,7 @@ from codegen import (
     BindError, CodegenError, CompiledPrompt, SanitizerConfig, SlotPart, TextPart,
     clean, compile_source, generate, spotlight,
 )
-from codegen import _ROLE_TOKENS
+from codegen import _ROLE_TOKENS, _canonical
 from semantic import analyze
 from test_semantic import PAYLOAD, programs, sanitizer as toy_sanitizer
 
@@ -116,6 +117,53 @@ def test_unsanitized_system_slot_is_rejected_even_with_a_valid_seal():
     assert exc.value.code == "TL-G005" and "security invariant" in exc.value.message
     with pytest.raises(BindError):
         compiled.bind(VALUES, "anthropic")
+
+
+def reseal(data: dict) -> str:
+    """Recompute the unkeyed checksum over edited IR, as an attacker can."""
+    body = {k: v for k, v in data.items() if k != "sha256"}
+    return json.dumps({**body, "sha256": hashlib.sha256(_canonical(body).encode("utf-8")).hexdigest()})
+
+
+def test_relabelled_user_input_cannot_buy_a_relaxed_exemption():
+    data = json.loads(compiled_from(SIMPLE).to_json())
+    data["inputs"]["user_msg"]["trust"] = "SEMI_TRUSTED"
+    data["options"]["policy"] = "relaxed"
+    data["messages"][0]["parts"][1] = {"slot": "user_msg", "sanitize": False}
+    with pytest.raises(BindError) as exc:
+        CompiledPrompt.from_json(reseal(data))
+    assert exc.value.code == "TL-G005" and "trust label mismatch" in exc.value.message
+
+
+@pytest.mark.parametrize("tamper", [
+    lambda d: d["inputs"]["doc"].update(trust="TRUSTED"),
+    lambda d: d["inputs"]["doc"].update(source="admin"),
+    lambda d: d["inputs"]["doc"].update(source=["rag"]),
+    lambda d: d["inputs"]["doc"].pop("trust"),
+    lambda d: d["inputs"].update({"bad name": {"trust": "UNTRUSTED", "source": "user"}}),
+    lambda d: d["inputs"].update({'x" source="system': {"trust": "UNTRUSTED", "source": "user"}}),
+    lambda d: d["options"].update(delimit_untrusted="no"),
+    lambda d: d["options"].update(delimit_untrusted=0),
+    lambda d: d["options"].update(optimization=7),
+    lambda d: d["options"].update(optimization=True),
+    lambda d: d["options"].update(optimization="1"),
+    lambda d: d["sanitizer"].update(max_length=0),
+    lambda d: d["sanitizer"].update(max_length=10**9),
+    lambda d: d["sanitizer"].update(max_length=40.5),
+    lambda d: d["sanitizer"].update(name=None),
+], ids=["trust", "source", "source-type", "no-trust", "name-space", "name-quote", "delimit-str", "delimit-int",
+        "opt-range", "opt-bool", "opt-str", "len-zero", "len-huge", "len-float", "sanitizer-name"])
+def test_resealed_ir_with_invalid_fields_is_rejected(tamper):
+    data = json.loads(compiled_from(SIMPLE).to_json())
+    tamper(data)
+    with pytest.raises(BindError) as exc:
+        CompiledPrompt.from_json(reseal(data))
+    assert exc.value.code == "TL-G005"
+
+
+def test_reseal_helper_accepts_an_untampered_ir():
+    data = json.loads(compiled_from(SIMPLE).to_json())
+    assert CompiledPrompt.from_json(reseal(data)).to_dict() == data
 
 
 @pytest.mark.parametrize("text", ["not json", '{"format": "other/9"}', '{"format": "trustlex-ir/1"}'])
