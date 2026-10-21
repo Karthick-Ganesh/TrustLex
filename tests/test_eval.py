@@ -158,3 +158,163 @@ def test_run_eval_end_to_end(tmp_path):
     assert summary["leaks"]["naive"]["structural_leak"]["count"] > 0
     assert summary["sanitizer"]["survive_structurally"] == []
     assert summary["b2"]["benign_false_positive"]["count"] > 0
+
+
+# ---- §5 providers and the live ASR experiment (offline) ----
+
+import json  # noqa: E402
+
+import httpx  # noqa: E402
+
+import llm_asr  # noqa: E402
+from providers import (  # noqa: E402
+    FakeProvider, GeminiProvider, MissingKeyError, OpenAICompatProvider, ProviderError, ReliableClient, cache_key,
+)
+
+
+def _transport(handler, seen):
+    def record(request):
+        seen.append(request)
+        return handler(request)
+    return httpx.MockTransport(record)
+
+
+def test_gemini_request_shape_and_key_header(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key-123")
+    seen = []
+    reply = {"candidates": [{"content": {"parts": [{"text": "Hello"}, {"text": " there"}]}}]}
+    provider = GeminiProvider("gem-x", transport=_transport(lambda r: httpx.Response(200, json=reply), seen))
+    assert provider.complete("rules", [{"role": "user", "content": "hi"}], 0.0, 64) == "Hello there"
+    [request] = seen
+    assert request.url.path.endswith("/models/gem-x:generateContent")
+    assert "test-key-123" not in str(request.url) and request.headers["x-goog-api-key"] == "test-key-123"
+    body = json.loads(request.content)
+    assert body["systemInstruction"] == {"parts": [{"text": "rules"}]}
+    assert body["contents"] == [{"role": "user", "parts": [{"text": "hi"}]}]
+    assert body["generationConfig"] == {"temperature": 0.0, "maxOutputTokens": 64}
+
+
+def test_gemini_safety_block_is_an_empty_reply(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    provider = GeminiProvider("g", transport=httpx.MockTransport(
+        lambda r: httpx.Response(200, json={"promptFeedback": {"blockReason": "SAFETY"}})))
+    assert provider.complete("", [{"role": "user", "content": "x"}], 0, 8) == ""
+
+
+def test_openai_compat_request_shape(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "gsk-test")
+    seen = []
+    reply = {"choices": [{"message": {"content": "ok"}}]}
+    provider = OpenAICompatProvider("llama-x", "https://api.groq.com/openai/v1/", "GROQ_API_KEY",
+                                    transport=_transport(lambda r: httpx.Response(200, json=reply), seen))
+    assert provider.complete("sys", [{"role": "user", "content": "q"}], 0.2, 32) == "ok"
+    [request] = seen
+    assert str(request.url) == "https://api.groq.com/openai/v1/chat/completions"
+    assert request.headers["authorization"] == "Bearer gsk-test"
+    assert json.loads(request.content) == {"model": "llama-x", "temperature": 0.2, "max_tokens": 32, "messages": [
+        {"role": "system", "content": "sys"}, {"role": "user", "content": "q"}]}
+
+
+def test_ollama_needs_no_key():
+    seen = []
+    provider = OpenAICompatProvider("m", "http://localhost:11434/v1", None, transport=_transport(
+        lambda r: httpx.Response(200, json={"choices": [{"message": {"content": "hi"}}]}), seen))
+    assert provider.complete("", [{"role": "user", "content": "q"}], 0, 8) == "hi"
+    assert "authorization" not in seen[0].headers
+
+
+def test_missing_key_is_reported_without_a_value(monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    provider = GeminiProvider("g", transport=httpx.MockTransport(lambda r: httpx.Response(200, json={})))
+    with pytest.raises(MissingKeyError, match="GEMINI_API_KEY"):
+        provider.complete("", [], 0, 8)
+
+
+def test_retries_with_exponential_backoff_then_succeeds(monkeypatch, tmp_path):
+    monkeypatch.setenv("K", "v")
+    responses = iter([httpx.Response(429), httpx.Response(503),
+                      httpx.Response(200, json={"choices": [{"message": {"content": "done"}}]})])
+    provider = OpenAICompatProvider("m", "http://x/v1", "K", transport=httpx.MockTransport(lambda r: next(responses)))
+    sleeps = []
+    client = ReliableClient(provider, tmp_path / "cache.jsonl", rpm=0, sleep=sleeps.append)
+    assert client.complete("s", [], 0, 8) == ("done", False)
+    assert sleeps == [1.0, 2.0] and client.requests == 3
+
+
+def test_gives_up_after_five_retries_and_does_not_retry_client_errors(monkeypatch):
+    monkeypatch.setenv("K", "v")
+    always_429 = OpenAICompatProvider("m", "http://x/v1", "K",
+                                      transport=httpx.MockTransport(lambda r: httpx.Response(429)))
+    client = ReliableClient(always_429, None, rpm=0, sleep=lambda s: None)
+    with pytest.raises(ProviderError, match="giving up after 6 attempts"):
+        client.complete("s", [], 0, 8)
+    bad_request = OpenAICompatProvider("m", "http://x/v1", "K", transport=httpx.MockTransport(
+        lambda r: httpx.Response(400, text="bad model")))
+    client = ReliableClient(bad_request, None, rpm=0, sleep=lambda s: None)
+    with pytest.raises(ProviderError, match="HTTP 400"):
+        client.complete("s", [], 0, 8)
+    assert client.requests == 1
+
+
+def test_rate_limit_spaces_requests():
+    now = [0.0]
+    sleeps = []
+
+    def sleep(seconds):
+        sleeps.append(seconds)
+        now[0] += seconds
+
+    client = ReliableClient(FakeProvider(), None, rpm=20, sleep=sleep, clock=lambda: now[0])
+    client.complete("a", [], 0, 8)
+    client.complete("b", [], 0, 8)
+    assert sleeps == [3.0]
+
+
+def test_cache_key_covers_every_field():
+    base = cache_key("p", "m", "s", [{"role": "user", "content": "x"}], 0.0)
+    assert base != cache_key("p", "m2", "s", [{"role": "user", "content": "x"}], 0.0)
+    assert base != cache_key("p", "m", "s", [{"role": "user", "content": "x"}], 0.7)
+    assert base == cache_key("p", "m", "s", [{"role": "user", "content": "x"}], 0.0)
+
+
+def _asr_args(*extra):
+    return llm_asr.build_parser().parse_args(["--provider", "fake", "--model", "fake", "--yes", *extra])
+
+
+def test_llm_asr_end_to_end_with_fake_provider_and_cache(tmp_path):
+    provider = FakeProvider(obey=1.0)
+    summary = llm_asr.run(_asr_args(), tmp_path, provider=provider)
+    conditions = summary["conditions"]
+    assert set(conditions) == {"A", "B", "C", "D"}
+    n_attacks, n_benign = len(load_attacks()), len(load_benign())
+    assert conditions["A"]["asr"] == 1.0 and conditions["A"]["attacks"] == n_attacks
+    assert conditions["D"]["asr"] == 0.0 and conditions["D"]["blocked"] == n_attacks  # all fail validation
+    assert all(c["utility"] == 1.0 for c in conditions.values())
+    low, high = conditions["D"]["asr_ci95"]
+    assert low == 0.0 and 0 < high < 0.15
+    assert provider.calls == 3 * (n_attacks + n_benign) + n_benign
+    meta = json.loads((tmp_path / "asr_fake_fake.json").read_text(encoding="utf-8"))["metadata"]
+    assert meta["model"] == "fake" and meta["git_commit"] and meta["temperature"] == 0.0
+    assert (tmp_path / "asr_fake_fake.csv").exists()
+
+    again = FakeProvider(obey=1.0)
+    rerun = llm_asr.run(_asr_args(), tmp_path, provider=again)
+    assert again.calls == 0 and rerun["metadata"]["requests_sent"] == 0  # every response came from the cache
+    assert rerun["conditions"] == summary["conditions"]
+
+
+def test_llm_asr_dry_run_and_confirmation_send_nothing(tmp_path, capsys, monkeypatch):
+    provider = FakeProvider()
+    assert llm_asr.run(_asr_args("--dry-run", "--limit", "3"), tmp_path, provider=provider) is None
+    out = capsys.readouterr().out
+    assert "24 trials" in out and "3 blocked" in out and "21 requests to send" in out and "condition D (trustlex-typed)" in out and "nothing was sent" in out
+    monkeypatch.setattr("builtins.input", lambda prompt: "n")
+    args = llm_asr.build_parser().parse_args(["--provider", "fake", "--model", "fake", "--limit", "2"])
+    assert llm_asr.run(args, tmp_path, provider=provider) is None
+    assert provider.calls == 0 and not (tmp_path / "cache.jsonl").exists()
+
+
+def test_llm_asr_cli_requires_a_model_and_a_base_url(capsys):
+    with pytest.raises(SystemExit):
+        llm_asr.main(["--provider", "gemini"])
+    assert llm_asr.main(["--provider", "openai_compat", "--model", "m", "--dry-run"]) == 2
