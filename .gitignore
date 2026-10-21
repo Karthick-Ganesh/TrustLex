@@ -16,3 +16,6 @@ parsetab.py
 
 # Evaluation outputs
 eval/results/
+
+# Secrets (API keys for eval/llm_asr.py)
+.env
