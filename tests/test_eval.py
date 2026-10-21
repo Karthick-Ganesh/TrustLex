@@ -318,3 +318,29 @@ def test_llm_asr_cli_requires_a_model_and_a_base_url(capsys):
     with pytest.raises(SystemExit):
         llm_asr.main(["--provider", "gemini"])
     assert llm_asr.main(["--provider", "openai_compat", "--model", "m", "--dry-run"]) == 2
+
+
+# ---- §6 latency ----
+
+import latency  # noqa: E402
+from parser_ast import parse  # noqa: E402
+
+
+@pytest.mark.parametrize("size", [10, 50, 100, 500, 1000])
+def test_latency_programs_compile_at_the_requested_size(size):
+    source = latency.generate_program(size)
+    assert len(parse(source, "bench.tlx").program.statements) == size
+    checked, compiled = compile_source(source, "bench.tlx")
+    assert compiled is not None and not checked.diagnostics.errors
+    kinds = {type(s).__name__ for s in parse(source, "bench.tlx").program.statements}
+    if size >= 50:
+        assert kinds == {"InputDecl", "VarDecl", "Assign", "Block"}
+
+
+def test_latency_script_writes_csv_json_and_chart(tmp_path):
+    assert latency.main(["--sizes", "10", "50", "--runs", "2", "--out", str(tmp_path)]) == 0
+    rows = (tmp_path / "latency.csv").read_text(encoding="utf-8").splitlines()
+    assert rows[0].startswith("statements,lines,bytes,Lexical analysis ms") and len(rows) == 3
+    assert (tmp_path / "latency.png").stat().st_size > 1000
+    meta = json.loads((tmp_path / "latency.json").read_text(encoding="utf-8"))["metadata"]
+    assert meta["python"] and meta["cpu"] and meta["runs"] == 2
