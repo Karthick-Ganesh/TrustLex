@@ -349,7 +349,7 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
   4. a length cap;
   5. *spotlighting* inside `<untrusted_input name=… source=…>` delimiters that the value cannot close early [Hines et al. 2024].
 
-  Raw slots in user turns are delimited too, unless `--no-delimit` is given.
+  Raw slots in user turns are delimited too, unless `--no-delimit` is given. They skip steps 1–4, so their text is kept as supplied, but delimiter break-outs are matched on the NFKC form of the value: a fullwidth lookalike such as `＜/untrusted_input＞` is defused like the ASCII tag.
 
 ### Module 5: token optimization (`optimizer.py`)
 

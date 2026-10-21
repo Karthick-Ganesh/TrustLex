@@ -127,12 +127,34 @@ def _attr(text: str) -> str:
     return text.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
 
 
+def _defuse_delimiters(value: str) -> str:
+    """Neutralize every `<` that opens an (un)trusted_input tag, including
+    lookalikes such as a fullwidth `＜／untrusted_input＞`.
+
+    Raw user-turn slots are not passed through clean(), so they are not
+    NFKC-normalized. The tag is therefore matched on a per-character NFKC
+    copy, and the character that normalizes to the opening `<` is replaced
+    in the original, which is otherwise left exactly as supplied."""
+    if value.isascii():
+        return _DELIMITER.sub(r"&lt;\1", value)
+    normalized, owner = [], []
+    for i, c in enumerate(value):
+        n = unicodedata.normalize("NFKC", c)
+        normalized.append(n)
+        owner.extend([i] * len(n))
+    opens = {owner[m.start()] for m in _DELIMITER.finditer("".join(normalized))}
+    out = "".join("&lt;" if i in opens else c for i, c in enumerate(value))
+    if _DELIMITER.search(unicodedata.normalize("NFKC", out)):  # pragma: no cover - defensive
+        out = _DELIMITER.sub(r"&lt;\1", unicodedata.normalize("NFKC", value))
+    return out
+
+
 def spotlight(value: str, name: str, source: str) -> str:
     """Wrap a value in delimiters it cannot close early.
 
     verify() already restricts `name` and `source` to identifiers and known
     tags; the attributes are escaped anyway, as defence in depth."""
-    value = _DELIMITER.sub(r"&lt;\1", value)
+    value = _defuse_delimiters(value)
     return f'<untrusted_input name="{_attr(name)}" source="{_attr(source)}">{value}</untrusted_input>'
 
 
