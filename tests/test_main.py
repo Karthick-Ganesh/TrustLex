@@ -50,9 +50,9 @@ def test_compile_rejects_injection(capsys):
 
 
 def test_compile_to_anthropic_payload(capsys):
-    code, out, _ = run(capsys, SAFE, "--target", "anthropic", "--input", "user_msg=hi", "--input", "doc=Refunds")
+    code, out, _ = run(capsys, SAFE, "--target", "anthropic", "--model", "m", "--input", "user_msg=hi", "--input", "doc=Refunds")
     payload = json.loads(out)
-    assert code == 0 and payload["model"] == "claude-opus-5"
+    assert code == 0 and payload["model"] == "m"
     assert payload["system"][0]["text"].startswith("You are a billing assistant")
 
 
@@ -71,6 +71,7 @@ def test_missing_input_value(capsys):
 
 @pytest.mark.parametrize("argv", [
     ["--target", "openai", "--input", "user_msg=x", "--input", "doc=y"],  # no --model
+    ["--target", "anthropic", "--input", "user_msg=x", "--input", "doc=y"],  # no --model
     ["--target", "anthropic", "--input", "oops"],                          # malformed --input
 ])
 def test_usage_errors(capsys, argv):
@@ -170,7 +171,7 @@ def test_demo_covers_both_outcomes():
 
 def test_demo_verbose_shows_payloads_and_diagnostics(capsys):
     code, out, _ = run(capsys, "demo", "--verbose")
-    assert code == 0 and '"system"' in out and "error[TL-S010]" in out
+    assert code == 0 and '"system"' in out and "error[TL-S010]" in out and '"model": "<model-id>"' in out
 
 
 def test_demo_detects_a_wrong_expectation(capsys, tmp_path):
@@ -206,6 +207,7 @@ def test_repl_compiles_and_binds_typed_program(capsys, monkeypatch):
     assert code == 0 and "✓ compiled" in out
     assert "[system]\nRules.\n" in out
     payload = json.loads(out[out.index("{", out.index("anthropic payload")):out.rindex("}") + 1])
+    assert payload["model"] == "<model-id>" and "placeholder model" in out
     assert "<|im_start|>" not in payload["system"][0]["text"]
     assert "<|im_start|>" in payload["messages"][0]["content"][0]["text"]  # raw only in the user turn
 

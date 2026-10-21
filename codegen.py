@@ -54,11 +54,11 @@ from semantic import CheckedProgram, SecurityPolicy, Slot, Text, analyze
 
 FORMAT = "trustlex-ir/1"
 TARGETS = ("ir", "openai", "anthropic")
-DEFAULT_ANTHROPIC_MODEL = "claude-opus-5"
 DEFAULT_ANTHROPIC_MAX_TOKENS = 16000
 ITEM_SEPARATOR = "\n"
 MAX_SANITIZER_LENGTH = 100_000
 IR_KEY_ENV = "TRUSTLEX_IR_KEY"
+DEFAULT_MODEL_ENV = "TRUSTLEX_DEFAULT_MODEL"
 
 
 class CodegenError(Exception):
@@ -238,6 +238,12 @@ _ROLE_OF = {BlockKind.SYSTEM: "system", BlockKind.INSTRUCTION: "user"}
 
 def _canonical(obj) -> str:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def resolve_model(model: str | None = None) -> str | None:
+    """The model for a payload: `model` if given, else $TRUSTLEX_DEFAULT_MODEL.
+    There is no built-in default, because model IDs change over time."""
+    return model or os.environ.get(DEFAULT_MODEL_ENV) or None
 
 
 def resolve_ir_key(key: str | bytes | None = None) -> bytes | None:
@@ -473,11 +479,15 @@ class CompiledPrompt:
              max_tokens: int | None = None, sanitizer=None, openai_developer_role: bool = False,
              *, unsafe_sanitizer_override: bool = False) -> dict:
         """Build an API request body for `target` ("openai" or "anthropic").
+        Both targets need a model: `model`, else $TRUSTLEX_DEFAULT_MODEL.
         `sanitizer` / `unsafe_sanitizer_override` are as for render()."""
         rendered = self.render(values, sanitizer, unsafe_sanitizer_override=unsafe_sanitizer_override)
-        if target == "openai":
+        if target in ("openai", "anthropic"):
+            model = resolve_model(model)
             if not model:
-                raise ValueError("the openai target requires a model name")
+                raise ValueError(f"the {target} target requires a model name "
+                                 f"(pass --model NAME or set {DEFAULT_MODEL_ENV})")
+        if target == "openai":
             system_role = "developer" if openai_developer_role else "system"
             payload = {
                 "model": model,
@@ -495,7 +505,7 @@ class CompiledPrompt:
             if not user:
                 raise BindError("TL-G002", "the Anthropic Messages API needs at least one user message (an `instruction` block)")
             payload = {
-                "model": model or DEFAULT_ANTHROPIC_MODEL,
+                "model": model,
                 "max_tokens": max_tokens or DEFAULT_ANTHROPIC_MAX_TOKENS,
                 "messages": [{"role": "user", "content": user}],
             }

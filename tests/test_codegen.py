@@ -265,7 +265,7 @@ def test_custom_sanitizer_callable_requires_the_override_flag():
 def test_custom_sanitizer_callable_with_the_flag_works_and_warns():
     compiled = compiled_from(SIMPLE, delimit_untrusted=False)
     with pytest.warns(UnsafeSanitizerWarning, match="trustlex-default/1"):
-        payload = compiled.bind(VALUES, "anthropic", sanitizer=ident, unsafe_sanitizer_override=True)
+        payload = compiled.bind(VALUES, "anthropic", "m", sanitizer=ident, unsafe_sanitizer_override=True)
     assert payload["system"][0]["text"] == "You are a support bot.\nWhere is my refund?"
 
 
@@ -315,9 +315,9 @@ def test_raw_slots_are_delimited_by_default():
 
 
 def test_anthropic_payload():
-    payload = compiled_from(SIMPLE).bind(VALUES, "anthropic")
+    payload = compiled_from(SIMPLE).bind(VALUES, "anthropic", model="some-model")
     assert set(payload) == {"model", "max_tokens", "system", "messages"}
-    assert payload["model"] == "claude-opus-5" and payload["max_tokens"] == 16000
+    assert payload["model"] == "some-model" and payload["max_tokens"] == 16000
     [system] = payload["system"]
     assert system["type"] == "text" and system["text"].startswith("You are a support bot.\n<untrusted_input")
     [message] = payload["messages"]
@@ -340,8 +340,21 @@ def test_anthropic_requires_a_user_message():
     checked, compiled = compile_source('system { "rules" }', "t.tlx")
     assert [d.code for d in checked.diagnostics] == ["TL-G002"]
     with pytest.raises(BindError) as exc:
-        compiled.bind({}, "anthropic")
+        compiled.bind({}, "anthropic", model="m")
     assert exc.value.code == "TL-G002"
+
+
+@pytest.mark.parametrize("target", ["anthropic", "openai"])
+def test_payload_targets_require_a_model(target):
+    with pytest.raises(ValueError, match=f"the {target} target requires a model name"):
+        compiled_from(SIMPLE).bind(VALUES, target)
+
+
+@pytest.mark.parametrize("target", ["anthropic", "openai"])
+def test_model_can_come_from_the_environment(target, monkeypatch):
+    monkeypatch.setenv("TRUSTLEX_DEFAULT_MODEL", "env-model")
+    assert compiled_from(SIMPLE).bind(VALUES, target)["model"] == "env-model"
+    assert compiled_from(SIMPLE).bind(VALUES, target, model="explicit")["model"] == "explicit"
 
 
 def test_openai_payload():
