@@ -74,6 +74,7 @@ class SanitizerConfig:
 
 
 _KEEP_CONTROLS = {"\n", "\t"}
+_LINE_SEPARATORS = {0x2028: "\n", 0x2029: "\n"}
 _ROLE_TOKENS = re.compile(r"<\|[^|<>]{0,32}\|>|\[/?INST\]|<</?SYS>>", re.IGNORECASE)
 _TRANSCRIPT_TURN = re.compile(r"(^|\n)([ \t]*)(human|assistant|system|user)([ \t]*:)", re.IGNORECASE)
 _DELIMITER = re.compile(r"<(\s*/?\s*untrusted_input)", re.IGNORECASE)
@@ -82,6 +83,10 @@ _TRUNCATED = "…[truncated]"
 
 def _strip_once(value: str) -> str:
     value = unicodedata.normalize("NFKC", value)
+    # LINE / PARAGRAPH SEPARATOR (Zl, Zp) survive the Cc/Cf filter, but a
+    # model may still read them as line breaks; make them real newlines so
+    # transcript-turn defusing sees the line start.
+    value = value.translate(_LINE_SEPARATORS)
     # Control characters (Cc) other than newline/tab, and invisible format
     # characters (Cf): zero-width spaces/joiners, bidi overrides, BOM.
     value = "".join(
