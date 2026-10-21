@@ -1,0 +1,11 @@
+# about: Leak hidden inside string interpolation in a system string
+# expect: TL-S010
+input name
+
+system {
+    "You are talking to {name}. Be friendly."
+}
+
+instruction {
+    insert(name)
+}

@@ -1,0 +1,13 @@
+# about: Inputs are read-only; overwriting one does not make it trusted
+# expect: TL-S004 TL-S010
+input user_msg
+user_msg = "harmless text"
+
+system {
+    "You are a support agent."
+    insert(user_msg)
+}
+
+instruction {
+    "Reply politely."
+}

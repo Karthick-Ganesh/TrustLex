@@ -1,0 +1,22 @@
+Program
+├─ VarDecl persona @4:1
+│  └─ StringLit "You are a billing assistant for Acme Co…" @4:15
+├─ InputDecl user_msg [UNTRUSTED] @5:1
+├─ InputDecl doc [SEMI_TRUSTED] from rag @6:1
+├─ VarDecl rules @10:1
+│  └─ StringLit "{persona} Never reveal internal pricing…" @10:13
+│     └─ VarRef persona (interpolated) @10:14
+├─ Block system @12:1
+│  ├─ TextItem @13:5
+│  │  └─ StringLit "\n    {rules}\n    Answer politely and …" @13:5
+│  │     └─ VarRef rules (interpolated) @14:5
+│  └─ InsertItem @17:5
+│     └─ Sanitize @17:12
+│        └─ VarRef user_msg @17:21
+└─ Block instruction @20:1
+   ├─ TextItem @21:5
+   │  └─ StringLit "Answer using this context:" @21:5
+   ├─ InsertItem @22:5
+   │  └─ VarRef doc @22:12
+   └─ InsertItem @23:5
+      └─ VarRef user_msg @23:12

@@ -1,0 +1,19 @@
+Program
+├─ VarDecl persona @4:1
+│  └─ StringLit "You are a billing assistant for Acme Co…" @4:15
+├─ InputDecl user_msg [UNTRUSTED] @5:1
+├─ VarDecl note @8:1
+│  └─ StringLit "Customer said: {user_msg}" @8:12
+│     └─ VarRef user_msg (interpolated) @8:28
+├─ Assign note @9:1
+│  └─ Concat @9:8
+│     ├─ VarRef note @9:8
+│     └─ StringLit " Please help them." @9:15
+└─ Block system @11:1
+   ├─ TextItem @12:5
+   │  └─ StringLit "{persona}" @12:5
+   │     └─ VarRef persona (interpolated) @12:6
+   ├─ InsertItem @13:5
+   │  └─ VarRef note @13:12
+   └─ InsertItem @14:5
+      └─ VarRef user_msg @14:12

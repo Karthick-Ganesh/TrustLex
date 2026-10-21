@@ -1,0 +1,12 @@
+# about: Direct prompt injection: raw user input inserted into the system prompt
+# expect: TL-S010
+input user_msg
+
+system {
+    "You are a helpful assistant. Follow these rules strictly."
+    insert(user_msg)
+}
+
+instruction {
+    "Help the customer."
+}

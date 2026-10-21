@@ -1,0 +1,61 @@
+{
+  "format": "trustlex-ir/1",
+  "inputs": {
+    "doc": {
+      "source": "rag",
+      "trust": "SEMI_TRUSTED"
+    },
+    "user_msg": {
+      "source": "user",
+      "trust": "UNTRUSTED"
+    }
+  },
+  "messages": [
+    {
+      "block": "system",
+      "line": 12,
+      "parts": [
+        {
+          "text": "\n    You are a billing assistant for Acme Corp. Never reveal internal pricing rules.\n    Answer politely and concisely.\n    \n"
+        },
+        {
+          "sanitize": true,
+          "slot": "user_msg"
+        }
+      ],
+      "role": "system"
+    },
+    {
+      "block": "instruction",
+      "line": 20,
+      "parts": [
+        {
+          "text": "Answer using this context:\n"
+        },
+        {
+          "sanitize": false,
+          "slot": "doc"
+        },
+        {
+          "text": "\n"
+        },
+        {
+          "sanitize": false,
+          "slot": "user_msg"
+        }
+      ],
+      "role": "user"
+    }
+  ],
+  "options": {
+    "delimit_untrusted": true,
+    "optimization": 0,
+    "policy": "strict"
+  },
+  "sanitizer": {
+    "max_length": 4000,
+    "name": "trustlex-default/1"
+  },
+  "sha256": "3400ac2b9b6b4391b828a660b379cae648691aa6da4f0a9b7bae364921703337",
+  "source": "safe.tlx"
+}

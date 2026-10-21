@@ -1,0 +1,15 @@
+# TrustLex example: an injection the security checker must reject.
+# Lexically this file is fine; Module 3 rejects it.
+
+var persona = "You are a billing assistant for Acme Corp."
+input user_msg
+
+# Taint flows through interpolation and reassignment:
+var note = "Customer said: {user_msg}"
+note = note + " Please help them."
+
+system {
+    "{persona}"
+    insert(note)          # error: UNTRUSTED data reaches the system block
+    insert(user_msg)      # error: raw input in the system block
+}

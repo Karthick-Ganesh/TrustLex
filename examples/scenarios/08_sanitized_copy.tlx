@@ -1,0 +1,12 @@
+# about: A sanitized copy of the input can be interpolated into the system prompt
+# expect: ok
+input user_msg
+var clean_msg = sanitize(user_msg)
+
+system {
+    "You are a support agent. The user asked: {clean_msg}"
+}
+
+instruction {
+    insert(user_msg)
+}

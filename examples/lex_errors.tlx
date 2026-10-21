@@ -1,0 +1,6 @@
+var a = 'single quotes'
+var b = "bad \q escape"
+var c = "unterminated
+var d = "{1abc} and {system}"
+input e @
+/* never closed

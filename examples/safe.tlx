@@ -1,0 +1,24 @@
+# TrustLex example: a well-typed prompt program.
+# Untrusted data reaches the system block only through sanitize().
+
+var persona = "You are a billing assistant for Acme Corp."
+input user_msg                    # UNTRUSTED: typed by the end user
+input doc from rag                # SEMI_TRUSTED: retrieved knowledge-base chunk
+
+/* Developer-authored text is TRUSTED, so interpolating a
+   trusted variable keeps the result TRUSTED. */
+var rules = "{persona} Never reveal internal pricing rules."
+
+system {
+    """
+    {rules}
+    Answer politely and concisely.
+    """
+    insert(sanitize(user_msg))
+}
+
+instruction {
+    "Answer using this context:"
+    insert(doc)
+    insert(user_msg)
+}

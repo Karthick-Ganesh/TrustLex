@@ -1,0 +1,14 @@
+# about: Syntax errors are reported with targeted hints and recovery
+# expect: TL-P003 TL-P007 TL-P001
+input user_msg
+
+system {
+    "You are an assistant."
+    user_msg
+}
+
+var greeting
+
+instruction {
+    insert(user_msg
+}

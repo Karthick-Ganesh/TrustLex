@@ -1,0 +1,13 @@
+# about: Indirect injection: a retrieved document (SEMI_TRUSTED) placed in the system prompt
+# expect: TL-S011
+input question
+input kb_article from rag
+
+system {
+    "You are a documentation assistant. Ground answers in this article:"
+    insert(kb_article)
+}
+
+instruction {
+    insert(question)
+}

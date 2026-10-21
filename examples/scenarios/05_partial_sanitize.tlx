@@ -1,0 +1,12 @@
+# about: Sanitizing only one copy of the input is not enough
+# expect: TL-S010
+input user_msg
+
+system {
+    "Summarize the request below."
+    insert(sanitize(user_msg) + " / " + user_msg)
+}
+
+instruction {
+    insert(user_msg)
+}

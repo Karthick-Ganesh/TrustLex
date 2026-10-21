@@ -1,0 +1,16 @@
+# about: Taint laundering through variables, interpolation and reassignment is still caught
+# expect: TL-S010
+input user_msg
+
+var quoted = "Customer wrote: {user_msg}"
+var context = "Context. " + quoted
+context = context + " End of context."
+
+system {
+    "You are a support agent."
+    insert(context)
+}
+
+instruction {
+    "Reply to the customer."
+}

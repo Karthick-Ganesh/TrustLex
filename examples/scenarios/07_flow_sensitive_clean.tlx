@@ -1,0 +1,16 @@
+# about: Flow sensitivity: a variable that is overwritten with trusted text is clean again (no false positive)
+# expect: ok
+input user_msg
+
+var note = "Customer said: {user_msg}"
+
+instruction {
+    insert(note)
+}
+
+note = "Always answer in English."
+
+system {
+    "You are a support agent."
+    insert(note)
+}

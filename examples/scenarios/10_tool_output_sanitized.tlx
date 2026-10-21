@@ -1,0 +1,13 @@
+# about: Tool output (SEMI_TRUSTED) is accepted in the system prompt once sanitized
+# expect: ok
+input question
+input weather from tool
+
+system {
+    "You are a travel assistant. Current weather report:"
+    insert(sanitize(weather))
+}
+
+instruction {
+    insert(question)
+}
