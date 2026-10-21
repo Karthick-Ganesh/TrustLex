@@ -344,3 +344,36 @@ def test_latency_script_writes_csv_json_and_chart(tmp_path):
     assert (tmp_path / "latency.png").stat().st_size > 1000
     meta = json.loads((tmp_path / "latency.json").read_text(encoding="utf-8"))["metadata"]
     assert meta["python"] and meta["cpu"] and meta["runs"] == 2
+
+
+# ---- §7 report ----
+
+import report  # noqa: E402
+import run_eval  # noqa: E402
+
+
+def test_report_on_fake_results_has_every_section_and_chart(tmp_path):
+    assert run_eval.main(["--out", str(tmp_path)]) == 0
+    assert latency.main(["--sizes", "10", "50", "--runs", "1", "--out", str(tmp_path)]) == 0
+    llm_asr.run(_asr_args("--limit", "2"), tmp_path, provider=FakeProvider(obey=1.0))
+
+    assert report.main(["--results", str(tmp_path)]) == 0
+    text = (tmp_path / "RESULTS.md").read_text(encoding="utf-8")
+    assert "*Skipped: no live ASR results found" in text and "fake-provider result(s) ignored" in text
+
+    assert report.main(["--results", str(tmp_path), "--include-fake"]) == 0
+    text = (tmp_path / "RESULTS.md").read_text(encoding="utf-8")
+    for heading in ("## 1. Setup", "## 2. Corpus", "## 3. Detection", "## 4. Leak rates", "## 5. Live attack",
+                    "## 6. Utility", "## 7. Compile-time", "## 8. Threats to validity"):
+        assert heading in text
+    assert "Skipped" not in text and "fake / fake (FAKE)" in text
+    for chart in ("detection.png", "asr.png", "latency.png"):
+        assert f"]({chart})" in text and (tmp_path / chart).stat().st_size > 1000
+    assert "<\\|im_start\\|>" in text  # table cells escape pipes
+
+
+def test_report_skips_sections_without_data(tmp_path):
+    assert report.main(["--results", str(tmp_path)]) == 0
+    text = (tmp_path / "RESULTS.md").read_text(encoding="utf-8")
+    assert text.count("*Skipped:") == 7 and "## 8. Threats to validity" in text
+    assert not list(tmp_path.glob("*.png"))
