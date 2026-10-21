@@ -28,7 +28,7 @@ error[TL-S010]: UNTRUSTED data from input `user_msg` reaches a `system` block
   = hint: `system` blocks accept data up to SANITIZED; untrusted text in a privileged block can override your instructions (direct prompt injection)
 ```
 
-Programs that pass the check compile to a sealed, provider-neutral intermediate representation (IR). At runtime, input values are bound into the IR to produce ready-to-send **OpenAI** or **Anthropic** API payloads.
+Programs that pass the check compile to a checksummed (optionally HMAC-sealed), provider-neutral intermediate representation (IR). At runtime, input values are bound into the IR to produce ready-to-send **OpenAI** or **Anthropic** API payloads.
 
 | | |
 |---|---|
@@ -141,7 +141,7 @@ python main.py demo -v       # also show every error report and generated payloa
 ### Compile a file
 
 ```bash
-python main.py examples/safe.tlx                       # sealed IR (JSON) on stdout
+python main.py examples/safe.tlx                       # IR (JSON) on stdout
 python main.py examples/safe.tlx --stages              # every compiler stage, with timings
 python main.py examples/safe.tlx --target anthropic \
     --input user_msg="Where is my refund?" --input doc="Refunds take 5 days."
@@ -257,14 +257,14 @@ The PLY grammar has no shift/reduce or reduce/reduce conflicts; this is checked 
 
 ```
                  ┌──────────────────────────── compile time ────────────────────────────┐
- prompt.tlx ──▶  │ 1 Lexer ──▶ 2 Parser ──▶ 3 Security ──▶ 4 Code ──────▶ 5 Optimizer   │ ──▶ sealed IR
+ prompt.tlx ──▶  │ 1 Lexer ──▶ 2 Parser ──▶ 3 Security ──▶ 4 Code ──────▶ 5 Optimizer   │ ──▶ IR + checksum
                  │  tokens +    typed AST     checker       generator      whitespace   │     (JSON, sha256)
                  │  trust seeds               templates +   IR + self-     rewrites,     │
                  │                            labels        check          slots kept    │
                  └──────────────────────────────────────────────────────────────────────┘
                                                                                              │
                  ┌──────────────────────────── run time ─────────────────────────────────┐   │
- input values ─▶ │ bind(): verify seal + invariant → fill slots → sanitize → payload       │ ◀─┘
+ input values ─▶ │ bind(): checksum/HMAC + invariant → fill slots → sanitize → payload     │ ◀─┘
                  └────────────────────────────────────────────────────────────────────────┘
                                                       │
                                     OpenAI chat payload  /  Anthropic Messages payload
@@ -277,7 +277,7 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
 | 1. Lexical analysis | [`lexer.py`](lexer.py) | text → tokens | Intrinsic trust seeded per token; strings pre-split into text and `{holes}` |
 | 2. Syntax analysis | [`parser_ast.py`](parser_ast.py) | tokens → typed AST | LALR(1) with error productions; exact "expected" sets |
 | 3. Security analysis | [`semantic.py`](semantic.py) | AST → checked program | Exact symbolic evaluation; trust lattice; taint paths; fix-its |
-| 4. Code generation | [`codegen.py`](codegen.py) | checked program → IR → payload | Sealed IR; self-verification; provider mapping; sanitizer |
+| 4. Code generation | [`codegen.py`](codegen.py) | checked program → IR → payload | Checksummed / HMAC-sealed IR; self-verification; provider mapping; sanitizer |
 | 5. Optimization | [`optimizer.py`](optimizer.py) | IR → smaller IR | Whitespace-equivalence-preserving rewrites |
 | 6. Driver | [`main.py`](main.py) | command line | `compile`, `check`, `fix`, `demo`, interactive mode |
 | Diagnostics | [`diagnostics.py`](diagnostics.py) | — | Source spans, snippets, secondary locations, fix-its |
@@ -329,11 +329,11 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
 ### Module 4: code generation (`codegen.py`)
 
 - **Two stages.** `generate()` produces an IR with **text parts and input slots kept separate**; there are no `{{placeholder}}` strings. `bind(values, target)` fills the slots at runtime. Values enter the payload as JSON data, so a value like `"}]}, {"role": "system", …` stays inside its content field.
-- **Canonical, sealed IR.** The IR is deterministic JSON (sorted keys, fixed separators, UTF-8) with a SHA-256 seal. `from_json()` refuses an IR whose contents no longer match the seal.
+- **Canonical IR with an integrity checksum / HMAC seal.** The IR is deterministic JSON (sorted keys, fixed separators, UTF-8) with an unkeyed SHA-256 **integrity checksum**, which detects accidental corruption but not tampering: anyone can recompute it. If `TRUSTLEX_IR_KEY` is set (or `key=` is passed to `to_json()` / `from_json()`), the IR also carries an **HMAC-SHA256 seal**, checked with `hmac.compare_digest`. With a key, `from_json()` refuses an unsealed IR (a stripped seal) as well as a wrong one; without a key, it refuses an IR that carries a seal rather than load it unauthenticated.
 - **Self-verification, as defence in depth:**
   - `generate()` re-checks its own output: every `system` slot must be sanitized. A checker bug therefore cannot silently emit a leaking prompt.
-  - `bind()` and `from_json()` check the same invariant, so even a hand-edited and re-sealed IR cannot smuggle raw input into the system prompt.
-  - The policy is part of the sealed IR. Only `relaxed` admits unsanitized **SEMI_TRUSTED** slots in `system`; **UNTRUSTED** input is never exempt.
+  - `bind()` and `from_json()` check the same invariant, so even a hand-edited and re-hashed IR cannot smuggle raw input into the system prompt.
+  - The policy is part of the checksummed IR. Only `relaxed` admits unsanitized **SEMI_TRUSTED** slots in `system`; **UNTRUSTED** input is never exempt.
 - **Provider mapping:**
 
   | | OpenAI Chat Completions | Anthropic Messages |
@@ -366,7 +366,7 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
   | `-O1` (default) | `merge-text`, `normalize-newlines`, `strip-trailing-ws`, `dedent`, `collapse-blank-lines`, `trim-message`, `drop-empty-messages` |
   | `-O2` | `-O1` plus `strip-indentation`, `collapse-inline-spaces`, `remove-blank-lines` |
 
-- **Proven by tests:** the optimizer keeps slots, preserves whitespace equivalence, is idempotent, never grows a message, keeps the security invariant and seal, passes values through byte-for-byte, and preserves non-interference.
+- **Proven by tests:** the optimizer keeps slots, preserves whitespace equivalence, is idempotent, never grows a message, keeps the security invariant and checksum, passes values through byte-for-byte, and preserves non-interference.
 - **Report.** Per-rule and per-message savings, an estimated token count (a BPE-style regex pre-tokenizer; any exact counter can be plugged in), and the comments removed during lexing.
 - **Measured.** `examples/safe.tlx` goes from 153 to 140 characters at `-O1` (−8%). The first demo scenario goes from 133 to 116 (−13%).
 
@@ -392,7 +392,7 @@ python main.py repl [--target T] [--model M] interactive mode with options
 
 | Compile option | Meaning |
 |---|---|
-| `--target ir\|openai\|anthropic` | Output the sealed IR (default) or an API payload |
+| `--target ir\|openai\|anthropic` | Output the IR (default; HMAC-sealed if `TRUSTLEX_IR_KEY` is set) or an API payload |
 | `-O0` / `-O1` / `-O2` | Optimization level (default `-O1`) |
 | `--input NAME=VALUE` | Input value for a payload target (repeatable) |
 | `--inputs FILE.json` | Input values from a JSON object |
@@ -474,7 +474,7 @@ Raw input can influence privileged content **only** through `sanitize()`.
 **Executable validation.** The lemma is tested with `hypothesis`. Random TrustLex programs are generated, and each one is checked as follows:
 - **Soundness:** every accepted program renders identical `system` text under two input assignments that differ in raw content but sanitize identically.
 - **Completeness:** every rejected program renders differently.
-- **Downstream:** the same property is re-run through `generate → seal → from_json → render`, and through the optimizer at `-O0`/`-O1`/`-O2`.
+- **Downstream:** the same property is re-run through `generate → to_json → from_json → render`, and through the optimizer at `-O0`/`-O1`/`-O2`.
 
 The generator is tuned so that both outcomes are well represented: in a 500-program sample, 221 were accepted (91 of them carrying sanitized input into `system`) and 279 were rejected.
 
@@ -511,7 +511,7 @@ The generator is tuned so that both outcomes are well represented: in a 500-prog
 | `TL-G002` | codegen | no `instruction` block; Anthropic needs a user message |
 | `TL-G003` | bind | missing (or non-string) input value |
 | `TL-G004` | bind | value supplied for an undeclared input |
-| `TL-G005` | bind | IR seal mismatch, malformed IR (unknown source tag, invalid input name, ill-typed option, unregistered sanitizer name), an input's trust label inconsistent with its source tag, or security-invariant violation |
+| `TL-G005` | bind | IR checksum or HMAC seal mismatch (or a seal present without a key, or missing with one), malformed IR (unknown source tag, invalid input name, ill-typed option, unregistered sanitizer name), an input's trust label inconsistent with its source tag, or security-invariant violation |
 
 ---
 
@@ -526,7 +526,7 @@ python -m pytest -q
 | [`test_lexer.py`](tests/test_lexer.py) | 28 | tokens, positions, escapes, interpolation spans, trust seeding, error recovery, rendered snapshot |
 | [`test_parser.py`](tests/test_parser.py) | 40 | zero grammar conflicts, every construct, associativity, spans, visitors, every `P` code, exact expected sets, recovery, AST snapshots |
 | [`test_semantic.py`](tests/test_semantic.py) | 37 | lattice laws, the core rule, flow sensitivity, partial sanitization, policies, taint paths, fix-its re-checked, every `S`/`W` code, **non-interference property (500 programs)** |
-| [`test_codegen.py`](tests/test_codegen.py) | 30 | IR shape and determinism, seal and tampering, invariant, provider payloads, sanitizer steps, JSON-structure injection, relaxed-policy sealing, **end-to-end non-interference** |
+| [`test_codegen.py`](tests/test_codegen.py) | 30 | IR shape and determinism, integrity checksum, HMAC seal and tampering, invariant, provider payloads, sanitizer steps, JSON-structure injection, relaxed policy recorded in the IR, **end-to-end non-interference** |
 | [`test_optimizer.py`](tests/test_optimizer.py) | 23 | every rule, slot-adjacent edge cases, report figures, **properties P1–P7 on random IR and random programs** |
 | [`test_main.py`](tests/test_main.py) | 29 | every command, exit codes, stdin, `--stages`, `fix`, scenario demo, interactive mode |
 | **Total** | **187** | |
@@ -585,7 +585,7 @@ python -m pytest -q
 2. **Compile-time enforcement with zero runtime checking.** A non-compliant prompt is never built.
 3. **An exact, flow-sensitive analysis.** It is sound *and* complete for the language, with machine-checked empirical validation of the lemma.
 4. **Developer-facing remediation.** Taint paths are shown as source snippets, and fix-its are verified by re-checking.
-5. **An end-to-end chain of custody.** The compile-time guarantee is carried into deployment: a sealed IR, invariant re-checks at generation and at binding, and provider-correct payloads.
+5. **An end-to-end chain of custody.** The compile-time guarantee is carried into deployment: an IR with an integrity checksum and optional HMAC seal, invariant re-checks at generation and at binding, and provider-correct payloads.
 6. **A semantics-preserving prompt optimizer.** Its correctness criterion is precisely defined and property-tested.
 
 ---
@@ -608,7 +608,7 @@ COMPILER/
 ├── lexer.py            Module 1: PLY tokenizer, trust lattice, trust seeding
 ├── parser_ast.py       Module 2: LALR(1) grammar, typed AST, visitors
 ├── semantic.py         Module 3: name resolution, taint analysis, policies, fix-its
-├── codegen.py          Module 4: sealed IR, sanitizer, OpenAI/Anthropic binding
+├── codegen.py          Module 4: IR + checksum/HMAC, sanitizer, OpenAI/Anthropic binding
 ├── optimizer.py        Module 5: whitespace-equivalence-preserving optimizer
 ├── main.py             Module 6: CLI driver, scenario demo, interactive mode
 ├── diagnostics.py      shared spans, snippets, secondary locations, fix-its

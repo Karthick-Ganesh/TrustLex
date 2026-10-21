@@ -15,7 +15,7 @@ generation -> optimizer -> (optionally) binding into an API payload.
 FILE may be `-` to read the program from standard input.
 
 Compile options:
-    --target ir|openai|anthropic   output the sealed IR (default) or an API payload
+    --target ir|openai|anthropic   output the IR (default) or an API payload
     -O0 | -O1 | -O2                optimization level (default -O1)
     --input NAME=VALUE             input value (repeatable), for payload targets
     --inputs FILE.json             input values from a JSON object
@@ -25,6 +25,9 @@ Compile options:
     --openai-developer-role        send OpenAI system messages as "developer"
     --stages                       print every stage's output and timing to stderr
     -o FILE                        write the output to FILE instead of stdout
+
+Set TRUSTLEX_IR_KEY to HMAC-seal the IR; without it the IR carries only an
+unkeyed SHA-256 integrity checksum.
 
 Exit codes: 0 success, 1 compile or bind errors, 2 usage errors.
 Diagnostics and stage output go to stderr, so stdout stays valid JSON.
@@ -41,7 +44,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from codegen import TARGETS, BindError, CompiledPrompt, SlotPart, compile_source, generate
+from codegen import TARGETS, BindError, CompiledPrompt, SlotPart, compile_source, generate, resolve_ir_key
 from diagnostics import apply_edits
 from lexer import TrustLexer, format_tokens
 from optimizer import LEVELS, OptimizationReport, optimize
@@ -203,7 +206,7 @@ def cmd_compile(args) -> int:
     compiled = result.compiled
     if args.target == "ir":
         output = compiled.to_json(indent=2)
-        what = "sealed IR"
+        what = "HMAC-sealed IR" if resolve_ir_key() else "IR"
     else:
         try:
             payload = compiled.bind(_values(args), args.target, args.model, args.max_tokens,
@@ -489,7 +492,7 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--relaxed", action="store_true", help="retrieved/tool data in system blocks is a warning")
         p.add_argument("--no-color", action="store_true", help="disable colored output")
 
-    p = sub.add_parser("compile", help="compile a program to sealed IR or an API payload")
+    p = sub.add_parser("compile", help="compile a program to IR or an API payload")
     p.add_argument("file")
     p.add_argument("--target", choices=TARGETS, default="ir")
     p.add_argument("-O", dest="level", type=int, choices=LEVELS, default=1, help="optimization level (default 1)")

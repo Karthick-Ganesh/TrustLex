@@ -25,9 +25,16 @@ def run(capsys, *argv):
 def test_compile_is_the_default_command(capsys):
     code, out, err = run(capsys, SAFE)
     assert code == 0
-    compiled = CompiledPrompt.from_json(out)  # stdout is the sealed IR, and it verifies
+    compiled = CompiledPrompt.from_json(out)  # stdout is the IR, and it verifies
     assert compiled.optimization == 1
-    assert "compiled" in err and "sealed IR" in err
+    assert "compiled" in err and "-> IR" in err and "hmac" not in json.loads(out)
+
+
+def test_compile_hmac_seals_the_ir_when_a_key_is_set(capsys, monkeypatch):
+    monkeypatch.setenv("TRUSTLEX_IR_KEY", "k3y")
+    code, out, err = run(capsys, SAFE)
+    assert code == 0 and "-> HMAC-sealed IR" in err
+    assert "hmac" in json.loads(out) and CompiledPrompt.from_json(out).optimization == 1
 
 
 def test_compile_explicit_and_optimization_levels(capsys):

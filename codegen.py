@@ -1,7 +1,7 @@
 """
 TrustLex - Module 4: Code Generation.
 
-Lowers a checked program to a sealed intermediate representation (IR) and,
+Lowers a checked program to a checksummed intermediate representation (IR) and,
 at runtime, binds input values into provider-ready API payloads:
 
     CheckedProgram --generate()--> CompiledPrompt (IR) --bind(values, target)--> payload
@@ -15,8 +15,12 @@ data rather than through string templating.
 Security is enforced again at both stages (defence in depth):
   * generate() re-checks its own output: every slot in a system message must
     be sanitized, so a checker bug cannot silently emit a leaking prompt;
-  * the IR is sealed with a SHA-256 digest of its canonical form, and
-    CompiledPrompt.from_json() / bind() refuse a tampered or non-compliant IR.
+  * the IR carries a SHA-256 integrity checksum of its canonical form, which
+    detects accidental corruption. With a key ($TRUSTLEX_IR_KEY or key=) it
+    also carries an HMAC-SHA256 seal, which detects tampering;
+  * CompiledPrompt.from_json() / bind() re-verify the security invariant
+    itself, so even an IR that was edited and re-hashed cannot smuggle raw
+    input into a system message.
 
 What sanitize() does at runtime is pluggable through a registry
 (register_sanitizer). The IR records the sanitizer's name and bind() runs
@@ -33,7 +37,9 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import hmac
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -52,6 +58,7 @@ DEFAULT_ANTHROPIC_MODEL = "claude-opus-5"
 DEFAULT_ANTHROPIC_MAX_TOKENS = 16000
 ITEM_SEPARATOR = "\n"
 MAX_SANITIZER_LENGTH = 100_000
+IR_KEY_ENV = "TRUSTLEX_IR_KEY"
 
 
 class CodegenError(Exception):
@@ -233,6 +240,18 @@ def _canonical(obj) -> str:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
+def resolve_ir_key(key: str | bytes | None = None) -> bytes | None:
+    """The HMAC key for sealing IR: `key` if given, else $TRUSTLEX_IR_KEY,
+    else None (integrity checksum only)."""
+    if key is None:
+        key = os.environ.get(IR_KEY_ENV) or None
+    if isinstance(key, str):
+        key = key.encode("utf-8")
+    if key is not None and not key:
+        raise ValueError("the IR key must not be empty")
+    return key
+
+
 @dataclass
 class CompiledPrompt:
     source: str
@@ -257,21 +276,41 @@ class CompiledPrompt:
         }
 
     def digest(self) -> str:
+        """Unkeyed SHA-256 integrity checksum: detects corruption, not tampering."""
         return hashlib.sha256(_canonical(self._body()).encode("utf-8")).hexdigest()
 
-    def to_dict(self) -> dict:
-        return {**self._body(), "sha256": self.digest()}
+    def mac(self, key: bytes) -> str:
+        """HMAC-SHA256 seal: only a holder of `key` can produce it."""
+        return hmac.new(key, _canonical(self._body()).encode("utf-8"), hashlib.sha256).hexdigest()
 
-    def to_json(self, indent: int | None = None) -> str:
+    def to_dict(self, key: str | bytes | None = None) -> dict:
+        """The IR with its integrity checksum, plus an HMAC seal when a key
+        is given or set in $TRUSTLEX_IR_KEY."""
+        data = {**self._body(), "sha256": self.digest()}
+        key = resolve_ir_key(key)
+        if key is not None:
+            data["hmac"] = self.mac(key)
+        return data
+
+    def to_json(self, indent: int | None = None, key: str | bytes | None = None) -> str:
+        data = self.to_dict(key)
         if indent is None:
-            return _canonical(self.to_dict())
-        return json.dumps(self.to_dict(), sort_keys=True, indent=indent, ensure_ascii=False)
+            return _canonical(data)
+        return json.dumps(data, sort_keys=True, indent=indent, ensure_ascii=False)
 
     @classmethod
-    def from_json(cls, text: str) -> CompiledPrompt:
-        """Load an IR, verifying its seal and the security invariant."""
+    def from_json(cls, text: str, key: str | bytes | None = None) -> CompiledPrompt:
+        """Load an IR, verifying its integrity checksum, its HMAC seal and the
+        security invariant.
+
+        With a key (`key=` or $TRUSTLEX_IR_KEY) the IR must carry a valid
+        HMAC seal; an unsealed IR is refused, since anyone can recompute the
+        checksum. An IR that carries a seal is refused when no key is
+        available, rather than loaded unauthenticated."""
         try:
             data = json.loads(text)
+            if not isinstance(data, dict):
+                raise BindError("TL-G005", "malformed IR: expected a JSON object")
             if data.get("format") != FORMAT:
                 raise BindError("TL-G005", f"unsupported IR format {data.get('format')!r}")
             compiled = cls(
@@ -295,18 +334,31 @@ class CompiledPrompt:
         except (ValueError, KeyError, TypeError) as exc:
             raise BindError("TL-G005", f"malformed IR: {exc}") from exc
         if compiled.digest() != expected:
-            raise BindError("TL-G005", "IR integrity check failed: the sha256 seal does not match its contents")
+            raise BindError("TL-G005", "IR integrity check failed: the sha256 checksum does not match its contents")
+        compiled._verify_seal(data, resolve_ir_key(key))
         compiled.verify()
         return compiled
+
+    def _verify_seal(self, data: dict, key: bytes | None):
+        if "hmac" not in data:
+            if key is not None:
+                raise BindError("TL-G005", "IR has no HMAC seal but a key is set; "
+                                           "an unsealed IR could have been edited and re-hashed by anyone")
+            return
+        if key is None:
+            raise BindError("TL-G005", f"IR carries an HMAC seal but no key is available; set {IR_KEY_ENV} or pass key=")
+        tag = data["hmac"]
+        if not isinstance(tag, str) or not hmac.compare_digest(tag.encode("utf-8"), self.mac(key).encode("utf-8")):
+            raise BindError("TL-G005", "IR HMAC seal does not verify: wrong key, or the contents were changed")
 
     # ---- invariant ----
 
     def verify(self):
         """Every slot must name a declared input, and every slot in a system
         message must be sanitized. Under the relaxed policy (recorded in the
-        sealed IR) a SEMI_TRUSTED slot may be unsanitized; UNTRUSTED never.
+        IR) a SEMI_TRUSTED slot may be unsanitized; UNTRUSTED never.
 
-        The checksum has no key, so anyone can edit the IR and recompute it.
+        Without an HMAC key, anyone can edit the IR and recompute its checksum.
         verify() therefore never takes a stored label on faith: each input's
         trust is re-derived from its source tag, and the options are
         type-checked, so an edited `trust` cannot buy an exemption."""
