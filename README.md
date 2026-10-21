@@ -367,7 +367,7 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
   | `-O2` | `-O1` plus `strip-indentation`, `collapse-inline-spaces`, `remove-blank-lines` |
 
 - **Proven by tests:** the optimizer keeps slots, preserves whitespace equivalence, is idempotent, never grows a message, keeps the security invariant and checksum, passes values through byte-for-byte, and preserves non-interference.
-- **Report.** Per-rule and per-message savings, an estimated token count (a BPE-style regex pre-tokenizer; any exact counter can be plugged in), and the comments removed during lexing.
+- **Report.** Per-rule and per-message savings, an estimated token count (a BPE-style regex pre-tokenizer; any exact counter can be plugged in). Comments are listed separately, as *comments in source (never part of the prompt)*: they never reach the prompt, so they are not counted as savings.
 - **Measured.** `examples/safe.tlx` goes from 153 to 140 characters at `-O1` (−8%). The first demo scenario goes from 133 to 116 (−13%).
 
 ### Module 6: the driver (`main.py`)

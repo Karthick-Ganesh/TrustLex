@@ -144,6 +144,18 @@ def test_safe_example_report():
     assert optimized.messages[0].parts[0].text.startswith("You are a billing assistant")
 
 
+def test_comments_are_reported_but_not_counted_as_savings():
+    checked, compiled = compile_source((ROOT / "examples" / "safe.tlx").read_text(), "safe.tlx")
+    _, with_comments = optimize(compiled, 1, comments=checked.comments)
+    _, without = optimize(compiled, 1)
+    text = with_comments.format()
+    assert "comments in source (never part of the prompt): 5 (300 chars)" in text
+    assert "removed" not in text
+    totals = lambda r: (r.chars_before, r.chars_after, r.tokens_before, r.tokens_after)
+    assert totals(with_comments) == totals(without)
+    assert [r.chars_saved for r in with_comments.rules] == [r.chars_saved for r in without.rules]
+
+
 def test_custom_token_counter():
     def words(text):
         return len(text.split())

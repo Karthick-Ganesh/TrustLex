@@ -37,8 +37,9 @@ Known limitation: dedent works per message, not per string literal, because
 code generation merges the text of adjacent block items. A block mixing an
 indented triple-quoted string with unindented strings is not dedented at -O1.
 
-Comments never reach the IR; the lexer drops them. The report still counts
-them so that the reported savings are complete.
+Comments never reach the IR; the lexer drops them. They are therefore not
+savings: the report lists them separately, for information only, and never
+adds them to the character or token totals.
 """
 
 from __future__ import annotations
@@ -232,7 +233,7 @@ class OptimizationReport:
         for r in self.rules:
             out.append(f"{r.name:<24} {'-O' + str(r.level):<6} {r.applications:>7} {r.chars_saved:>12}")
         out.append("")
-        out.append(f"comments removed during lexing: {self.comment_count} ({self.comment_chars} chars)")
+        out.append(f"comments in source (never part of the prompt): {self.comment_count} ({self.comment_chars} chars)")
         return "\n".join(out)
 
 
@@ -248,7 +249,8 @@ def optimize(compiled: CompiledPrompt, level: int = 1, token_counter=None,
              comments=()) -> tuple[CompiledPrompt, OptimizationReport]:
     """Return an optimized copy of `compiled` and a report. The input is not
     modified. `token_counter(text) -> int` replaces the built-in estimate;
-    `comments` (lexer.Comment objects) are only counted in the report."""
+    `comments` (lexer.Comment objects) are listed in the report for
+    information; they are never counted as savings."""
     if level not in LEVELS:
         raise ValueError(f"optimization level must be one of {LEVELS}")
     count = token_counter or estimate_tokens
