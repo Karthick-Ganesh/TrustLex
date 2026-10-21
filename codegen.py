@@ -18,7 +18,10 @@ Security is enforced again at both stages (defence in depth):
   * the IR is sealed with a SHA-256 digest of its canonical form, and
     CompiledPrompt.from_json() / bind() refuse a tampered or non-compliant IR.
 
-What sanitize() does at runtime is pluggable. The compiler guarantees that
+What sanitize() does at runtime is pluggable through a registry
+(register_sanitizer). The IR records the sanitizer's name and bind() runs
+exactly that sanitizer; a caller-supplied callable needs an explicit
+unsafe_sanitizer_override=True and warns. The compiler guarantees that
 raw input never reaches a system message without passing through the
 sanitizer; how much protection that sanitizer gives is a separate concern.
 The default (trustlex-default/1) normalizes Unicode, strips control and
@@ -34,6 +37,8 @@ import json
 import re
 import sys
 import unicodedata
+import warnings
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from diagnostics import DiagnosticBag
@@ -162,6 +167,30 @@ def default_sanitizer(config: SanitizerConfig, inputs: dict[str, dict]):
     def sanitize(value: str, name: str) -> str:
         return spotlight(clean(value, config.max_length), name, inputs[name]["source"])
     return sanitize
+
+
+class UnsafeSanitizerWarning(UserWarning):
+    """A caller replaced the IR's registered sanitizer with its own callable."""
+
+
+_SANITIZERS: dict[str, Callable] = {}
+
+
+def register_sanitizer(name: str, factory: Callable) -> None:
+    """Register `factory(config, inputs) -> sanitize(value, input_name)`.
+
+    The IR records the sanitizer's name, and render()/bind() look it up
+    here, so the sanitizer that runs is the one the program was compiled
+    against. A registered name cannot be rebound to a different factory:
+    otherwise `trustlex-default/1` itself could be swapped for a no-op."""
+    if not isinstance(name, str) or not name:
+        raise ValueError("a sanitizer name must be a non-empty string")
+    if _SANITIZERS.get(name, factory) is not factory:
+        raise ValueError(f"sanitizer {name!r} is already registered")
+    _SANITIZERS[name] = factory
+
+
+register_sanitizer(SanitizerConfig.name, default_sanitizer)
 
 
 # --------------------------------------------------------------------------
@@ -328,6 +357,8 @@ class CompiledPrompt:
             raise BindError("TL-G005", f"unknown optimization level {self.optimization!r} in IR")
         if not isinstance(self.sanitizer.name, str):
             raise BindError("TL-G005", "malformed IR: the sanitizer name must be a string")
+        if self.sanitizer.name not in _SANITIZERS:
+            raise BindError("TL-G005", f"IR names unknown sanitizer {self.sanitizer.name!r}")
         length = self.sanitizer.max_length
         if type(length) is not int or not 1 <= length <= MAX_SANITIZER_LENGTH:
             raise BindError(
@@ -335,10 +366,30 @@ class CompiledPrompt:
 
     # ---- runtime binding ----
 
-    def render(self, values: dict[str, str], sanitizer=None) -> list[tuple[str, str]]:
+    def render(self, values: dict[str, str], sanitizer=None, *,
+               unsafe_sanitizer_override: bool = False) -> list[tuple[str, str]]:
         """Fill the slots; return (role, text) pairs, skipping empty messages.
-        `sanitizer(value, input_name) -> str` defaults to the IR's configured one."""
+
+        Sanitized slots go through the sanitizer registered under the IR's
+        `sanitizer.name`. A caller-supplied `sanitizer(value, input_name)`
+        replaces it and with it the compile-time guarantee, so it is refused
+        unless `unsafe_sanitizer_override=True`, and then warns."""
         self.verify()
+        if sanitizer is None:
+            sanitize = _SANITIZERS[self.sanitizer.name](self.sanitizer, self.inputs)
+        elif not unsafe_sanitizer_override:
+            raise ValueError(
+                f"a custom sanitizer would replace {self.sanitizer.name!r} and void the compile-time guarantee; "
+                "register it with register_sanitizer() and compile against its name, "
+                "or pass unsafe_sanitizer_override=True"
+            )
+        else:
+            warnings.warn(
+                f"using a caller-supplied sanitizer instead of {self.sanitizer.name!r}: "
+                "the compile-time guarantee no longer holds",
+                UnsafeSanitizerWarning, stacklevel=2,
+            )
+            sanitize = sanitizer
         missing = [n for n in self.inputs if n not in values]
         if missing:
             raise BindError("TL-G003", "no value supplied for input(s): " + ", ".join(f"`{n}`" for n in missing))
@@ -349,7 +400,6 @@ class CompiledPrompt:
             if not isinstance(value, str):
                 raise BindError("TL-G003", f"the value of input `{name}` must be a string, not {type(value).__name__}")
 
-        sanitize = sanitizer or default_sanitizer(self.sanitizer, self.inputs)
         rendered = []
         for m in self.messages:
             chunks = []
@@ -368,9 +418,11 @@ class CompiledPrompt:
         return rendered
 
     def bind(self, values: dict[str, str], target: str, model: str | None = None,
-             max_tokens: int | None = None, sanitizer=None, openai_developer_role: bool = False) -> dict:
-        """Build an API request body for `target` ("openai" or "anthropic")."""
-        rendered = self.render(values, sanitizer)
+             max_tokens: int | None = None, sanitizer=None, openai_developer_role: bool = False,
+             *, unsafe_sanitizer_override: bool = False) -> dict:
+        """Build an API request body for `target` ("openai" or "anthropic").
+        `sanitizer` / `unsafe_sanitizer_override` are as for render()."""
+        rendered = self.render(values, sanitizer, unsafe_sanitizer_override=unsafe_sanitizer_override)
         if target == "openai":
             if not model:
                 raise ValueError("the openai target requires a model name")
@@ -411,6 +463,8 @@ def generate(checked: CheckedProgram, sanitizer: SanitizerConfig | None = None,
     program's diagnostics; refuses programs with errors."""
     if not checked.ok:
         raise CodegenError("cannot generate code for a program with errors")
+    if sanitizer is not None and sanitizer.name not in _SANITIZERS:
+        raise CodegenError(f"unknown sanitizer {sanitizer.name!r}; register it with register_sanitizer() first")
 
     inputs = {
         sym.name: {"trust": sym.trust.name, "source": sym.source_tag or "user"}

@@ -13,7 +13,7 @@ from hypothesis import example, given, settings, strategies as st
 
 from codegen import (
     BindError, CodegenError, CompiledPrompt, SanitizerConfig, SlotPart, TextPart,
-    clean, compile_source, generate, spotlight,
+    UnsafeSanitizerWarning, clean, compile_source, generate, register_sanitizer, spotlight,
 )
 from codegen import _ROLE_TOKENS, _canonical
 from semantic import analyze
@@ -190,6 +190,50 @@ def test_missing_and_unknown_inputs():
     assert exc.value.code == "TL-G003"
 
 
+def _upper_sanitizer(config, inputs):
+    return lambda value, name: value.upper()
+
+
+register_sanitizer("test-upper/1", _upper_sanitizer)
+
+
+def test_custom_sanitizer_callable_requires_the_override_flag():
+    compiled = compiled_from(SIMPLE)
+    with pytest.raises(ValueError, match="unsafe_sanitizer_override"):
+        compiled.render(VALUES, ident)
+    with pytest.raises(ValueError, match="unsafe_sanitizer_override"):
+        compiled.bind(VALUES, "anthropic", sanitizer=ident)
+
+
+def test_custom_sanitizer_callable_with_the_flag_works_and_warns():
+    compiled = compiled_from(SIMPLE, delimit_untrusted=False)
+    with pytest.warns(UnsafeSanitizerWarning, match="trustlex-default/1"):
+        payload = compiled.bind(VALUES, "anthropic", sanitizer=ident, unsafe_sanitizer_override=True)
+    assert payload["system"][0]["text"] == "You are a support bot.\nWhere is my refund?"
+
+
+def test_registered_sanitizer_is_looked_up_by_the_ir_name():
+    compiled = compiled_from(SIMPLE, sanitizer=SanitizerConfig(name="test-upper/1"), delimit_untrusted=False)
+    loaded = CompiledPrompt.from_json(compiled.to_json())
+    assert loaded.render(VALUES)[0] == ("system", "You are a support bot.\nWHERE IS MY REFUND?")
+
+
+def test_unknown_sanitizer_name_in_ir_is_rejected():
+    data = json.loads(compiled_from(SIMPLE).to_json())
+    data["sanitizer"]["name"] = "identity/1"
+    with pytest.raises(BindError) as exc:
+        CompiledPrompt.from_json(reseal(data))
+    assert exc.value.code == "TL-G005" and "unknown sanitizer" in exc.value.message
+    with pytest.raises(CodegenError, match="unknown sanitizer"):
+        compiled_from(SIMPLE, sanitizer=SanitizerConfig(name="identity/1"))
+
+
+def test_registered_sanitizer_names_cannot_be_rebound():
+    with pytest.raises(ValueError, match="already registered"):
+        register_sanitizer("trustlex-default/1", lambda config, inputs: ident)
+    register_sanitizer("test-upper/1", _upper_sanitizer)  # re-registering the same factory is a no-op
+
+
 def test_sanitizer_runs_only_on_sanitized_slots():
     compiled = compiled_from(SIMPLE, delimit_untrusted=False)
     calls = []
@@ -198,7 +242,8 @@ def test_sanitizer_runs_only_on_sanitized_slots():
         calls.append(name)
         return f"[{value}]"
 
-    rendered = compiled.render(VALUES, recording)
+    with pytest.warns(UnsafeSanitizerWarning):
+        rendered = compiled.render(VALUES, recording, unsafe_sanitizer_override=True)
     assert calls == ["user_msg"]
     assert rendered == [
         ("system", "You are a support bot.\n[Where is my refund?]"),
@@ -398,6 +443,7 @@ def test_default_sanitizer_in_system_message():
 
 # ---- end-to-end non-interference ----
 
+@pytest.mark.filterwarnings("ignore::codegen.UnsafeSanitizerWarning")  # deliberate toy sanitizer
 @settings(max_examples=300, deadline=None)
 @given(programs(), st.data())
 def test_codegen_preserves_non_interference(program, data):
@@ -412,7 +458,7 @@ def test_codegen_preserves_non_interference(program, data):
     sigma2 = {x: v + PAYLOAD for x, v in sigma1.items()}
 
     def system_texts(sigma):
-        return [text for role, text in compiled.render(sigma, lambda v, n: toy_sanitizer(v)) if role == "system"]
+        return [text for role, text in compiled.render(sigma, lambda v, n: toy_sanitizer(v), unsafe_sanitizer_override=True) if role == "system"]
 
     assert system_texts(sigma1) == system_texts(sigma2), src
 
@@ -422,13 +468,14 @@ def test_codegen_preserves_non_interference(program, data):
 RAG_IN_SYSTEM = 'input d from rag\ninput u\nsystem { insert(d) }\ninstruction { insert(u) }'
 
 
+@pytest.mark.filterwarnings("ignore::codegen.UnsafeSanitizerWarning")  # deliberate toy sanitizer
 def test_relaxed_policy_is_sealed_into_the_ir():
     from semantic import SecurityPolicy
 
     checked, compiled = compile_source(RAG_IN_SYSTEM, "t.tlx", SecurityPolicy.relaxed())
     assert compiled.policy == "relaxed" and checked.ok
     loaded = CompiledPrompt.from_json(compiled.to_json())
-    assert loaded.render({"d": "doc", "u": "q"}, ident)[0] == ("system", '<untrusted_input name="d" source="rag">doc</untrusted_input>')
+    assert loaded.render({"d": "doc", "u": "q"}, ident, unsafe_sanitizer_override=True)[0] == ("system", '<untrusted_input name="d" source="rag">doc</untrusted_input>')
 
     # Flipping the recorded policy breaks the seal.
     data = json.loads(compiled.to_json())

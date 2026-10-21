@@ -349,6 +349,8 @@ All phases report into one shared `DiagnosticBag`, so lexer, parser and security
   4. a length cap;
   5. *spotlighting* inside `<untrusted_input name=… source=…>` delimiters that the value cannot close early [Hines et al. 2024].
 
+  Sanitizers are looked up by name in a registry (`register_sanitizer(name, factory)`). The IR records the name, and `bind()` runs exactly that sanitizer; an IR naming an unregistered sanitizer is rejected (`TL-G005`), and a registered name cannot be rebound. Passing a custom callable to `render()`/`bind()` instead voids the guarantee, so it requires `unsafe_sanitizer_override=True` and emits an `UnsafeSanitizerWarning`.
+
   Raw slots in user turns are delimited too, unless `--no-delimit` is given. They skip steps 1–4, so their text is kept as supplied, but delimiter break-outs are matched on the NFKC form of the value: a fullwidth lookalike such as `＜/untrusted_input＞` is defused like the ASCII tag.
 
 ### Module 5: token optimization (`optimizer.py`)
@@ -509,7 +511,7 @@ The generator is tuned so that both outcomes are well represented: in a 500-prog
 | `TL-G002` | codegen | no `instruction` block; Anthropic needs a user message |
 | `TL-G003` | bind | missing (or non-string) input value |
 | `TL-G004` | bind | value supplied for an undeclared input |
-| `TL-G005` | bind | IR seal mismatch, malformed IR (unknown source tag, invalid input name, ill-typed option), an input's trust label inconsistent with its source tag, or security-invariant violation |
+| `TL-G005` | bind | IR seal mismatch, malformed IR (unknown source tag, invalid input name, ill-typed option, unregistered sanitizer name), an input's trust label inconsistent with its source tag, or security-invariant violation |
 
 ---
 
@@ -591,7 +593,7 @@ python -m pytest -q
 ## 10. Limitations
 
 - **The guarantee covers the `system` channel only.** Untrusted text is still allowed in `instruction` blocks (the user turn), so a model can still be steered through the user turn. TrustLex guarantees that untrusted text cannot pose as *developer instructions*, and it delimits raw input in user turns. It does not make the model immune to persuasion.
-- **`sanitize()` is only as strong as the runtime sanitizer.** The theorem is relative to *san*. The default sanitizer removes known structural attack vectors (role tokens, invisible characters, delimiter break-outs) and spotlights the value. It cannot neutralize natural-language instructions in general. The sanitizer is pluggable for that reason.
+- **`sanitize()` is only as strong as the runtime sanitizer.** The theorem is relative to *san*. The default sanitizer removes known structural attack vectors (role tokens, invisible characters, delimiter break-outs) and spotlights the value. It cannot neutralize natural-language instructions in general. The sanitizer is pluggable for that reason: register a stronger one and compile against its name.
 - **Completeness relies on the language having no control flow.** Adding conditionals or loops would require joining templates at merge points, which keeps soundness but gives up completeness.
 - **"Zero runtime overhead" refers to checking.** Binding runs the sanitizer, which is linear in the input size.
 - **Token counts are estimates** unless an exact counter is plugged in. Input slots are not counted.

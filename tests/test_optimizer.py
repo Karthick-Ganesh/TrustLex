@@ -224,16 +224,18 @@ def test_optimizer_properties(compiled, level):
 
 # ---- untrusted values are untouched ----
 
+@pytest.mark.filterwarnings("ignore::codegen.UnsafeSanitizerWarning")  # deliberate toy sanitizer
 def test_values_pass_through_byte_for_byte():
     src = 'input u\nsystem { """\n    Rules.\n    """ insert(sanitize(u)) }\ninstruction { "  Q:   " insert(u) }'
     _, compiled = compile_source(src, "t.tlx", delimit_untrusted=False)
     optimized, _ = optimize(compiled, 2)
     value = "  a \n\n\n b  \t"
-    rendered = optimized.render({"u": value}, lambda v, n: f"[{v}]")
+    rendered = optimized.render({"u": value}, lambda v, n: f"[{v}]", unsafe_sanitizer_override=True)
     # Item separators and indentation are normalized; the values are not.
     assert rendered == [("system", f"Rules.\n[{value}]"), ("user", f"Q:\n{value}")]
 
 
+@pytest.mark.filterwarnings("ignore::codegen.UnsafeSanitizerWarning")  # deliberate toy sanitizer
 @settings(max_examples=300, deadline=None)
 @given(programs(), st.sampled_from([0, 1, 2]), st.data())
 def test_optimizer_preserves_non_interference_and_content(program, level, data):
@@ -247,7 +249,7 @@ def test_optimizer_preserves_non_interference_and_content(program, level, data):
     sigma2 = {x: v + PAYLOAD for x, v in sigma1.items()}
 
     def render(prompt, sigma):
-        return prompt.render(sigma, lambda v, n: toy_sanitizer(v))
+        return prompt.render(sigma, lambda v, n: toy_sanitizer(v), unsafe_sanitizer_override=True)
 
     def system_texts(prompt, sigma):
         return [text for role, text in render(prompt, sigma) if role == "system"]
