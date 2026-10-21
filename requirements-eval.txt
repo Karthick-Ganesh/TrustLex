@@ -1,0 +1,7 @@
+# Evaluation harness (eval/). Install on top of the core requirements:
+#   pip install -r requirements.txt -r requirements-eval.txt
+matplotlib>=3.7
+python-dotenv>=1.0
+httpx>=0.27
+# Optional: exact token counts in the optimizer report (o200k_base)
+tiktoken>=0.7

@@ -574,6 +574,18 @@ python -m pytest -q
 | `12_validated_enum` | compiles | `enum`, `pattern` and `int` inputs enter `system` without `sanitize()` |
 | `13_unsafe_pattern` | `TL-S012` | `pattern(".+")` admits free text, so it does not validate |
 
+
+### Evaluation harness (`eval/`)
+
+The `eval/` folder measures TrustLex against two baselines and a naive string-concatenation renderer:
+
+- **Detection** on a labelled corpus of 48 programs (TrustLex vs. a lexical linter vs. a runtime keyword filter).
+- **Leak rates** for 32 injection attacks, and which attacks survive the default sanitizer.
+- **Live attack success** against real models (Gemini, Groq, OpenRouter or a local Ollama), with confidence intervals.
+- **Compile-time overhead** from 10 to 5,000 statements.
+
+`python eval/run_eval.py`, `python eval/latency.py` and `python eval/report.py` run offline. See [`eval/README.md`](eval/README.md) for the full procedure, API-key setup and expected request counts.
+
 ---
 
 ## 9. Literature comparison and gap analysis
@@ -643,8 +655,10 @@ COMPILER/
 ├── examples/
 │   ├── safe.tlx, injection.tlx, lex_errors.tlx
 │   └── scenarios/      11 demo scripts with `# expect:` headers
+├── eval/               evaluation harness: corpus, attacks, baselines, live ASR, latency, report
 ├── tests/              187 tests (+ snapshots/)
 ├── requirements.txt    ply, pytest, hypothesis
+├── requirements-eval.txt  matplotlib, python-dotenv, httpx (+ optional tiktoken)
 └── pytest.ini
 ```
 
