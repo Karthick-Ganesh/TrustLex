@@ -123,10 +123,17 @@ def clean(value: str, max_length: int = 4000) -> str:
     return value
 
 
+def _attr(text: str) -> str:
+    return text.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
+
+
 def spotlight(value: str, name: str, source: str) -> str:
-    """Wrap a value in delimiters it cannot close early."""
+    """Wrap a value in delimiters it cannot close early.
+
+    verify() already restricts `name` and `source` to identifiers and known
+    tags; the attributes are escaped anyway, as defence in depth."""
     value = _DELIMITER.sub(r"&lt;\1", value)
-    return f'<untrusted_input name="{name}" source="{source}">{value}</untrusted_input>'
+    return f'<untrusted_input name="{_attr(name)}" source="{_attr(source)}">{value}</untrusted_input>'
 
 
 def default_sanitizer(config: SanitizerConfig, inputs: dict[str, dict]):
