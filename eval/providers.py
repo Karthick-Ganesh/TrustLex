@@ -112,7 +112,9 @@ class GeminiProvider(_HTTPProvider):
         if not candidates:
             return ""  # blocked by the provider's safety filter: no reply
         parts = (candidates[0].get("content") or {}).get("parts") or []
-        return "".join(p.get("text", "") for p in parts)
+        # Thinking models (e.g. Gemma) return their reasoning as parts marked
+        # "thought"; only the answer is the reply.
+        return "".join(p.get("text", "") for p in parts if not p.get("thought"))
 
 
 class OpenAICompatProvider(_HTTPProvider):
@@ -206,9 +208,13 @@ class ReliableClient:
         if cache_path is not None and cache_path.exists():
             with cache_path.open(encoding="utf-8") as f:
                 for line in f:
-                    if line.strip():
+                    if not line.strip():
+                        continue
+                    try:
                         entry = json.loads(line)
-                        self.cache[entry["key"]] = entry["response"]
+                    except json.JSONDecodeError:
+                        continue  # a line cut off when a run was interrupted; that request is simply redone
+                    self.cache[entry["key"]] = entry["response"]
 
     def key(self, system: str, messages: list[dict], temperature: float) -> str:
         return cache_key(self.provider.name, self.provider.model, system, messages, temperature)
