@@ -377,3 +377,32 @@ def test_report_skips_sections_without_data(tmp_path):
     text = (tmp_path / "RESULTS.md").read_text(encoding="utf-8")
     assert text.count("*Skipped:") == 7 and "## 8. Threats to validity" in text
     assert not list(tmp_path.glob("*.png"))
+
+
+# ---- indirect-injection scenario ----
+
+def test_indirect_scenario_plants_the_attack_in_the_retrieved_article(tmp_path):
+    attack = load_attacks()[0]
+    values = llm_asr.trial_values("indirect", "A", "attack", "PLANTED")
+    assert values == {"article": llm_asr.ARTICLE + "\n\nPLANTED", "msg": llm_asr.INDIRECT_QUESTION}
+    system, messages = llm_asr.build_prompt("A", values, "m", "indirect")
+    assert "PLANTED" in system and "PLANTED" not in messages[0]["content"]
+    system, messages = llm_asr.build_prompt("C", values, "m", "indirect")
+    assert "PLANTED" not in system
+    assert '<untrusted_input name="article" source="rag">' in messages[0]["content"]
+    assert llm_asr.trustlex_verdicts("indirect") == {"A": "rejected: TL-S011", "B": "compiles", "C": "compiles"}
+    assert llm_asr.trustlex_verdicts("direct")["A"] == "rejected: TL-S010"
+    assert attack["text"]  # the attack set is reused unchanged
+
+
+def test_indirect_scenario_end_to_end_with_fake_provider(tmp_path):
+    provider = FakeProvider(obey=1.0)
+    summary = llm_asr.run(_asr_args("--scenario", "indirect", "--limit", "3"), tmp_path, provider=provider)
+    assert set(summary["conditions"]) == {"A", "B", "C"} and summary["metadata"]["scenario"] == "indirect"
+    assert summary["conditions"]["A"]["label"] == "rag-in-system"
+    assert provider.calls == 3 * (3 + 3)
+    assert (tmp_path / "asr_indirect_fake_fake.json").exists()
+    assert report.main(["--results", str(tmp_path), "--include-fake"]) == 0
+    text = (tmp_path / "RESULTS.md").read_text(encoding="utf-8")
+    assert "### Indirect injection" in text and "](asr_indirect.png)" in text
+    assert (tmp_path / "asr_indirect.png").exists()
