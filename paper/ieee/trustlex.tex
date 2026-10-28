@@ -54,7 +54,8 @@
 
 \begin{document}
 
-\title{TrustLex: Compile-Time Trust Typing for Injection-Safe Prompts in LLM-Integrated Applications}
+\title{TrustLex: Compile-Time Trust Typing for Injection-Safe Prompts in LLM-Integrated Applications%
+\thanks{The implementation, evaluation harness and all results are available at \url{https://github.com/Karthick-Ganesh/TrustLex}.}}
 
 \author{
 \IEEEauthorblockN{Amritha Varshini Pakanati}
@@ -112,7 +113,6 @@ Existing defences act at the model, by training or prompting it to separate inst
 (2)~An exact, flow-sensitive security analysis with a non-interference theorem and a completeness result, validated by property-based testing, and compiler-style diagnostics with taint paths and verified fix-its.
 (3)~An end-to-end chain of custody from source to API payload: checksummed and HMAC-sealed IR, invariant re-checks and a named-sanitizer registry.
 (4)~An evaluation combining offline detection and leakage experiments, live attack-success experiments in direct and indirect scenarios with our attacks and the public Tensor Trust benchmark~\cite{toyer2024tensortrust}, and a complexity analysis.
-The implementation, evaluation harness and all results are available at \url{https://github.com/Karthick-Ganesh/TrustLex}.
 
 % =====================================================================
 \section{Literature Review}\label{sec:lit}
