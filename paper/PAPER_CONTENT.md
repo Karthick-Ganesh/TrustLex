@@ -1,9 +1,9 @@
 # TrustLex — paper content (draft, format-neutral)
 
 > Working content for the paper, to be pasted into the format your guide gives.
-> Numbers marked **⟦UPDATE⟧** change when the runs started on 2026-10-28 finish
-> (extra repeat + Tensor Trust benchmark). Everything else is final for the
-> code at commit `5ed3ea2`.
+> Long version of the paper. The submitted IEEE version is `ieee/trustlex.tex`.
+> All live results are final as of 2026-10-28 (gpt-oss-20b Tensor Trust
+> indirect uses the first 32 attacks because of the free tier's token limit).
 >
 > Suggested length if the format is a standard 8–10 page conference paper:
 > §1 1 p, §2 1 p, §3–4 2 p, §5 1 p, §6 0.5 p, §7 2.5 p, §8–10 1.5 p.
@@ -419,7 +419,7 @@ To avoid relying only on our own attacks, we use the **Tensor Trust** hijacking 
 | Model | Scenario | n | A | B | C | D |
 |---|---|---|---|---|---|---|
 | gpt-oss-20b | direct | 64 | 23.4% | 18.8% | 18.8% | **0%** |
-| gpt-oss-20b | indirect | 32 ⟦UPDATE: 64⟧ | 43.8% | 25.0% | 31.2% | — |
+| gpt-oss-20b | indirect | 32 (daily token limit) | 43.8% | 25.0% | 31.2% | — |
 | allam-2-7b | direct | 64 | 62.5% | 70.3% | 59.4% | **0%** |
 | allam-2-7b | indirect | 64 | 75.0% | 73.0% | **56.2%** | — |
 | gemma-4-26b-a4b-it | direct | 64 | 1.6% | 1.6% | 1.6% | **0%** |

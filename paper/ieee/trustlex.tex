@@ -1,6 +1,5 @@
 % TrustLex -- IEEE conference paper (IEEEtran, two-column).
 % Compile on Overleaf (pdfLaTeX) or locally with: latexmk -pdf trustlex.tex
-% Cells marked \pending{} are filled in when the last live runs finish.
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
 
@@ -17,7 +16,6 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,fit}
 
-\newcommand{\pending}[1]{\textcolor{red}{#1}}
 \newcommand{\TL}{\textsc{TrustLex}}
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\lab}[1]{\textsf{\small #1}}
@@ -314,7 +312,7 @@ Model & Attacks & $n$ & A & B & C & D \\
 \multirow{4}{*}{gpt-oss-20b} & Ours, Dir. & 32 & 25.0 & 12.5 & 9.4 & \textbf{0} \\
  & Ours, Ind. & 32 & 28.1 & 18.8 & \textbf{6.2} & -- \\
  & TT, Dir. & 64 & 23.4 & 18.8 & 18.8 & \textbf{0} \\
- & TT, Ind. & \pending{32} & 43.8 & 25.0 & 31.2 & -- \\
+ & TT, Ind. & 32 & 43.8 & 25.0 & 31.2 & -- \\
 \midrule
 \multirow{4}{*}{allam-2-7b} & Ours, Dir. & 64 & 48.4 & 42.2 & 48.4 & \textbf{0} \\
  & Ours, Ind. & 64 & 57.8 & 59.4 & \textbf{40.6} & -- \\
@@ -359,7 +357,7 @@ Three points stand out. First, unlike the keyword filter, \TL{} decides from whe
 % =====================================================================
 \section{Limitations and Threats to Validity}
 
-The guarantee covers the privileged channel: untrusted text is still allowed, delimited, in the user turn, where a model can still be persuaded. \code{sanitize()} is only as strong as the sanitizer, which removes structural vectors but cannot neutralize natural-language instructions in general. Validation is syntactic: a permissive pattern such as \code{[A-Za-z]\{1,40\}} admits a single word. Completeness relies on straight-line programs; with branches the analysis would stay sound but not complete. The worst case is exponential (Section~\ref{sec:complexity}). Our corpus and attacks are hand-written, which the Tensor Trust benchmark mitigates; that benchmark was written against the game's defences rather than our application, and attacks that spell the target phrase indirectly are excluded. We test three free-tier models with 32--64 attacks per condition, so intervals are wide; repeats at temperature 0 vary only the canary. Canary-based success is a proxy; a refusal-aware judge avoids counting refusals that quote the canary, and some gpt-oss replies were empty because its reasoning exhausted the output budget.
+The guarantee covers the privileged channel: untrusted text is still allowed, delimited, in the user turn, where a model can still be persuaded. \code{sanitize()} is only as strong as the sanitizer, which removes structural vectors but cannot neutralize natural-language instructions in general. Validation is syntactic: a permissive pattern such as \code{[A-Za-z]\{1,40\}} admits a single word. Completeness relies on straight-line programs; with branches the analysis would stay sound but not complete. The worst case is exponential (Section~\ref{sec:complexity}). Our corpus and attacks are hand-written, which the Tensor Trust benchmark mitigates; that benchmark was written against the game's defences rather than our application, and attacks that spell the target phrase indirectly are excluded. We test three free-tier models with 32--64 attacks per condition (32 where the free tier's daily token budget ran out), so intervals are wide; repeats at temperature 0 vary only the canary. Canary-based success is a proxy; a refusal-aware judge avoids counting refusals that quote the canary, and some gpt-oss replies were empty because its reasoning exhausted the output budget.
 
 % =====================================================================
 \section{Conclusion}
