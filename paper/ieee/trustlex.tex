@@ -155,7 +155,7 @@ Per-request cost & inference & extra LLM + interpreter & none & sanitizers & cla
 % =====================================================================
 \section{The TrustLex Language}
 
-Figure~\ref{lst:example} shows a support bot for a telecom company. \code{var} declares developer text; \code{input} declares outside data with its source (\code{user} by default, \code{rag}, \code{tool}); an input may carry a refinement type. \code{system\{\dots\}} is the privileged system prompt and \code{instruction\{\dots\}} the user turn; blocks contain string literals and \code{insert(e)} items. Expressions are literals with \code{\{name\}} interpolation, names, concatenation \code{+}, \code{sanitize(e)} and parentheses. Programs are straight-line: there are no branches, loops or calls. Unknown source tags fail closed.
+Fig.~\ref{lst:example} shows a support bot for a telecom company. \code{var} declares developer text; \code{input} declares outside data with its source (\code{user} by default, \code{rag}, \code{tool}); an input may carry a refinement type. \code{system\{\dots\}} is the privileged system prompt and \code{instruction\{\dots\}} the user turn; blocks contain string literals and \code{insert(e)} items. Expressions are literals with \code{\{name\}} interpolation, names, concatenation \code{+}, \code{sanitize(e)} and parentheses. Programs are straight-line: there are no branches, loops or calls. Unknown source tags fail closed.
 
 \begin{figure}[t]
 \begin{lstlisting}
@@ -255,7 +255,7 @@ Let $P$ be a program with no \code{TL-S010}/\code{S011}/\code{S012} errors under
 % =====================================================================
 \section{Compiler Implementation}
 
-\TL{} is about 4{,}100 lines of Python with PLY~3.11, plus a 1{,}700-line evaluation harness and 492 automated tests. Figure~\ref{fig:pipeline} shows the phases.
+\TL{} is about 4{,}100 lines of Python with PLY~3.11, plus a 1{,}700-line evaluation harness and 492 automated tests. Fig.~\ref{fig:pipeline} shows the phases.
 
 \begin{figure}[t]
 \centering
