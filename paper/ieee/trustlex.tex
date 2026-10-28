@@ -24,6 +24,15 @@
 
 \newtheorem{theorem}{Theorem}
 
+% Start a new row of author blocks (two authors per row).
+\makeatletter
+\newcommand{\linebreakand}{%
+  \end{@IEEEauthorhalign}
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+\makeatother
+
 \lstdefinelanguage{trustlex}{
   morekeywords={var,input,from,system,instruction,insert,sanitize},
   morecomment=[l]{\#},
@@ -49,31 +58,41 @@
 
 \title{TrustLex: Compile-Time Trust Typing for Injection-Safe Prompts in LLM-Integrated Applications}
 
-% TODO: replace with the real author list, department and guide.
 \author{
-\IEEEauthorblockN{Author One}
-\IEEEauthorblockA{\textit{School of Computer Science and Engineering}\\
+\IEEEauthorblockN{Amritha Varshini Pakanati}
+\IEEEauthorblockA{\textit{School of Computer Science}\\
+\textit{and Engineering (SCOPE)}\\
 \textit{Vellore Institute of Technology}\\
-Vellore, India \\
-email@vitstudent.ac.in}
+Vellore, Tamil Nadu 632014, India\\
+amritha.varshini2024@vitstudent.ac.in}
 \and
-\IEEEauthorblockN{Author Two}
-\IEEEauthorblockA{\textit{School of Computer Science and Engineering}\\
+\IEEEauthorblockN{V L Lakshmi Shriyaa}
+\IEEEauthorblockA{\textit{School of Computer Science}\\
+\textit{and Engineering (SCOPE)}\\
 \textit{Vellore Institute of Technology}\\
-Vellore, India \\
-email@vitstudent.ac.in}
+Vellore, Tamil Nadu 632014, India\\
+lakshmishriyaa.vl2024@vitstudent.ac.in}
+\linebreakand
+\IEEEauthorblockN{Karthick Ganesh}
+\IEEEauthorblockA{\textit{School of Computer Science}\\
+\textit{and Engineering (SCOPE)}\\
+\textit{Vellore Institute of Technology}\\
+Vellore, Tamil Nadu 632014, India\\
+karthick.ganesh2024@vitstudent.ac.in}
 \and
-\IEEEauthorblockN{Guide Name}
-\IEEEauthorblockA{\textit{School of Computer Science and Engineering}\\
+\IEEEauthorblockN{Dr. Krishnaraj N}
+\IEEEauthorblockA{\textit{Department of Database Systems}\\
+\textit{School of Computer Science}\\
+\textit{and Engineering (SCOPE)}\\
 \textit{Vellore Institute of Technology}\\
-Vellore, India \\
-email@vit.ac.in}
+Vellore, Tamil Nadu 632014, India\\
+krishnaraj.n@vit.ac.in}
 }
 
 \maketitle
 
 \begin{abstract}
-Companies increasingly deploy large language models (LLMs) inside their own applications: support bots on websites, retrieval-augmented assistants over internal documents, and agents that consume tool and API results. Each application builds its prompt by concatenating the developer's trusted system prompt with untrusted text, so attacker-controlled text can impersonate the developer (prompt injection). We present \TL{}, a domain-specific language and compiler that makes trust a grammar-level type. Inputs declare their origin; the compiler tracks trust through variables, interpolation, concatenation and reassignment by exact symbolic evaluation over a five-level lattice, and refuses to compile any prompt in which untrusted data can reach the privileged system channel without a sanitizer, unless the input carries a refinement type that provably cannot express an instruction. We prove non-interference up to sanitization and validation and show that the check is complete for the language. Accepted programs compile to a checksummed, optionally HMAC-sealed intermediate representation that is bound at run time into OpenAI or Anthropic API payloads. On a labelled corpus \TL{} reaches an F1 score of 1.00 versus 0.55 for a lexical linter and 0.80 for a keyword filter; across 1{,}536 program--attack pairs it reduces structural leakage into the system prompt from 38.1\% to 0\%. In live experiments with three hosted models, using our own attacks and the public Tensor Trust benchmark, typed inputs block 100\% of attacks before any API call, and \TL{}'s layout significantly lowers indirect-injection success (e.g.\ from 75.0\% to 56.2\% on allam-2-7b with Tensor Trust attacks, $p=0.017$). Compilation takes about 5\,ms per program.
+Companies increasingly deploy large language models (LLMs) inside their own applications: support bots on websites, retrieval-augmented assistants over internal documents, and agents that consume tool and API results. Each application builds its prompt by concatenating the developer's trusted system prompt with untrusted text, so attacker-controlled text can impersonate the developer (prompt injection). We present \TL{}, a domain-specific language and compiler that makes trust a grammar-level type. Inputs declare their origin; the compiler tracks trust through variables, interpolation, concatenation and reassignment by exact symbolic evaluation over a five-level lattice, and refuses to compile any prompt in which untrusted data can reach the privileged system channel without a sanitizer, unless the input carries a refinement type that provably cannot express an instruction. We prove non-interference up to sanitization and validation and show that the check is complete for the language. Accepted programs compile to a checksummed, optionally HMAC-sealed intermediate representation that is bound at run time into OpenAI or Anthropic API payloads. On a labelled corpus \TL{} reaches an F1 score of 1.00 versus 0.55 for a lexical linter and 0.80 for a keyword filter; across 1{,}536 program--attack pairs it reduces structural leakage into the system prompt from 38.1\% to 0\%. In live experiments with three hosted models, using our own attacks and the public Tensor Trust benchmark, typed inputs block 100\% of attacks before any API call, and \TL{}'s layout significantly lowers indirect-injection success (e.g.\ from 75.0\% to 56.2\% on allam-2-7b with Tensor Trust attacks, $p=0.017$). Compilation takes about 5\,ms per program. The implementation, evaluation harness and results are available at \url{https://github.com/Karthick-Ganesh/TrustLex}.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -98,6 +117,32 @@ Existing defences act at the model, by training or prompting it to separate inst
 (4)~An end-to-end chain of custody from source to API payload: checksummed and HMAC-sealed IR, invariant re-checks and a named-sanitizer registry.
 (5)~Compiler-style diagnostics with taint paths and verified fix-its.
 (6)~An evaluation combining offline detection and leakage experiments, live attack-success experiments in direct and indirect scenarios with our attacks and the public Tensor Trust benchmark~\cite{toyer2024tensortrust}, and a complexity analysis.
+
+% =====================================================================
+\section{Literature Review}\label{sec:lit}
+
+We review the lines of work that address prompt injection or the techniques \TL{} builds on; Table~\ref{tab:related} compares them along the dimensions that matter for a developer, and Section~\ref{sec:compare} compares reported and measured results.
+
+\begin{table*}[t]
+\caption{Comparison with related approaches}
+\label{tab:related}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{2.0cm}p{2.2cm}p{2.2cm}p{2.2cm}p{2.2cm}p{2.4cm}p{2.4cm}@{}}
+\toprule
+ & DSPy, LMQL & CaMeL & TaintP2X, DeepClause & Semantic Kernel & Guards (PromptShield, Lakera, NeMo) & \textbf{\TL{}} \\
+\midrule
+Domain & LM pipelines, constrained decoding & privileged/quarantined LLMs & taint in app code & SDK prompt templates & run-time detection & \textbf{prompt DSL} \\
+Reasons about trust & no & yes & yes & yes (vars unsafe) & implicitly & \textbf{yes, deterministic} \\
+Enforcement & -- & run time & static, general code & render time & run time & \textbf{compile time} \\
+Flow analysis & -- & run-time data flow & approximate & none & none & \textbf{exact, flow-sensitive} \\
+Guarantee & -- & policy on tool calls & detection & no new message tags & best effort & \textbf{non-interference, sound \& complete} \\
+Per-request cost & inference & extra LLM + interpreter & none & encoding & classifier call & \textbf{linear sanitizer only} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\textbf{Prompt languages.} DSPy~\cite{khattab2024dspy} and LMQL~\cite{beurer2023lmql} treat prompts as programs but optimize what the model does, not where text comes from. \textbf{CaMeL}~\cite{debenedetti2025camel} separates a privileged planner from a quarantined LLM and enforces capability policies on tool calls at run time; \TL{} targets prompt construction one step earlier, and the two compose. \textbf{Static taint analysis} for LLM applications~\cite{he2026taintp2x,deepclause2026} retrofits taint tracking onto general-purpose code and must approximate its control flow and libraries; \TL{} designs the language so the analysis is exact. \textbf{Run-time detectors}~\cite{jacob2024promptshield,rebedea2023nemo} are probabilistic and add per-request cost; a detector can be registered as a named \TL{} sanitizer. \textbf{Auto-sanitizing templates}: CSAS~\cite{samuel2011csas} infers sanitizers for web templates with type qualifiers, and Semantic Kernel~\cite{microsoft2024sk} encodes every prompt variable at render time; \TL{} brings compile-time, flow-sensitive typing to prompts. \textbf{Model-level defences}~\cite{wallace2024hierarchy,chen2025struq,hines2024spotlighting} train or prompt the model to separate instructions from data; \TL{} supplies the structural separation they assume. \textbf{Benchmarks}~\cite{toyer2024tensortrust,liu2024formalizing} evaluate attacks and defences at the model level. \textbf{Foundations}: lattice-based information flow~\cite{denning1976lattice}, non-interference~\cite{goguen1982security}, security type systems~\cite{volpano1996sound,sabelfeld2003language}, flow-sensitive typing~\cite{hunt2006flow} and declassification~\cite{sabelfeld2009declassification}, with \code{sanitize()} as an explicit declassifier.
 
 % =====================================================================
 \section{Threat Model and Scope}
@@ -299,31 +344,30 @@ Model & Attacks & $n$ & A & B & C & D \\
 
 \textbf{Findings.} (1)~\emph{Typed inputs block every attack on every model before any API call.} D's 0\% holds by construction: it shows that a refinement-typed field cannot carry an injection, independent of the model. (2)~\emph{The public attacks are stronger}: on allam-2-7b they succeed in 56--75\% of trials versus 41--59\% for ours, yet D still blocks all of them. (3)~\emph{\TL{}'s layout significantly reduces indirect injection.} With the attack in a retrieved document, C is significantly lower than both naive layouts on allam-2-7b for both attack sets (exact McNemar, A vs.\ C $p=0.043$ and $0.017$; B vs.\ C $p=0.029$ and $0.013$), and lower than the system-prompt layout on gpt-oss-20b with our attacks (28.1\% to 6.2\%, $p=0.016$). With Tensor Trust attacks on gpt-oss-20b, C (31.2\%) is below A (43.8\%) but not significantly, and not below B. In the direct scenario no difference between A, B and C is significant: spotlighting marks data, but the customer's own message is addressed to the model anyway. (4)~\emph{Spotlighting needs a model that respects delimiters.} allam-2-7b, a 7B model without instruction-hierarchy training, often repeats codes found anywhere in its context, so only the compile-time guarantees fully protect it; this agrees with findings that prompt-level defences depend on model training~\cite{hines2024spotlighting,chen2025struq}. (5)~\emph{A strongly aligned model} (gemma-4) resists all conditions, so they cannot be separated. Utility on benign inputs stayed between 80\% and 100\% in every condition, and \TL{} conditions were never more than one request below the naive ones.
 
-% =====================================================================
-\section{Related Work}
+\subsection{Comparison with existing work}\label{sec:compare}
+Table~\ref{tab:compare} sets our measured values beside the alternatives we implemented and the results that existing defences report. The published figures come from different models, attack sets and threat models, so they are context rather than a head-to-head ranking; the qualitative comparison is in Table~\ref{tab:related}.
 
-Table~\ref{tab:related} summarises the comparison.
-
-\begin{table*}[t]
-\caption{Comparison with related approaches}
-\label{tab:related}
-\centering\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}p{2.0cm}p{2.2cm}p{2.2cm}p{2.2cm}p{2.2cm}p{2.4cm}p{2.4cm}@{}}
+\begin{table}[t]
+\caption{Measured and reported results of prompt-injection defences}
+\label{tab:compare}
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}p{2.3cm}p{1.9cm}p{4.4cm}@{}}
 \toprule
- & DSPy, LMQL & CaMeL & TaintP2X, DeepClause & Semantic Kernel & Guards (PromptShield, Lakera, NeMo) & \textbf{\TL{}} \\
+Approach & Acts at & Result (source) \\
 \midrule
-Domain & LM pipelines, constrained decoding & privileged/quarantined LLMs & taint in app code & SDK prompt templates & run-time detection & \textbf{prompt DSL} \\
-Reasons about trust & no & yes & yes & yes (vars unsafe) & implicitly & \textbf{yes, deterministic} \\
-Enforcement & -- & run time & static, general code & render time & run time & \textbf{compile time} \\
-Flow analysis & -- & run-time data flow & approximate & none & none & \textbf{exact, flow-sensitive} \\
-Guarantee & -- & policy on tool calls & detection & no new message tags & best effort & \textbf{non-interference, sound \& complete} \\
-Per-request cost & inference & extra LLM + interpreter & none & encoding & classifier call & \textbf{linear sanitizer only} \\
+B1 lexical linter & dev.\ time & F1 0.55; misses 13 of 26 unsafe programs (ours) \\
+B2 keyword filter & run time & catches 56.2\% of attacks reaching the system prompt; flags 30\% of benign inputs (ours) \\
+Spotlighting~\cite{hines2024spotlighting} & prompt & ASR from $>$50\% to $<$2\% on GPT-family models (reported) \\
+StruQ~\cite{chen2025struq} & model training & significantly better resistance, little or no utility loss (reported, qualitative) \\
+CaMeL~\cite{debenedetti2025camel} & run time & 77\% of AgentDojo tasks solved with provable security vs.\ 84\% undefended (reported) \\
+\midrule
+\textbf{\TL{}} & compile time & F1 1.00; structural leaks 38.1\%$\to$0\%; typed inputs 100\% blocked; indirect ASR 75.0$\to$56.2\% (allam, $p{=}0.017$), 28.1$\to$6.2\% (gpt-oss, $p{=}0.016$); utility 80--100\%; $\approx$5\,ms compile, no per-request model call (ours) \\
 \bottomrule
-\end{tabular}
-\end{table*}
+\end{tabular}}
+\end{table}
 
-\textbf{Prompt languages.} DSPy~\cite{khattab2024dspy} and LMQL~\cite{beurer2023lmql} treat prompts as programs but optimize what the model does, not where text comes from. \textbf{CaMeL}~\cite{debenedetti2025camel} separates a privileged planner from a quarantined LLM and enforces capability policies on tool calls at run time; \TL{} targets prompt construction one step earlier, and the two compose. \textbf{Static taint analysis} for LLM applications~\cite{he2026taintp2x,deepclause2026} retrofits taint tracking onto general-purpose code and must approximate its control flow and libraries; \TL{} designs the language so the analysis is exact. \textbf{Run-time detectors}~\cite{jacob2024promptshield,rebedea2023nemo} are probabilistic and add per-request cost; a detector can be registered as a named \TL{} sanitizer. \textbf{Auto-sanitizing templates}: CSAS~\cite{samuel2011csas} infers sanitizers for web templates with type qualifiers, and Semantic Kernel~\cite{microsoft2024sk} encodes every prompt variable at render time; \TL{} brings compile-time, flow-sensitive typing to prompts. \textbf{Model-level defences}~\cite{wallace2024hierarchy,chen2025struq,hines2024spotlighting} train or prompt the model to separate instructions from data; \TL{} supplies the structural separation they assume. \textbf{Benchmarks}~\cite{toyer2024tensortrust,liu2024formalizing} evaluate attacks and defences at the model level. \textbf{Foundations}: lattice-based information flow~\cite{denning1976lattice}, non-interference~\cite{goguen1982security}, security type systems~\cite{volpano1996sound,sabelfeld2003language}, flow-sensitive typing~\cite{hunt2006flow} and declassification~\cite{sabelfeld2009declassification}, with \code{sanitize()} as an explicit declassifier.
+Three points stand out. First, unlike the keyword filter, \TL{} decides from where text is placed rather than what it says, so it has no false positives on benign inputs and its compile-time verdict cannot be evaded by rephrasing an attack. Second, our spotlighting gains are smaller than the figure Hines et al.\ report; their experiments use GPT-family models and their own spotlighting variants and attacks, while we use the default delimiting sanitizer with smaller open models and include the public Tensor Trust attacks, so the comparison illustrates how strongly prompt-level defences depend on the model and the attacks. This is exactly why \TL{} pairs spotlighting with model-independent compile-time guarantees. Third, CaMeL and StruQ protect a different layer (agent tool calls and model weights) and compose with \TL{}: a \TL{} program can supply the trusted prompt of a CaMeL-style system or be sent to a StruQ-trained model.
 
 % =====================================================================
 \section{Limitations and Threats to Validity}

@@ -10,6 +10,16 @@
 
 ---
 
+## Authors (title page)
+
+- Amritha Varshini Pakanati (24BCE0390), amritha.varshini2024@vitstudent.ac.in
+- V L Lakshmi Shriyaa (24BCE0778), lakshmishriyaa.vl2024@vitstudent.ac.in
+- Karthick Ganesh (24BCI0018), karthick.ganesh2024@vitstudent.ac.in
+- Dr. Krishnaraj N, Assistant Professor Sr. Grade 2, Department of Database Systems, krishnaraj.n@vit.ac.in
+
+School of Computer Science and Engineering (SCOPE), Vellore Institute of Technology, Vellore, Tamil Nadu 632014, India.
+Code: https://github.com/Karthick-Ganesh/TrustLex
+
 ## Title (options)
 
 1. **TrustLex: Compile-Time Trust Typing for Injection-Safe Prompts in LLM-Integrated Applications**
