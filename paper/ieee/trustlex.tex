@@ -268,22 +268,7 @@ error[TL-S010]: UNTRUSTED data from input `user_msg`
 
 Let $n$ be the program size, $S$ the largest template built, and $m$ the IR size. Lexing and LALR(1) parsing are $O(n)$; name resolution is $O(n)$ expected; the security analysis is $O(n\cdot S)$, since each statement copies at most $S$ template parts and joins are over a constant-height lattice; pattern analysis is linear in the pattern; IR generation, checksumming and sealing are $O(m)$; the optimizer is $O(k\cdot m)$ for $k$ fixpoint rounds, with $k\le m$ because every rewrite except one-time normalization strictly shortens the text; binding is linear in $m$ plus the input length. No flow analysis runs per request.
 
-\textbf{Typical programs.} When no value is repeatedly duplicated, $S$ is bounded by the program text. Table~\ref{tab:latency} shows near-linear scaling (log--log slope 1.14 for $n\ge100$); lexing and parsing take 63--80\% of the time. The example program compiles in about 5\,ms.
-
-\begin{table}[t]
-\caption{Compile time (median of 5 runs; AMD Ryzen laptop, Python 3.10)}
-\label{tab:latency}
-\centering
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}lrrrrrrr@{}}
-\toprule
-Statements & 10 & 50 & 100 & 500 & 1k & 2k & 5k \\
-\midrule
-Total (ms) & 4.7 & 20.3 & 44.0 & 207 & 520 & 1205 & 3765 \\
-ms/stmt & .47 & .41 & .44 & .41 & .52 & .60 & .75 \\
-\bottomrule
-\end{tabular}}
-\end{table}
+\textbf{Typical programs.} When no value is repeatedly duplicated, $S$ is bounded by the program text and scaling is near-linear. Measured on an AMD Ryzen laptop (Python 3.10, median of 5 runs), compile time grows from 4.7\,ms for 10 statements to 44\,ms for 100, 207\,ms for 500 and 3.77\,s for 5{,}000, i.e.\ 0.41--0.75\,ms per statement (log--log slope 1.14 for $n\ge100$); lexing and parsing take 63--80\% of the time. The example program compiles in about 5\,ms.
 
 \textbf{Worst case.} Because templates are copied, $k$ repetitions of \code{a = a + a} build $2^k$ parts: compile time is 18.8\,ms at $k{=}10$, 305\,ms at $k{=}14$ and 2.69\,s at $k{=}17$, doubling with each statement. The cost is proportional to the prompt being built---inserting the value yields $2^{17}$ slots, beyond any model's context window---and can be bounded independently of output size by hash-consing templates into a DAG or by a size cap tied to the largest context window.
 
