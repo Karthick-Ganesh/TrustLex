@@ -26,7 +26,7 @@ Companies increasingly deploy large language models (LLMs) not as stand-alone ch
 
 We present **TrustLex**, a domain-specific language and compiler that makes trust a grammar-level type. Every input declares its origin (`user`, `rag`, `tool`); the compiler tracks trust through variables, interpolation, concatenation and reassignment by exact symbolic evaluation over a five-level trust lattice, and **refuses to compile** any prompt in which untrusted data can reach the privileged system channel without passing through a sanitizer, unless the input carries a refinement type (`enum`, `pattern`, `int`) that provably cannot express an instruction. We prove non-interference up to sanitization and validation, and show the check is also complete for the language. Accepted programs compile to a checksummed, optionally HMAC-sealed IR that is bound at run time into OpenAI or Anthropic API payloads.
 
-On a labelled corpus of 48 programs TrustLex achieves an F1 of 1.00, against 0.55 for a lexical linter and 0.80 for a keyword filter that also flags 30% of benign inputs. Across 1,536 program–attack pairs, naive templating lets structural injection reach the system prompt in 38.1% of cases; TrustLex in 0%. In live experiments with three hosted models, typed inputs block 100% of attacks before any API call, and TrustLex's spotlighted layout lowers the indirect-injection success rate on gpt-oss-20b from 28.1% to 6.2% (exact McNemar p = 0.016) **⟦UPDATE⟧**. Compilation takes about 5 ms for a typical program.
+On a labelled corpus of 48 programs TrustLex achieves an F1 of 1.00, against 0.55 for a lexical linter and 0.80 for a keyword filter that also flags 30% of benign inputs. Across 1,536 program–attack pairs, naive templating lets structural injection reach the system prompt in 38.1% of cases; TrustLex in 0%. In live experiments with three hosted models, using our own attacks and the public Tensor Trust benchmark, typed inputs block 100% of attacks before any API call, and TrustLex's layout significantly lowers indirect-injection success — e.g. from 75.0% to 56.2% on allam-2-7b with Tensor Trust attacks (exact McNemar p = 0.017) and from 28.1% to 6.2% on gpt-oss-20b with ours (p = 0.016). Compilation takes about 5 ms for a typical program.
 
 ---
 
@@ -78,7 +78,7 @@ Neither gives the *developer* a guarantee about the prompt they wrote. TrustLex 
 3. **A safety analysis for regular-expression types** that decides whether a `pattern` can match free text (whitespace, invisible characters, unbounded repetition, over 64 characters).
 4. **An end-to-end chain of custody**: a canonical IR with a SHA-256 integrity checksum and optional HMAC seal, invariant re-checks at generation and at binding, a registry of named sanitizers, and provider-correct OpenAI/Anthropic API payloads in which values remain JSON data.
 5. **Developer-facing diagnostics** in compiler style: taint paths as source snippets, machine-applicable fix-its that are re-checked, and a semantics-preserving prompt optimizer.
-6. **An evaluation** combining offline detection and leakage experiments, live attack-success experiments with three hosted models in direct and indirect (RAG) scenarios, a public benchmark (Tensor Trust) **⟦UPDATE⟧**, and a complexity analysis.
+6. **An evaluation** combining offline detection and leakage experiments, live attack-success experiments with three hosted models in direct and indirect (RAG) scenarios, a public benchmark (Tensor Trust), and a complexity analysis.
 
 ---
 
@@ -135,7 +135,7 @@ instruction {
 }
 ```
 
-Moving `insert(article)` into the `system` block — a layout common in RAG tutorials — is rejected with `TL-S011`; inserting `msg` there is rejected with `TL-S010`. Our live experiment (§7.4) shows that this rejected layout is, empirically, the most attacked one on every model tested.
+Moving `insert(article)` into the `system` block — a layout common in RAG tutorials — is rejected with `TL-S011`; inserting `msg` there is rejected with `TL-S010`. In our live experiment (§7.4) this rejected layout is the most attacked one on gpt-oss-20b and gemma-4 for every attack set and scenario.
 
 *(Figure 1 suggestion: three boxes on the left — Developer (green, trusted), Customer and Documents/APIs (red/orange, untrusted) — flowing into the TrustLex compiler in the middle, which outputs either a checked API payload (system channel: developer text + sanitized/validated slots only; user channel: spotlighted data) or a compile error with the taint path.)*
 
@@ -329,7 +329,7 @@ We answer five research questions:
 - **RQ1** Does TrustLex detect unsafe prompt programs more accurately than lightweight alternatives?
 - **RQ2** Does it prevent structural injection from reaching the system prompt?
 - **RQ3** How does it change attack success against real models, for direct and indirect injection?
-- **RQ4** Does the result hold on a public, independently written attack set? **⟦UPDATE⟧**
+- **RQ4** Does the result hold on a public, independently written attack set?
 - **RQ5** What does it cost (utility, compile time)?
 
 ### 7.1 Setup
@@ -363,40 +363,59 @@ A *structural leak* is a chat-template role token, a forged transcript turn, or 
 
 **Conditions.** Direct: **A** customer message raw in the system prompt; **B** raw in the user turn; **C** the TrustLex program (sanitized + spotlighted in the user turn); **D** C plus typed fields into which the attacker also writes. Indirect (RAG; the customer question is harmless, the attacker controls a retrieved article): **A** article raw in the system prompt (TrustLex rejects this program with `TL-S011`); **B** raw in the user turn; **C** TrustLex (sanitized + spotlighted).
 
-Attack success rate, 32 attacks per condition **⟦UPDATE: 2 repeats → 64 trials⟧**:
+Attack success rate with our 32 attacks (n = attack trials per condition; 2 repeats where n = 64; gpt-oss-20b has 1 repeat because of its daily token limit):
 
-| Model | Scenario | A naive, system | B naive, user | C TrustLex | D TrustLex typed |
-|---|---|---|---|---|---|
-| gpt-oss-20b | direct | 25.0% | 12.5% | 9.4% | **0%** (32/32 blocked) |
-| gpt-oss-20b | indirect | 28.1% | 18.8% | **6.2%** | — |
-| allam-2-7b | direct | 50.0% | 37.5% | 46.9% | **0%** |
-| allam-2-7b | indirect | 53.1% | 53.1% | 43.8% | — |
-| gemma-4-26b-a4b-it | direct | 3.1% | 0% | 0% | **0%** |
-| gemma-4-26b-a4b-it | indirect | 6.2% | 0% | 0% | — |
+| Model | Scenario | n | A naive, system | B naive, user | C TrustLex | D TrustLex typed |
+|---|---|---|---|---|---|---|
+| gpt-oss-20b | direct | 32 | 25.0% | 12.5% | 9.4% | **0%** (all blocked) |
+| gpt-oss-20b | indirect | 32 | 28.1% | 18.8% | **6.2%** | — |
+| allam-2-7b | direct | 64 | 48.4% | 42.2% | 48.4% | **0%** |
+| allam-2-7b | indirect | 64 | 57.8% | 59.4% | **40.6%** | — |
+| gemma-4-26b-a4b-it | direct | 64 | 4.7% | 1.6% | 0.0% | **0%** |
+| gemma-4-26b-a4b-it | indirect | 64 | 6.2% | 0.0% | 0.0% | — |
 
-Utility on benign inputs stayed at 80–100% in every condition (TrustLex never reduced it).
+Paired comparisons (exact McNemar test, same attack and repeat under two conditions; "a/b" = trials where only the first / only the second condition was attacked successfully):
+
+| Model | Attacks | Scenario | A vs C | p | B vs C | p |
+|---|---|---|---|---|---|---|
+| gpt-oss-20b | ours | direct | 8/3 | 0.227 | 3/2 | 1.000 |
+| gpt-oss-20b | ours | indirect | 7/0 | **0.016** | 4/0 | 0.125 |
+| gpt-oss-20b | Tensor Trust | direct | 12/9 | 0.664 | 6/6 | 1.000 |
+| gpt-oss-20b | Tensor Trust (32) | indirect | 8/4 | 0.388 | 2/4 | 0.688 |
+| allam-2-7b | ours | direct | 9/9 | 1.000 | 11/15 | 0.557 |
+| allam-2-7b | ours | indirect | 18/7 | **0.043** | 19/7 | **0.029** |
+| allam-2-7b | Tensor Trust | direct | 7/5 | 0.774 | 13/6 | 0.167 |
+| allam-2-7b | Tensor Trust | indirect | 17/5 | **0.017** | 14/3 | **0.013** |
+| gemma-4 | ours | direct | 3/0 | 0.250 | 1/0 | 1.000 |
+| gemma-4 | ours | indirect | 4/0 | 0.125 | 0/0 | 1.000 |
+| gemma-4 | Tensor Trust | direct | 0/0 | 1.000 | 0/0 | 1.000 |
+| gemma-4 | Tensor Trust | indirect | 2/0 | 0.500 | 0/0 | 1.000 |
+
+Utility on benign inputs stayed at 80–100% in every condition; a TrustLex condition was never more than one request below a naive one.
 
 **Findings.**
 1. **Typed inputs block every attack, on every model, before any API call.** D's 0% holds by construction — it demonstrates that a refinement-typed field cannot carry an injection, independent of the model; the free-text message in D is protected exactly as in C. (There is no D in the indirect scenario because a free-text article cannot be given a refinement type.)
-2. **The layout TrustLex rejects is the most attacked one.** Condition A (untrusted text in the system prompt) has the highest success rate for every model and scenario — independent empirical support for `TL-S010`/`TL-S011`.
-3. **On a mid-size model, TrustLex's layout substantially lowers success.** For gpt-oss-20b, indirect injection drops from 28.1% to 6.2%; 7 attacks succeed only in A and none only in C (exact McNemar p = 0.016). Role-token attacks succeed 4/4 in A and 0/4 in C (direct). Other differences are not significant at this sample size **⟦UPDATE with repeat⟧**.
-4. **Spotlighting needs a model that respects delimiters.** allam-2-7b, a 7B model without instruction-hierarchy training, repeats codes it sees anywhere in its context — including inside clearly marked data — so spotlighting gives it little benefit (C vs A not significant). Only the compile-time guarantees (D, and keeping data out of the system channel) protect such a model. This matches the literature: prompt-level defences reduce but do not eliminate injection, and their effect depends on model training [Hines et al. 2024; Chen et al. 2025].
+2. **The layout TrustLex rejects is the most attacked one on the stronger models.** Condition A (untrusted text in the system prompt) has the highest success rate for gpt-oss-20b and gemma-4 in every attack set and scenario — empirical support for `TL-S010`/`TL-S011`. On allam-2-7b, A and B are similar: the model does not distinguish the channels at all.
+3. **TrustLex significantly reduces indirect injection.** With the attack in a retrieved document, C is significantly lower than both naive layouts on allam-2-7b for both attack sets (A vs C p = 0.043 and 0.017; B vs C p = 0.029 and 0.013), and lower than the system-prompt layout on gpt-oss-20b with our attacks (28.1% → 6.2%, p = 0.016). With Tensor Trust attacks on gpt-oss-20b, C (31.2%) is below A (43.8%) but not significantly, and not below B (25.0%).
+4. **No significant effect for direct injection.** In the direct scenario no difference between A, B and C is significant on any model: spotlighting marks the customer's message as data, but that message is addressed to the model anyway. Only the typed fields (D) help there. This matches the literature: prompt-level defences reduce but do not eliminate injection, and their effect depends on the model and the attack [Hines et al. 2024; Chen et al. 2025]. allam-2-7b, a 7B model without instruction-hierarchy training, also often repeats codes it finds anywhere in its context.
 5. **A strongly aligned model resists all conditions.** gemma-4 is near 0% everywhere, so the conditions cannot be separated; its single direct success (A14) is borderline (it acknowledged the code).
 
 *(Figure: grouped bar charts `asr.png` and `asr_indirect.png` with 95% Wilson intervals.)*
 
-### 7.5 RQ4 — Public benchmark (Tensor Trust) **⟦UPDATE: results pending⟧**
+### 7.5 RQ4 — Public benchmark (Tensor Trust)
 
 To avoid relying only on our own attacks, we use the **Tensor Trust** hijacking benchmark [Toyer et al. 2024], a public set of 776 prompt-injection attacks written by human players of an online game whose goal is to make a model say "Access Granted". We keep only the attack text (not the game's defence prompts), select the 206 distinct attacks that name the target phrase literally and are at most 800 characters, replace the phrase with our per-trial canary so the same judge applies, and draw a seeded random sample of 64. The attacks were run in both scenarios under the same conditions and models.
 
-| Model | Scenario | A | B | C | D |
-|---|---|---|---|---|---|
-| gpt-oss-20b | direct | ⟦⟧ | ⟦⟧ | ⟦⟧ | ⟦⟧ |
-| gpt-oss-20b | indirect | ⟦⟧ | ⟦⟧ | ⟦⟧ | — |
-| allam-2-7b | direct | ⟦⟧ | ⟦⟧ | ⟦⟧ | ⟦⟧ |
-| allam-2-7b | indirect | ⟦⟧ | ⟦⟧ | ⟦⟧ | — |
-| gemma-4-26b-a4b-it | direct | ⟦⟧ | ⟦⟧ | ⟦⟧ | ⟦⟧ |
-| gemma-4-26b-a4b-it | indirect | ⟦⟧ | ⟦⟧ | ⟦⟧ | — |
+| Model | Scenario | n | A | B | C | D |
+|---|---|---|---|---|---|---|
+| gpt-oss-20b | direct | 64 | 23.4% | 18.8% | 18.8% | **0%** |
+| gpt-oss-20b | indirect | 32 ⟦UPDATE: 64⟧ | 43.8% | 25.0% | 31.2% | — |
+| allam-2-7b | direct | 64 | 62.5% | 70.3% | 59.4% | **0%** |
+| allam-2-7b | indirect | 64 | 75.0% | 73.0% | **56.2%** | — |
+| gemma-4-26b-a4b-it | direct | 64 | 1.6% | 1.6% | 1.6% | **0%** |
+| gemma-4-26b-a4b-it | indirect | 64 | 4.7% | 1.6% | 1.6% | — |
+
+The public attacks are stronger than ours (on allam-2-7b 56–75% vs. 41–59%), yet typed inputs still block all of them, and the indirect-scenario reduction on allam-2-7b is the strongest effect in the study (p = 0.017 and 0.013, table above).
 
 ### 7.6 RQ5 — Cost
 
@@ -452,7 +471,8 @@ To avoid relying only on our own attacks, we use the **Tensor Trust** hijacking 
 **Threats to validity**
 - **Hand-written corpus and attacks** — mitigated by the Tensor Trust benchmark (§7.5).
 - **Few models, free tiers.** Three models; hosted free models change or are retired; exact IDs and dates are recorded and all responses cached.
-- **Sample size.** 32 attacks per condition give wide intervals; only one paired difference is significant at one repeat **⟦UPDATE⟧**. Repeats at temperature 0 vary only the canary and are correlated.
+- **Sample size.** 32–64 attack trials per condition give wide intervals; 5 of the 24 paired comparisons are significant, all in the indirect scenario. Repeats at temperature 0 vary only the canary and are correlated.
+- **Empty replies.** About 4–5 of 64 gpt-oss-20b replies per condition were empty because its reasoning used up the 1,024-token output budget; they count as unsuccessful attacks.
 - **Canary-based success is a proxy**: attacks that change behaviour without repeating the canary are not counted; a refusal-aware judge prevents counting refusals that quote the canary.
 - **Benchmark adaptation**: Tensor Trust attacks were written against the game's defences, not our application; attacks that spell the target phrase indirectly are excluded.
 - **Condition D is a guarantee check, not a behavioural measurement.**
@@ -508,7 +528,7 @@ Prompt injection in LLM-integrated applications is, at its root, a construction 
 | Fig. 4 | Example diagnostic with taint path | §5 |
 | Fig. 5 | Detection scores | `eval/results/detection.png` |
 | Fig. 6 | Live ASR, direct and indirect | `eval/results/asr.png`, `asr_indirect.png` |
-| Fig. 7 | Tensor Trust ASR | `eval/results/asr_tensor_trust.png`, `asr_indirect_tensor_trust.png` ⟦UPDATE⟧ |
+| Fig. 7 | Tensor Trust ASR | `eval/results/asr_tensor_trust.png`, `asr_indirect_tensor_trust.png` |
 | Fig. 8 | Compile time vs. program size (log–log) | `eval/results/latency.png` |
 | Table | Diagnostics reference (TL-L/P/S/W/G codes) | README §7 |
 
