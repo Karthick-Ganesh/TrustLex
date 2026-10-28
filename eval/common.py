@@ -6,6 +6,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import json
+import math
 import platform
 import re
 import subprocess
@@ -109,6 +110,16 @@ def wilson(successes: int, n: int, z: float = 1.96) -> tuple[float, float]:
     centre = (p + z * z / (2 * n)) / denom
     half = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / denom
     return (max(0.0, centre - half), min(1.0, centre + half))
+
+
+def mcnemar(b: int, c: int) -> float:
+    """Exact two-sided McNemar p-value for paired binary outcomes: `b` pairs
+    where only the first condition succeeded, `c` where only the second did."""
+    n = b + c
+    if n == 0:
+        return 1.0
+    tail = sum(math.comb(n, i) for i in range(min(b, c) + 1)) / 2 ** n
+    return min(1.0, 2 * tail)
 
 
 def confusion(truth: list[bool], predicted: list[bool]) -> dict:

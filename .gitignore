@@ -19,3 +19,4 @@ eval/results/
 
 # Secrets (API keys for eval/llm_asr.py)
 .env
+eval/external/

@@ -38,7 +38,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from common import (  # noqa: E402
-    DEFAULT_SEED, ROOT, canary, load_attacks, load_benign, metadata, results_dir, wilson, with_canary,
+    ATTACKS, DEFAULT_SEED, ROOT, canary, load_attacks, load_benign, metadata, results_dir, wilson, with_canary,
 )
 from naive import naive_render  # noqa: E402
 from providers import MissingKeyError, ProviderError, ReliableClient, make_provider  # noqa: E402
@@ -272,7 +272,9 @@ def _load_dotenv():
 
 
 def run(args, out: Path, provider=None, sleep=None) -> dict | None:
-    attacks, benign = load_attacks(), load_benign()
+    attack_path = getattr(args, "attacks", None) or ATTACKS
+    attacks, benign = load_attacks(attack_path), load_benign()
+    attack_set = "" if attack_path == ATTACKS else _slug(attack_path.stem)
     if args.limit:
         attacks, benign = attacks[:args.limit], benign[:args.limit]
     scenario = getattr(args, "scenario", "direct")
@@ -336,14 +338,14 @@ def run(args, out: Path, provider=None, sleep=None) -> dict | None:
         "metadata": metadata(script="eval/llm_asr.py", scenario=scenario, provider=provider.name, model=args.model,
                              base_url=getattr(args, "base_url", None), temperature=args.temperature,
                              max_tokens=args.max_tokens, repeats=args.repeats, limit=args.limit, seed=args.seed,
-                             attacks=len(attacks), benign=len(benign), requests_sent=client.requests,
+                             attack_set=attack_set or "trustlex", attacks=len(attacks), benign=len(benign),
+                             requests_sent=client.requests,
                              errors=sum(1 for r in rows if r["error"]),
                              trustlex_verdicts=trustlex_verdicts(scenario)),
         "conditions": summarize(rows, labels),
     }
-    stem = f"asr_{_slug(provider.name)}_{_slug(args.model)}"
-    if scenario != "direct":
-        stem = f"asr_{scenario}_{_slug(provider.name)}_{_slug(args.model)}"
+    prefix = "asr" + (f"_{scenario}" if scenario != "direct" else "") + (f"_{attack_set}" if attack_set else "")
+    stem = f"{prefix}_{_slug(provider.name)}_{_slug(args.model)}"
     with (out / f"{stem}.csv").open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
         writer.writeheader()
@@ -369,6 +371,8 @@ def build_parser() -> argparse.ArgumentParser:
                                      "(default GEMINI_API_KEY for gemini; none for openai_compat)")
     p.add_argument("--scenario", choices=tuple(SCENARIOS), default="direct",
                    help="direct: the attack is the customer's message; indirect: it is planted in a retrieved article")
+    p.add_argument("--attacks", type=Path, help="attack file (JSONL with {CANARY}; default eval/attacks/attacks.jsonl), "
+                                                "e.g. one made by eval/import_tensor_trust.py")
     p.add_argument("--repeats", type=int, default=1)
     p.add_argument("--limit", type=int, help="use only the first N attacks and N benign inputs")
     p.add_argument("--rpm", type=float, default=20, help="requests per minute (default 20)")

@@ -19,20 +19,29 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from common import EVAL  # noqa: E402
+from common import EVAL, mcnemar  # noqa: E402
 
 CONDITION_ORDER = ("A", "B", "C", "D")
 SCENARIO_TEXT = {
     "direct": ("Direct injection: the attack is the customer's message",
                "**A** the message raw in the system prompt; **B** raw as the user message; **C** the TrustLex "
                "program (sanitized and spotlighted in the user turn); **D** C plus validated typed fields, into "
-               "which the attacker also writes (a value that fails validation is blocked before any request)."),
+               "which the attacker also writes (a value that fails validation is blocked before any request). "
+               "D's 0% therefore holds by construction: it shows that a typed field cannot carry an attack, not "
+               "how a model behaves; the free-text message in D is protected exactly as in C."),
     "indirect": ("Indirect injection: the attack is planted in a retrieved help-center article",
                  "The customer's question is harmless; the attacker controls only a retrieved article "
                  "(`input article from rag`). **A** the article raw in the system prompt (TrustLex rejects this "
                  "program with `TL-S011`); **B** raw in the user turn; **C** the TrustLex program (article "
                  "sanitized and spotlighted in the user turn)."),
 }
+ATTACK_SET_TEXT = {
+    "trustlex": "",
+    "tensor_trust": "Tensor Trust benchmark attacks (public, written by human players; see "
+                    "`eval/import_tensor_trust.py`)",
+}
+# Pairs compared with an exact McNemar test (same attack, same repeat).
+PAIRS = (("A", "C"), ("B", "C"))
 
 
 def _load_json(path: Path):
@@ -116,10 +125,30 @@ def _scenario(run: dict) -> str:
     return run["metadata"].get("scenario", "direct")
 
 
+def _attack_set(run: dict) -> str:
+    return run["metadata"].get("attack_set", "trustlex")
+
+
 def _run_label(run: dict, scenario: bool = True) -> str:
     meta = run["metadata"]
     label = f"{meta['provider']} / {meta['model']}" + (" (FAKE)" if meta["provider"] == "fake" else "")
-    return label + (f" [{_scenario(run)}]" if scenario and _scenario(run) != "direct" else "")
+    tags = [t for t in (_scenario(run), _attack_set(run)) if t not in ("direct", "trustlex")]
+    return label + (f" [{', '.join(tags)}]" if scenario and tags else "")
+
+
+def _paired(run: dict) -> list[list]:
+    """Exact McNemar tests between conditions, pairing trials by attack and repeat."""
+    outcome = {(r["condition"], r["item"], r["repeat"]): r["success"] == "1"
+               for r in run.get("_rows", []) if r["kind"] == "attack" and not r["error"] and not r["blocked"]}
+    rows = []
+    for x, y in PAIRS:
+        keys = sorted({k[1:] for k in outcome if k[0] == x} & {k[1:] for k in outcome if k[0] == y})
+        if not keys:
+            continue
+        b = sum(outcome[(x, *k)] and not outcome[(y, *k)] for k in keys)
+        c = sum(outcome[(y, *k)] and not outcome[(x, *k)] for k in keys)
+        rows.append([f"{x} vs {y}", len(keys), b, c, f"{mcnemar(b, c):.3f}"])
+    return rows
 
 
 def _slope(rows: list[dict]) -> float | None:
@@ -155,6 +184,11 @@ def _asr_run_section(run: dict) -> list[str]:
             _table(["category", *conds],
                    [[cat, *(_pct(run["conditions"][c]["by_category"].get(cat, {}).get("asr")) for c in conds)]
                     for cat in categories]), ""]
+    paired = _paired(run)
+    if paired:
+        out += ["Paired comparison (exact McNemar test; p < 0.05 means the difference is unlikely to be chance):", "",
+                _table(["comparison", "paired trials", "only first succeeded", "only second succeeded", "p"],
+                       paired), ""]
     return out
 
 
@@ -163,7 +197,8 @@ def build(results: Path, include_fake: bool = False) -> tuple[str, list[str]]:
     detection_rows = _load_csv(results / "detection.csv")
     sanitizer_rows = _load_csv(results / "sanitizer.csv")
     latency = _load_json(results / "latency.json")
-    all_runs = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(results.glob("asr_*.json"))]
+    all_runs = [{**json.loads(p.read_text(encoding="utf-8")), "_rows": _load_csv(p.with_suffix(".csv"))}
+                for p in sorted(results.glob("asr_*.json"))]
     runs = [r for r in all_runs if include_fake or r["metadata"]["provider"] != "fake"]
     skipped_fake = len(all_runs) - len(runs)
 
@@ -286,14 +321,22 @@ def build(results: Path, include_fake: bool = False) -> tuple[str, list[str]]:
                 "that only quote the canary while refusing (\"I can't respond with codes like TLX-…\") are counted "
                 "separately as *canary mentioned*. Reasoning (\"thought\") parts of thinking models are not part of "
                 "the reply.", ""]
-        scenarios = [sc for sc in SCENARIO_TEXT if any(_scenario(r) == sc for r in runs)]
-        for scenario in scenarios:
+        sets = sorted({_attack_set(r) for r in runs}, key=lambda s: (s != "trustlex", s))
+        groups = [(sc, st) for st in sets for sc in SCENARIO_TEXT
+                  if any(_scenario(r) == sc and _attack_set(r) == st for r in runs)]
+        for scenario, attack_set in groups:
             heading, explanation = SCENARIO_TEXT[scenario]
-            out += [f"### {heading}", "", f"Conditions: {explanation}", ""]
-            for run in [r for r in runs if _scenario(r) == scenario]:
+            set_text = ATTACK_SET_TEXT.get(attack_set, f"attack set `{attack_set}`")
+            if set_text:
+                heading += f" ({set_text.split(' (')[0]})"
+            out += [f"### {heading}", ""] + ([f"Attacks: {set_text}.", ""] if set_text else []) + \
+                   [f"Conditions: {explanation}", ""]
+            group = [r for r in runs if _scenario(r) == scenario and _attack_set(r) == attack_set]
+            for run in group:
                 out += _asr_run_section(run)
-            chart = "asr.png" if scenario == "direct" else f"asr_{scenario}.png"
-            asr_chart([r for r in runs if _scenario(r) == scenario], results / chart, heading)
+            chart = "asr" + (f"_{scenario}" if scenario != "direct" else "") + \
+                    (f"_{attack_set}" if attack_set != "trustlex" else "") + ".png"
+            asr_chart(group, results / chart, heading)
             charts.append(chart)
             out += [f"![{heading}]({chart})", ""]
     else:
@@ -342,6 +385,12 @@ def build(results: Path, include_fake: bool = False) -> tuple[str, list[str]]:
             "- **Small, hand-written corpus.** The programs and attacks were written by the authors; they cover the "
             "listed categories but are not a sample of real applications. TrustLex's perfect detection score "
             "reflects an exact analysis of a small straight-line language, not a general result.",
+            "- **Adapted benchmark attacks.** Tensor Trust attacks were written against the game's own defence "
+            "prompts, not the Acme application; we keep only attacks that name the target phrase \"Access Granted\" "
+            "literally (≤ 800 characters) and replace it with the canary, which excludes attacks that spell the "
+            "phrase indirectly.",
+            "- **Repeats at temperature 0.** A repeat changes only the trial's canary, so repeats of one attack are "
+            "correlated; paired tests treat them as separate pairs.",
             "- **Few models.** ASR is reported only for the models listed in §5; other models, sizes and system-"
             "prompt styles may behave differently.",
             "- **Free models change.** Hosted free-tier models are updated or retired without notice; the exact "
