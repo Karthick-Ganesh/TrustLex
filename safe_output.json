@@ -1,0 +1,47 @@
+{
+  "format": "trustlex-ir/1",
+  "inputs": {
+    "user_msg": {
+      "source": "user",
+      "trust": "UNTRUSTED"
+    }
+  },
+  "messages": [
+    {
+      "block": "system",
+      "line": 6,
+      "parts": [
+        {
+          "text": "You are a support agent. The user asked: "
+        },
+        {
+          "sanitize": true,
+          "slot": "user_msg"
+        }
+      ],
+      "role": "system"
+    },
+    {
+      "block": "instruction",
+      "line": 10,
+      "parts": [
+        {
+          "sanitize": false,
+          "slot": "user_msg"
+        }
+      ],
+      "role": "user"
+    }
+  ],
+  "options": {
+    "delimit_untrusted": true,
+    "optimization": 1,
+    "policy": "strict"
+  },
+  "sanitizer": {
+    "max_length": 4000,
+    "name": "trustlex-default/1"
+  },
+  "sha256": "5944b5a07e1a99eb4eeb3e2701d0e7091e8e0456cd5530f6d8a2db5177a0bafd",
+  "source": "examples\\scenarios\\08_sanitized_copy.tlx"
+}

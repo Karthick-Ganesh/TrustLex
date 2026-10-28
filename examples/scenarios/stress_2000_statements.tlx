@@ -1,0 +1,2002 @@
+# about: Stress test: a 2,000-statement program (inputs, sanitized copies, interpolation, many blocks) that compiles cleanly
+# expect: ok
+input user_msg
+input doc from rag
+input lang : enum("en", "fr")
+var persona = "You are a helpful assistant."
+var safe_msg = sanitize(user_msg)
+input in0
+var t1 = "Rule 1: be concise. {persona}"
+var s2 = sanitize(in0 + doc)
+var c3 = "Note " + safe_msg + " in {lang}"
+s2 = "Reset 4: " + s2
+system { "Section 5." insert(t1) insert(s2) "{c3}" }
+instruction { insert(in0) insert(doc) }
+var u7 = "{t1} / {c3}"
+input in8
+var t9 = "Rule 9: be concise. {persona}"
+var s10 = sanitize(in8 + doc)
+var c11 = "Note " + safe_msg + " in {lang}"
+s10 = "Reset 12: " + s10
+system { "Section 13." insert(t9) insert(s10) "{c11}" }
+instruction { insert(in8) insert(doc) }
+var u15 = "{t9} / {c11}"
+input in16
+var t17 = "Rule 17: be concise. {persona}"
+var s18 = sanitize(in16 + doc)
+var c19 = "Note " + safe_msg + " in {lang}"
+s18 = "Reset 20: " + s18
+system { "Section 21." insert(t17) insert(s18) "{c19}" }
+instruction { insert(in16) insert(doc) }
+var u23 = "{t17} / {c19}"
+input in24
+var t25 = "Rule 25: be concise. {persona}"
+var s26 = sanitize(in24 + doc)
+var c27 = "Note " + safe_msg + " in {lang}"
+s26 = "Reset 28: " + s26
+system { "Section 29." insert(t25) insert(s26) "{c27}" }
+instruction { insert(in24) insert(doc) }
+var u31 = "{t25} / {c27}"
+input in32
+var t33 = "Rule 33: be concise. {persona}"
+var s34 = sanitize(in32 + doc)
+var c35 = "Note " + safe_msg + " in {lang}"
+s34 = "Reset 36: " + s34
+system { "Section 37." insert(t33) insert(s34) "{c35}" }
+instruction { insert(in32) insert(doc) }
+var u39 = "{t33} / {c35}"
+input in40
+var t41 = "Rule 41: be concise. {persona}"
+var s42 = sanitize(in40 + doc)
+var c43 = "Note " + safe_msg + " in {lang}"
+s42 = "Reset 44: " + s42
+system { "Section 45." insert(t41) insert(s42) "{c43}" }
+instruction { insert(in40) insert(doc) }
+var u47 = "{t41} / {c43}"
+input in48
+var t49 = "Rule 49: be concise. {persona}"
+var s50 = sanitize(in48 + doc)
+var c51 = "Note " + safe_msg + " in {lang}"
+s50 = "Reset 52: " + s50
+system { "Section 53." insert(t49) insert(s50) "{c51}" }
+instruction { insert(in48) insert(doc) }
+var u55 = "{t49} / {c51}"
+input in56
+var t57 = "Rule 57: be concise. {persona}"
+var s58 = sanitize(in56 + doc)
+var c59 = "Note " + safe_msg + " in {lang}"
+s58 = "Reset 60: " + s58
+system { "Section 61." insert(t57) insert(s58) "{c59}" }
+instruction { insert(in56) insert(doc) }
+var u63 = "{t57} / {c59}"
+input in64
+var t65 = "Rule 65: be concise. {persona}"
+var s66 = sanitize(in64 + doc)
+var c67 = "Note " + safe_msg + " in {lang}"
+s66 = "Reset 68: " + s66
+system { "Section 69." insert(t65) insert(s66) "{c67}" }
+instruction { insert(in64) insert(doc) }
+var u71 = "{t65} / {c67}"
+input in72
+var t73 = "Rule 73: be concise. {persona}"
+var s74 = sanitize(in72 + doc)
+var c75 = "Note " + safe_msg + " in {lang}"
+s74 = "Reset 76: " + s74
+system { "Section 77." insert(t73) insert(s74) "{c75}" }
+instruction { insert(in72) insert(doc) }
+var u79 = "{t73} / {c75}"
+input in80
+var t81 = "Rule 81: be concise. {persona}"
+var s82 = sanitize(in80 + doc)
+var c83 = "Note " + safe_msg + " in {lang}"
+s82 = "Reset 84: " + s82
+system { "Section 85." insert(t81) insert(s82) "{c83}" }
+instruction { insert(in80) insert(doc) }
+var u87 = "{t81} / {c83}"
+input in88
+var t89 = "Rule 89: be concise. {persona}"
+var s90 = sanitize(in88 + doc)
+var c91 = "Note " + safe_msg + " in {lang}"
+s90 = "Reset 92: " + s90
+system { "Section 93." insert(t89) insert(s90) "{c91}" }
+instruction { insert(in88) insert(doc) }
+var u95 = "{t89} / {c91}"
+input in96
+var t97 = "Rule 97: be concise. {persona}"
+var s98 = sanitize(in96 + doc)
+var c99 = "Note " + safe_msg + " in {lang}"
+s98 = "Reset 100: " + s98
+system { "Section 101." insert(t97) insert(s98) "{c99}" }
+instruction { insert(in96) insert(doc) }
+var u103 = "{t97} / {c99}"
+input in104
+var t105 = "Rule 105: be concise. {persona}"
+var s106 = sanitize(in104 + doc)
+var c107 = "Note " + safe_msg + " in {lang}"
+s106 = "Reset 108: " + s106
+system { "Section 109." insert(t105) insert(s106) "{c107}" }
+instruction { insert(in104) insert(doc) }
+var u111 = "{t105} / {c107}"
+input in112
+var t113 = "Rule 113: be concise. {persona}"
+var s114 = sanitize(in112 + doc)
+var c115 = "Note " + safe_msg + " in {lang}"
+s114 = "Reset 116: " + s114
+system { "Section 117." insert(t113) insert(s114) "{c115}" }
+instruction { insert(in112) insert(doc) }
+var u119 = "{t113} / {c115}"
+input in120
+var t121 = "Rule 121: be concise. {persona}"
+var s122 = sanitize(in120 + doc)
+var c123 = "Note " + safe_msg + " in {lang}"
+s122 = "Reset 124: " + s122
+system { "Section 125." insert(t121) insert(s122) "{c123}" }
+instruction { insert(in120) insert(doc) }
+var u127 = "{t121} / {c123}"
+input in128
+var t129 = "Rule 129: be concise. {persona}"
+var s130 = sanitize(in128 + doc)
+var c131 = "Note " + safe_msg + " in {lang}"
+s130 = "Reset 132: " + s130
+system { "Section 133." insert(t129) insert(s130) "{c131}" }
+instruction { insert(in128) insert(doc) }
+var u135 = "{t129} / {c131}"
+input in136
+var t137 = "Rule 137: be concise. {persona}"
+var s138 = sanitize(in136 + doc)
+var c139 = "Note " + safe_msg + " in {lang}"
+s138 = "Reset 140: " + s138
+system { "Section 141." insert(t137) insert(s138) "{c139}" }
+instruction { insert(in136) insert(doc) }
+var u143 = "{t137} / {c139}"
+input in144
+var t145 = "Rule 145: be concise. {persona}"
+var s146 = sanitize(in144 + doc)
+var c147 = "Note " + safe_msg + " in {lang}"
+s146 = "Reset 148: " + s146
+system { "Section 149." insert(t145) insert(s146) "{c147}" }
+instruction { insert(in144) insert(doc) }
+var u151 = "{t145} / {c147}"
+input in152
+var t153 = "Rule 153: be concise. {persona}"
+var s154 = sanitize(in152 + doc)
+var c155 = "Note " + safe_msg + " in {lang}"
+s154 = "Reset 156: " + s154
+system { "Section 157." insert(t153) insert(s154) "{c155}" }
+instruction { insert(in152) insert(doc) }
+var u159 = "{t153} / {c155}"
+input in160
+var t161 = "Rule 161: be concise. {persona}"
+var s162 = sanitize(in160 + doc)
+var c163 = "Note " + safe_msg + " in {lang}"
+s162 = "Reset 164: " + s162
+system { "Section 165." insert(t161) insert(s162) "{c163}" }
+instruction { insert(in160) insert(doc) }
+var u167 = "{t161} / {c163}"
+input in168
+var t169 = "Rule 169: be concise. {persona}"
+var s170 = sanitize(in168 + doc)
+var c171 = "Note " + safe_msg + " in {lang}"
+s170 = "Reset 172: " + s170
+system { "Section 173." insert(t169) insert(s170) "{c171}" }
+instruction { insert(in168) insert(doc) }
+var u175 = "{t169} / {c171}"
+input in176
+var t177 = "Rule 177: be concise. {persona}"
+var s178 = sanitize(in176 + doc)
+var c179 = "Note " + safe_msg + " in {lang}"
+s178 = "Reset 180: " + s178
+system { "Section 181." insert(t177) insert(s178) "{c179}" }
+instruction { insert(in176) insert(doc) }
+var u183 = "{t177} / {c179}"
+input in184
+var t185 = "Rule 185: be concise. {persona}"
+var s186 = sanitize(in184 + doc)
+var c187 = "Note " + safe_msg + " in {lang}"
+s186 = "Reset 188: " + s186
+system { "Section 189." insert(t185) insert(s186) "{c187}" }
+instruction { insert(in184) insert(doc) }
+var u191 = "{t185} / {c187}"
+input in192
+var t193 = "Rule 193: be concise. {persona}"
+var s194 = sanitize(in192 + doc)
+var c195 = "Note " + safe_msg + " in {lang}"
+s194 = "Reset 196: " + s194
+system { "Section 197." insert(t193) insert(s194) "{c195}" }
+instruction { insert(in192) insert(doc) }
+var u199 = "{t193} / {c195}"
+input in200
+var t201 = "Rule 201: be concise. {persona}"
+var s202 = sanitize(in200 + doc)
+var c203 = "Note " + safe_msg + " in {lang}"
+s202 = "Reset 204: " + s202
+system { "Section 205." insert(t201) insert(s202) "{c203}" }
+instruction { insert(in200) insert(doc) }
+var u207 = "{t201} / {c203}"
+input in208
+var t209 = "Rule 209: be concise. {persona}"
+var s210 = sanitize(in208 + doc)
+var c211 = "Note " + safe_msg + " in {lang}"
+s210 = "Reset 212: " + s210
+system { "Section 213." insert(t209) insert(s210) "{c211}" }
+instruction { insert(in208) insert(doc) }
+var u215 = "{t209} / {c211}"
+input in216
+var t217 = "Rule 217: be concise. {persona}"
+var s218 = sanitize(in216 + doc)
+var c219 = "Note " + safe_msg + " in {lang}"
+s218 = "Reset 220: " + s218
+system { "Section 221." insert(t217) insert(s218) "{c219}" }
+instruction { insert(in216) insert(doc) }
+var u223 = "{t217} / {c219}"
+input in224
+var t225 = "Rule 225: be concise. {persona}"
+var s226 = sanitize(in224 + doc)
+var c227 = "Note " + safe_msg + " in {lang}"
+s226 = "Reset 228: " + s226
+system { "Section 229." insert(t225) insert(s226) "{c227}" }
+instruction { insert(in224) insert(doc) }
+var u231 = "{t225} / {c227}"
+input in232
+var t233 = "Rule 233: be concise. {persona}"
+var s234 = sanitize(in232 + doc)
+var c235 = "Note " + safe_msg + " in {lang}"
+s234 = "Reset 236: " + s234
+system { "Section 237." insert(t233) insert(s234) "{c235}" }
+instruction { insert(in232) insert(doc) }
+var u239 = "{t233} / {c235}"
+input in240
+var t241 = "Rule 241: be concise. {persona}"
+var s242 = sanitize(in240 + doc)
+var c243 = "Note " + safe_msg + " in {lang}"
+s242 = "Reset 244: " + s242
+system { "Section 245." insert(t241) insert(s242) "{c243}" }
+instruction { insert(in240) insert(doc) }
+var u247 = "{t241} / {c243}"
+input in248
+var t249 = "Rule 249: be concise. {persona}"
+var s250 = sanitize(in248 + doc)
+var c251 = "Note " + safe_msg + " in {lang}"
+s250 = "Reset 252: " + s250
+system { "Section 253." insert(t249) insert(s250) "{c251}" }
+instruction { insert(in248) insert(doc) }
+var u255 = "{t249} / {c251}"
+input in256
+var t257 = "Rule 257: be concise. {persona}"
+var s258 = sanitize(in256 + doc)
+var c259 = "Note " + safe_msg + " in {lang}"
+s258 = "Reset 260: " + s258
+system { "Section 261." insert(t257) insert(s258) "{c259}" }
+instruction { insert(in256) insert(doc) }
+var u263 = "{t257} / {c259}"
+input in264
+var t265 = "Rule 265: be concise. {persona}"
+var s266 = sanitize(in264 + doc)
+var c267 = "Note " + safe_msg + " in {lang}"
+s266 = "Reset 268: " + s266
+system { "Section 269." insert(t265) insert(s266) "{c267}" }
+instruction { insert(in264) insert(doc) }
+var u271 = "{t265} / {c267}"
+input in272
+var t273 = "Rule 273: be concise. {persona}"
+var s274 = sanitize(in272 + doc)
+var c275 = "Note " + safe_msg + " in {lang}"
+s274 = "Reset 276: " + s274
+system { "Section 277." insert(t273) insert(s274) "{c275}" }
+instruction { insert(in272) insert(doc) }
+var u279 = "{t273} / {c275}"
+input in280
+var t281 = "Rule 281: be concise. {persona}"
+var s282 = sanitize(in280 + doc)
+var c283 = "Note " + safe_msg + " in {lang}"
+s282 = "Reset 284: " + s282
+system { "Section 285." insert(t281) insert(s282) "{c283}" }
+instruction { insert(in280) insert(doc) }
+var u287 = "{t281} / {c283}"
+input in288
+var t289 = "Rule 289: be concise. {persona}"
+var s290 = sanitize(in288 + doc)
+var c291 = "Note " + safe_msg + " in {lang}"
+s290 = "Reset 292: " + s290
+system { "Section 293." insert(t289) insert(s290) "{c291}" }
+instruction { insert(in288) insert(doc) }
+var u295 = "{t289} / {c291}"
+input in296
+var t297 = "Rule 297: be concise. {persona}"
+var s298 = sanitize(in296 + doc)
+var c299 = "Note " + safe_msg + " in {lang}"
+s298 = "Reset 300: " + s298
+system { "Section 301." insert(t297) insert(s298) "{c299}" }
+instruction { insert(in296) insert(doc) }
+var u303 = "{t297} / {c299}"
+input in304
+var t305 = "Rule 305: be concise. {persona}"
+var s306 = sanitize(in304 + doc)
+var c307 = "Note " + safe_msg + " in {lang}"
+s306 = "Reset 308: " + s306
+system { "Section 309." insert(t305) insert(s306) "{c307}" }
+instruction { insert(in304) insert(doc) }
+var u311 = "{t305} / {c307}"
+input in312
+var t313 = "Rule 313: be concise. {persona}"
+var s314 = sanitize(in312 + doc)
+var c315 = "Note " + safe_msg + " in {lang}"
+s314 = "Reset 316: " + s314
+system { "Section 317." insert(t313) insert(s314) "{c315}" }
+instruction { insert(in312) insert(doc) }
+var u319 = "{t313} / {c315}"
+input in320
+var t321 = "Rule 321: be concise. {persona}"
+var s322 = sanitize(in320 + doc)
+var c323 = "Note " + safe_msg + " in {lang}"
+s322 = "Reset 324: " + s322
+system { "Section 325." insert(t321) insert(s322) "{c323}" }
+instruction { insert(in320) insert(doc) }
+var u327 = "{t321} / {c323}"
+input in328
+var t329 = "Rule 329: be concise. {persona}"
+var s330 = sanitize(in328 + doc)
+var c331 = "Note " + safe_msg + " in {lang}"
+s330 = "Reset 332: " + s330
+system { "Section 333." insert(t329) insert(s330) "{c331}" }
+instruction { insert(in328) insert(doc) }
+var u335 = "{t329} / {c331}"
+input in336
+var t337 = "Rule 337: be concise. {persona}"
+var s338 = sanitize(in336 + doc)
+var c339 = "Note " + safe_msg + " in {lang}"
+s338 = "Reset 340: " + s338
+system { "Section 341." insert(t337) insert(s338) "{c339}" }
+instruction { insert(in336) insert(doc) }
+var u343 = "{t337} / {c339}"
+input in344
+var t345 = "Rule 345: be concise. {persona}"
+var s346 = sanitize(in344 + doc)
+var c347 = "Note " + safe_msg + " in {lang}"
+s346 = "Reset 348: " + s346
+system { "Section 349." insert(t345) insert(s346) "{c347}" }
+instruction { insert(in344) insert(doc) }
+var u351 = "{t345} / {c347}"
+input in352
+var t353 = "Rule 353: be concise. {persona}"
+var s354 = sanitize(in352 + doc)
+var c355 = "Note " + safe_msg + " in {lang}"
+s354 = "Reset 356: " + s354
+system { "Section 357." insert(t353) insert(s354) "{c355}" }
+instruction { insert(in352) insert(doc) }
+var u359 = "{t353} / {c355}"
+input in360
+var t361 = "Rule 361: be concise. {persona}"
+var s362 = sanitize(in360 + doc)
+var c363 = "Note " + safe_msg + " in {lang}"
+s362 = "Reset 364: " + s362
+system { "Section 365." insert(t361) insert(s362) "{c363}" }
+instruction { insert(in360) insert(doc) }
+var u367 = "{t361} / {c363}"
+input in368
+var t369 = "Rule 369: be concise. {persona}"
+var s370 = sanitize(in368 + doc)
+var c371 = "Note " + safe_msg + " in {lang}"
+s370 = "Reset 372: " + s370
+system { "Section 373." insert(t369) insert(s370) "{c371}" }
+instruction { insert(in368) insert(doc) }
+var u375 = "{t369} / {c371}"
+input in376
+var t377 = "Rule 377: be concise. {persona}"
+var s378 = sanitize(in376 + doc)
+var c379 = "Note " + safe_msg + " in {lang}"
+s378 = "Reset 380: " + s378
+system { "Section 381." insert(t377) insert(s378) "{c379}" }
+instruction { insert(in376) insert(doc) }
+var u383 = "{t377} / {c379}"
+input in384
+var t385 = "Rule 385: be concise. {persona}"
+var s386 = sanitize(in384 + doc)
+var c387 = "Note " + safe_msg + " in {lang}"
+s386 = "Reset 388: " + s386
+system { "Section 389." insert(t385) insert(s386) "{c387}" }
+instruction { insert(in384) insert(doc) }
+var u391 = "{t385} / {c387}"
+input in392
+var t393 = "Rule 393: be concise. {persona}"
+var s394 = sanitize(in392 + doc)
+var c395 = "Note " + safe_msg + " in {lang}"
+s394 = "Reset 396: " + s394
+system { "Section 397." insert(t393) insert(s394) "{c395}" }
+instruction { insert(in392) insert(doc) }
+var u399 = "{t393} / {c395}"
+input in400
+var t401 = "Rule 401: be concise. {persona}"
+var s402 = sanitize(in400 + doc)
+var c403 = "Note " + safe_msg + " in {lang}"
+s402 = "Reset 404: " + s402
+system { "Section 405." insert(t401) insert(s402) "{c403}" }
+instruction { insert(in400) insert(doc) }
+var u407 = "{t401} / {c403}"
+input in408
+var t409 = "Rule 409: be concise. {persona}"
+var s410 = sanitize(in408 + doc)
+var c411 = "Note " + safe_msg + " in {lang}"
+s410 = "Reset 412: " + s410
+system { "Section 413." insert(t409) insert(s410) "{c411}" }
+instruction { insert(in408) insert(doc) }
+var u415 = "{t409} / {c411}"
+input in416
+var t417 = "Rule 417: be concise. {persona}"
+var s418 = sanitize(in416 + doc)
+var c419 = "Note " + safe_msg + " in {lang}"
+s418 = "Reset 420: " + s418
+system { "Section 421." insert(t417) insert(s418) "{c419}" }
+instruction { insert(in416) insert(doc) }
+var u423 = "{t417} / {c419}"
+input in424
+var t425 = "Rule 425: be concise. {persona}"
+var s426 = sanitize(in424 + doc)
+var c427 = "Note " + safe_msg + " in {lang}"
+s426 = "Reset 428: " + s426
+system { "Section 429." insert(t425) insert(s426) "{c427}" }
+instruction { insert(in424) insert(doc) }
+var u431 = "{t425} / {c427}"
+input in432
+var t433 = "Rule 433: be concise. {persona}"
+var s434 = sanitize(in432 + doc)
+var c435 = "Note " + safe_msg + " in {lang}"
+s434 = "Reset 436: " + s434
+system { "Section 437." insert(t433) insert(s434) "{c435}" }
+instruction { insert(in432) insert(doc) }
+var u439 = "{t433} / {c435}"
+input in440
+var t441 = "Rule 441: be concise. {persona}"
+var s442 = sanitize(in440 + doc)
+var c443 = "Note " + safe_msg + " in {lang}"
+s442 = "Reset 444: " + s442
+system { "Section 445." insert(t441) insert(s442) "{c443}" }
+instruction { insert(in440) insert(doc) }
+var u447 = "{t441} / {c443}"
+input in448
+var t449 = "Rule 449: be concise. {persona}"
+var s450 = sanitize(in448 + doc)
+var c451 = "Note " + safe_msg + " in {lang}"
+s450 = "Reset 452: " + s450
+system { "Section 453." insert(t449) insert(s450) "{c451}" }
+instruction { insert(in448) insert(doc) }
+var u455 = "{t449} / {c451}"
+input in456
+var t457 = "Rule 457: be concise. {persona}"
+var s458 = sanitize(in456 + doc)
+var c459 = "Note " + safe_msg + " in {lang}"
+s458 = "Reset 460: " + s458
+system { "Section 461." insert(t457) insert(s458) "{c459}" }
+instruction { insert(in456) insert(doc) }
+var u463 = "{t457} / {c459}"
+input in464
+var t465 = "Rule 465: be concise. {persona}"
+var s466 = sanitize(in464 + doc)
+var c467 = "Note " + safe_msg + " in {lang}"
+s466 = "Reset 468: " + s466
+system { "Section 469." insert(t465) insert(s466) "{c467}" }
+instruction { insert(in464) insert(doc) }
+var u471 = "{t465} / {c467}"
+input in472
+var t473 = "Rule 473: be concise. {persona}"
+var s474 = sanitize(in472 + doc)
+var c475 = "Note " + safe_msg + " in {lang}"
+s474 = "Reset 476: " + s474
+system { "Section 477." insert(t473) insert(s474) "{c475}" }
+instruction { insert(in472) insert(doc) }
+var u479 = "{t473} / {c475}"
+input in480
+var t481 = "Rule 481: be concise. {persona}"
+var s482 = sanitize(in480 + doc)
+var c483 = "Note " + safe_msg + " in {lang}"
+s482 = "Reset 484: " + s482
+system { "Section 485." insert(t481) insert(s482) "{c483}" }
+instruction { insert(in480) insert(doc) }
+var u487 = "{t481} / {c483}"
+input in488
+var t489 = "Rule 489: be concise. {persona}"
+var s490 = sanitize(in488 + doc)
+var c491 = "Note " + safe_msg + " in {lang}"
+s490 = "Reset 492: " + s490
+system { "Section 493." insert(t489) insert(s490) "{c491}" }
+instruction { insert(in488) insert(doc) }
+var u495 = "{t489} / {c491}"
+input in496
+var t497 = "Rule 497: be concise. {persona}"
+var s498 = sanitize(in496 + doc)
+var c499 = "Note " + safe_msg + " in {lang}"
+s498 = "Reset 500: " + s498
+system { "Section 501." insert(t497) insert(s498) "{c499}" }
+instruction { insert(in496) insert(doc) }
+var u503 = "{t497} / {c499}"
+input in504
+var t505 = "Rule 505: be concise. {persona}"
+var s506 = sanitize(in504 + doc)
+var c507 = "Note " + safe_msg + " in {lang}"
+s506 = "Reset 508: " + s506
+system { "Section 509." insert(t505) insert(s506) "{c507}" }
+instruction { insert(in504) insert(doc) }
+var u511 = "{t505} / {c507}"
+input in512
+var t513 = "Rule 513: be concise. {persona}"
+var s514 = sanitize(in512 + doc)
+var c515 = "Note " + safe_msg + " in {lang}"
+s514 = "Reset 516: " + s514
+system { "Section 517." insert(t513) insert(s514) "{c515}" }
+instruction { insert(in512) insert(doc) }
+var u519 = "{t513} / {c515}"
+input in520
+var t521 = "Rule 521: be concise. {persona}"
+var s522 = sanitize(in520 + doc)
+var c523 = "Note " + safe_msg + " in {lang}"
+s522 = "Reset 524: " + s522
+system { "Section 525." insert(t521) insert(s522) "{c523}" }
+instruction { insert(in520) insert(doc) }
+var u527 = "{t521} / {c523}"
+input in528
+var t529 = "Rule 529: be concise. {persona}"
+var s530 = sanitize(in528 + doc)
+var c531 = "Note " + safe_msg + " in {lang}"
+s530 = "Reset 532: " + s530
+system { "Section 533." insert(t529) insert(s530) "{c531}" }
+instruction { insert(in528) insert(doc) }
+var u535 = "{t529} / {c531}"
+input in536
+var t537 = "Rule 537: be concise. {persona}"
+var s538 = sanitize(in536 + doc)
+var c539 = "Note " + safe_msg + " in {lang}"
+s538 = "Reset 540: " + s538
+system { "Section 541." insert(t537) insert(s538) "{c539}" }
+instruction { insert(in536) insert(doc) }
+var u543 = "{t537} / {c539}"
+input in544
+var t545 = "Rule 545: be concise. {persona}"
+var s546 = sanitize(in544 + doc)
+var c547 = "Note " + safe_msg + " in {lang}"
+s546 = "Reset 548: " + s546
+system { "Section 549." insert(t545) insert(s546) "{c547}" }
+instruction { insert(in544) insert(doc) }
+var u551 = "{t545} / {c547}"
+input in552
+var t553 = "Rule 553: be concise. {persona}"
+var s554 = sanitize(in552 + doc)
+var c555 = "Note " + safe_msg + " in {lang}"
+s554 = "Reset 556: " + s554
+system { "Section 557." insert(t553) insert(s554) "{c555}" }
+instruction { insert(in552) insert(doc) }
+var u559 = "{t553} / {c555}"
+input in560
+var t561 = "Rule 561: be concise. {persona}"
+var s562 = sanitize(in560 + doc)
+var c563 = "Note " + safe_msg + " in {lang}"
+s562 = "Reset 564: " + s562
+system { "Section 565." insert(t561) insert(s562) "{c563}" }
+instruction { insert(in560) insert(doc) }
+var u567 = "{t561} / {c563}"
+input in568
+var t569 = "Rule 569: be concise. {persona}"
+var s570 = sanitize(in568 + doc)
+var c571 = "Note " + safe_msg + " in {lang}"
+s570 = "Reset 572: " + s570
+system { "Section 573." insert(t569) insert(s570) "{c571}" }
+instruction { insert(in568) insert(doc) }
+var u575 = "{t569} / {c571}"
+input in576
+var t577 = "Rule 577: be concise. {persona}"
+var s578 = sanitize(in576 + doc)
+var c579 = "Note " + safe_msg + " in {lang}"
+s578 = "Reset 580: " + s578
+system { "Section 581." insert(t577) insert(s578) "{c579}" }
+instruction { insert(in576) insert(doc) }
+var u583 = "{t577} / {c579}"
+input in584
+var t585 = "Rule 585: be concise. {persona}"
+var s586 = sanitize(in584 + doc)
+var c587 = "Note " + safe_msg + " in {lang}"
+s586 = "Reset 588: " + s586
+system { "Section 589." insert(t585) insert(s586) "{c587}" }
+instruction { insert(in584) insert(doc) }
+var u591 = "{t585} / {c587}"
+input in592
+var t593 = "Rule 593: be concise. {persona}"
+var s594 = sanitize(in592 + doc)
+var c595 = "Note " + safe_msg + " in {lang}"
+s594 = "Reset 596: " + s594
+system { "Section 597." insert(t593) insert(s594) "{c595}" }
+instruction { insert(in592) insert(doc) }
+var u599 = "{t593} / {c595}"
+input in600
+var t601 = "Rule 601: be concise. {persona}"
+var s602 = sanitize(in600 + doc)
+var c603 = "Note " + safe_msg + " in {lang}"
+s602 = "Reset 604: " + s602
+system { "Section 605." insert(t601) insert(s602) "{c603}" }
+instruction { insert(in600) insert(doc) }
+var u607 = "{t601} / {c603}"
+input in608
+var t609 = "Rule 609: be concise. {persona}"
+var s610 = sanitize(in608 + doc)
+var c611 = "Note " + safe_msg + " in {lang}"
+s610 = "Reset 612: " + s610
+system { "Section 613." insert(t609) insert(s610) "{c611}" }
+instruction { insert(in608) insert(doc) }
+var u615 = "{t609} / {c611}"
+input in616
+var t617 = "Rule 617: be concise. {persona}"
+var s618 = sanitize(in616 + doc)
+var c619 = "Note " + safe_msg + " in {lang}"
+s618 = "Reset 620: " + s618
+system { "Section 621." insert(t617) insert(s618) "{c619}" }
+instruction { insert(in616) insert(doc) }
+var u623 = "{t617} / {c619}"
+input in624
+var t625 = "Rule 625: be concise. {persona}"
+var s626 = sanitize(in624 + doc)
+var c627 = "Note " + safe_msg + " in {lang}"
+s626 = "Reset 628: " + s626
+system { "Section 629." insert(t625) insert(s626) "{c627}" }
+instruction { insert(in624) insert(doc) }
+var u631 = "{t625} / {c627}"
+input in632
+var t633 = "Rule 633: be concise. {persona}"
+var s634 = sanitize(in632 + doc)
+var c635 = "Note " + safe_msg + " in {lang}"
+s634 = "Reset 636: " + s634
+system { "Section 637." insert(t633) insert(s634) "{c635}" }
+instruction { insert(in632) insert(doc) }
+var u639 = "{t633} / {c635}"
+input in640
+var t641 = "Rule 641: be concise. {persona}"
+var s642 = sanitize(in640 + doc)
+var c643 = "Note " + safe_msg + " in {lang}"
+s642 = "Reset 644: " + s642
+system { "Section 645." insert(t641) insert(s642) "{c643}" }
+instruction { insert(in640) insert(doc) }
+var u647 = "{t641} / {c643}"
+input in648
+var t649 = "Rule 649: be concise. {persona}"
+var s650 = sanitize(in648 + doc)
+var c651 = "Note " + safe_msg + " in {lang}"
+s650 = "Reset 652: " + s650
+system { "Section 653." insert(t649) insert(s650) "{c651}" }
+instruction { insert(in648) insert(doc) }
+var u655 = "{t649} / {c651}"
+input in656
+var t657 = "Rule 657: be concise. {persona}"
+var s658 = sanitize(in656 + doc)
+var c659 = "Note " + safe_msg + " in {lang}"
+s658 = "Reset 660: " + s658
+system { "Section 661." insert(t657) insert(s658) "{c659}" }
+instruction { insert(in656) insert(doc) }
+var u663 = "{t657} / {c659}"
+input in664
+var t665 = "Rule 665: be concise. {persona}"
+var s666 = sanitize(in664 + doc)
+var c667 = "Note " + safe_msg + " in {lang}"
+s666 = "Reset 668: " + s666
+system { "Section 669." insert(t665) insert(s666) "{c667}" }
+instruction { insert(in664) insert(doc) }
+var u671 = "{t665} / {c667}"
+input in672
+var t673 = "Rule 673: be concise. {persona}"
+var s674 = sanitize(in672 + doc)
+var c675 = "Note " + safe_msg + " in {lang}"
+s674 = "Reset 676: " + s674
+system { "Section 677." insert(t673) insert(s674) "{c675}" }
+instruction { insert(in672) insert(doc) }
+var u679 = "{t673} / {c675}"
+input in680
+var t681 = "Rule 681: be concise. {persona}"
+var s682 = sanitize(in680 + doc)
+var c683 = "Note " + safe_msg + " in {lang}"
+s682 = "Reset 684: " + s682
+system { "Section 685." insert(t681) insert(s682) "{c683}" }
+instruction { insert(in680) insert(doc) }
+var u687 = "{t681} / {c683}"
+input in688
+var t689 = "Rule 689: be concise. {persona}"
+var s690 = sanitize(in688 + doc)
+var c691 = "Note " + safe_msg + " in {lang}"
+s690 = "Reset 692: " + s690
+system { "Section 693." insert(t689) insert(s690) "{c691}" }
+instruction { insert(in688) insert(doc) }
+var u695 = "{t689} / {c691}"
+input in696
+var t697 = "Rule 697: be concise. {persona}"
+var s698 = sanitize(in696 + doc)
+var c699 = "Note " + safe_msg + " in {lang}"
+s698 = "Reset 700: " + s698
+system { "Section 701." insert(t697) insert(s698) "{c699}" }
+instruction { insert(in696) insert(doc) }
+var u703 = "{t697} / {c699}"
+input in704
+var t705 = "Rule 705: be concise. {persona}"
+var s706 = sanitize(in704 + doc)
+var c707 = "Note " + safe_msg + " in {lang}"
+s706 = "Reset 708: " + s706
+system { "Section 709." insert(t705) insert(s706) "{c707}" }
+instruction { insert(in704) insert(doc) }
+var u711 = "{t705} / {c707}"
+input in712
+var t713 = "Rule 713: be concise. {persona}"
+var s714 = sanitize(in712 + doc)
+var c715 = "Note " + safe_msg + " in {lang}"
+s714 = "Reset 716: " + s714
+system { "Section 717." insert(t713) insert(s714) "{c715}" }
+instruction { insert(in712) insert(doc) }
+var u719 = "{t713} / {c715}"
+input in720
+var t721 = "Rule 721: be concise. {persona}"
+var s722 = sanitize(in720 + doc)
+var c723 = "Note " + safe_msg + " in {lang}"
+s722 = "Reset 724: " + s722
+system { "Section 725." insert(t721) insert(s722) "{c723}" }
+instruction { insert(in720) insert(doc) }
+var u727 = "{t721} / {c723}"
+input in728
+var t729 = "Rule 729: be concise. {persona}"
+var s730 = sanitize(in728 + doc)
+var c731 = "Note " + safe_msg + " in {lang}"
+s730 = "Reset 732: " + s730
+system { "Section 733." insert(t729) insert(s730) "{c731}" }
+instruction { insert(in728) insert(doc) }
+var u735 = "{t729} / {c731}"
+input in736
+var t737 = "Rule 737: be concise. {persona}"
+var s738 = sanitize(in736 + doc)
+var c739 = "Note " + safe_msg + " in {lang}"
+s738 = "Reset 740: " + s738
+system { "Section 741." insert(t737) insert(s738) "{c739}" }
+instruction { insert(in736) insert(doc) }
+var u743 = "{t737} / {c739}"
+input in744
+var t745 = "Rule 745: be concise. {persona}"
+var s746 = sanitize(in744 + doc)
+var c747 = "Note " + safe_msg + " in {lang}"
+s746 = "Reset 748: " + s746
+system { "Section 749." insert(t745) insert(s746) "{c747}" }
+instruction { insert(in744) insert(doc) }
+var u751 = "{t745} / {c747}"
+input in752
+var t753 = "Rule 753: be concise. {persona}"
+var s754 = sanitize(in752 + doc)
+var c755 = "Note " + safe_msg + " in {lang}"
+s754 = "Reset 756: " + s754
+system { "Section 757." insert(t753) insert(s754) "{c755}" }
+instruction { insert(in752) insert(doc) }
+var u759 = "{t753} / {c755}"
+input in760
+var t761 = "Rule 761: be concise. {persona}"
+var s762 = sanitize(in760 + doc)
+var c763 = "Note " + safe_msg + " in {lang}"
+s762 = "Reset 764: " + s762
+system { "Section 765." insert(t761) insert(s762) "{c763}" }
+instruction { insert(in760) insert(doc) }
+var u767 = "{t761} / {c763}"
+input in768
+var t769 = "Rule 769: be concise. {persona}"
+var s770 = sanitize(in768 + doc)
+var c771 = "Note " + safe_msg + " in {lang}"
+s770 = "Reset 772: " + s770
+system { "Section 773." insert(t769) insert(s770) "{c771}" }
+instruction { insert(in768) insert(doc) }
+var u775 = "{t769} / {c771}"
+input in776
+var t777 = "Rule 777: be concise. {persona}"
+var s778 = sanitize(in776 + doc)
+var c779 = "Note " + safe_msg + " in {lang}"
+s778 = "Reset 780: " + s778
+system { "Section 781." insert(t777) insert(s778) "{c779}" }
+instruction { insert(in776) insert(doc) }
+var u783 = "{t777} / {c779}"
+input in784
+var t785 = "Rule 785: be concise. {persona}"
+var s786 = sanitize(in784 + doc)
+var c787 = "Note " + safe_msg + " in {lang}"
+s786 = "Reset 788: " + s786
+system { "Section 789." insert(t785) insert(s786) "{c787}" }
+instruction { insert(in784) insert(doc) }
+var u791 = "{t785} / {c787}"
+input in792
+var t793 = "Rule 793: be concise. {persona}"
+var s794 = sanitize(in792 + doc)
+var c795 = "Note " + safe_msg + " in {lang}"
+s794 = "Reset 796: " + s794
+system { "Section 797." insert(t793) insert(s794) "{c795}" }
+instruction { insert(in792) insert(doc) }
+var u799 = "{t793} / {c795}"
+input in800
+var t801 = "Rule 801: be concise. {persona}"
+var s802 = sanitize(in800 + doc)
+var c803 = "Note " + safe_msg + " in {lang}"
+s802 = "Reset 804: " + s802
+system { "Section 805." insert(t801) insert(s802) "{c803}" }
+instruction { insert(in800) insert(doc) }
+var u807 = "{t801} / {c803}"
+input in808
+var t809 = "Rule 809: be concise. {persona}"
+var s810 = sanitize(in808 + doc)
+var c811 = "Note " + safe_msg + " in {lang}"
+s810 = "Reset 812: " + s810
+system { "Section 813." insert(t809) insert(s810) "{c811}" }
+instruction { insert(in808) insert(doc) }
+var u815 = "{t809} / {c811}"
+input in816
+var t817 = "Rule 817: be concise. {persona}"
+var s818 = sanitize(in816 + doc)
+var c819 = "Note " + safe_msg + " in {lang}"
+s818 = "Reset 820: " + s818
+system { "Section 821." insert(t817) insert(s818) "{c819}" }
+instruction { insert(in816) insert(doc) }
+var u823 = "{t817} / {c819}"
+input in824
+var t825 = "Rule 825: be concise. {persona}"
+var s826 = sanitize(in824 + doc)
+var c827 = "Note " + safe_msg + " in {lang}"
+s826 = "Reset 828: " + s826
+system { "Section 829." insert(t825) insert(s826) "{c827}" }
+instruction { insert(in824) insert(doc) }
+var u831 = "{t825} / {c827}"
+input in832
+var t833 = "Rule 833: be concise. {persona}"
+var s834 = sanitize(in832 + doc)
+var c835 = "Note " + safe_msg + " in {lang}"
+s834 = "Reset 836: " + s834
+system { "Section 837." insert(t833) insert(s834) "{c835}" }
+instruction { insert(in832) insert(doc) }
+var u839 = "{t833} / {c835}"
+input in840
+var t841 = "Rule 841: be concise. {persona}"
+var s842 = sanitize(in840 + doc)
+var c843 = "Note " + safe_msg + " in {lang}"
+s842 = "Reset 844: " + s842
+system { "Section 845." insert(t841) insert(s842) "{c843}" }
+instruction { insert(in840) insert(doc) }
+var u847 = "{t841} / {c843}"
+input in848
+var t849 = "Rule 849: be concise. {persona}"
+var s850 = sanitize(in848 + doc)
+var c851 = "Note " + safe_msg + " in {lang}"
+s850 = "Reset 852: " + s850
+system { "Section 853." insert(t849) insert(s850) "{c851}" }
+instruction { insert(in848) insert(doc) }
+var u855 = "{t849} / {c851}"
+input in856
+var t857 = "Rule 857: be concise. {persona}"
+var s858 = sanitize(in856 + doc)
+var c859 = "Note " + safe_msg + " in {lang}"
+s858 = "Reset 860: " + s858
+system { "Section 861." insert(t857) insert(s858) "{c859}" }
+instruction { insert(in856) insert(doc) }
+var u863 = "{t857} / {c859}"
+input in864
+var t865 = "Rule 865: be concise. {persona}"
+var s866 = sanitize(in864 + doc)
+var c867 = "Note " + safe_msg + " in {lang}"
+s866 = "Reset 868: " + s866
+system { "Section 869." insert(t865) insert(s866) "{c867}" }
+instruction { insert(in864) insert(doc) }
+var u871 = "{t865} / {c867}"
+input in872
+var t873 = "Rule 873: be concise. {persona}"
+var s874 = sanitize(in872 + doc)
+var c875 = "Note " + safe_msg + " in {lang}"
+s874 = "Reset 876: " + s874
+system { "Section 877." insert(t873) insert(s874) "{c875}" }
+instruction { insert(in872) insert(doc) }
+var u879 = "{t873} / {c875}"
+input in880
+var t881 = "Rule 881: be concise. {persona}"
+var s882 = sanitize(in880 + doc)
+var c883 = "Note " + safe_msg + " in {lang}"
+s882 = "Reset 884: " + s882
+system { "Section 885." insert(t881) insert(s882) "{c883}" }
+instruction { insert(in880) insert(doc) }
+var u887 = "{t881} / {c883}"
+input in888
+var t889 = "Rule 889: be concise. {persona}"
+var s890 = sanitize(in888 + doc)
+var c891 = "Note " + safe_msg + " in {lang}"
+s890 = "Reset 892: " + s890
+system { "Section 893." insert(t889) insert(s890) "{c891}" }
+instruction { insert(in888) insert(doc) }
+var u895 = "{t889} / {c891}"
+input in896
+var t897 = "Rule 897: be concise. {persona}"
+var s898 = sanitize(in896 + doc)
+var c899 = "Note " + safe_msg + " in {lang}"
+s898 = "Reset 900: " + s898
+system { "Section 901." insert(t897) insert(s898) "{c899}" }
+instruction { insert(in896) insert(doc) }
+var u903 = "{t897} / {c899}"
+input in904
+var t905 = "Rule 905: be concise. {persona}"
+var s906 = sanitize(in904 + doc)
+var c907 = "Note " + safe_msg + " in {lang}"
+s906 = "Reset 908: " + s906
+system { "Section 909." insert(t905) insert(s906) "{c907}" }
+instruction { insert(in904) insert(doc) }
+var u911 = "{t905} / {c907}"
+input in912
+var t913 = "Rule 913: be concise. {persona}"
+var s914 = sanitize(in912 + doc)
+var c915 = "Note " + safe_msg + " in {lang}"
+s914 = "Reset 916: " + s914
+system { "Section 917." insert(t913) insert(s914) "{c915}" }
+instruction { insert(in912) insert(doc) }
+var u919 = "{t913} / {c915}"
+input in920
+var t921 = "Rule 921: be concise. {persona}"
+var s922 = sanitize(in920 + doc)
+var c923 = "Note " + safe_msg + " in {lang}"
+s922 = "Reset 924: " + s922
+system { "Section 925." insert(t921) insert(s922) "{c923}" }
+instruction { insert(in920) insert(doc) }
+var u927 = "{t921} / {c923}"
+input in928
+var t929 = "Rule 929: be concise. {persona}"
+var s930 = sanitize(in928 + doc)
+var c931 = "Note " + safe_msg + " in {lang}"
+s930 = "Reset 932: " + s930
+system { "Section 933." insert(t929) insert(s930) "{c931}" }
+instruction { insert(in928) insert(doc) }
+var u935 = "{t929} / {c931}"
+input in936
+var t937 = "Rule 937: be concise. {persona}"
+var s938 = sanitize(in936 + doc)
+var c939 = "Note " + safe_msg + " in {lang}"
+s938 = "Reset 940: " + s938
+system { "Section 941." insert(t937) insert(s938) "{c939}" }
+instruction { insert(in936) insert(doc) }
+var u943 = "{t937} / {c939}"
+input in944
+var t945 = "Rule 945: be concise. {persona}"
+var s946 = sanitize(in944 + doc)
+var c947 = "Note " + safe_msg + " in {lang}"
+s946 = "Reset 948: " + s946
+system { "Section 949." insert(t945) insert(s946) "{c947}" }
+instruction { insert(in944) insert(doc) }
+var u951 = "{t945} / {c947}"
+input in952
+var t953 = "Rule 953: be concise. {persona}"
+var s954 = sanitize(in952 + doc)
+var c955 = "Note " + safe_msg + " in {lang}"
+s954 = "Reset 956: " + s954
+system { "Section 957." insert(t953) insert(s954) "{c955}" }
+instruction { insert(in952) insert(doc) }
+var u959 = "{t953} / {c955}"
+input in960
+var t961 = "Rule 961: be concise. {persona}"
+var s962 = sanitize(in960 + doc)
+var c963 = "Note " + safe_msg + " in {lang}"
+s962 = "Reset 964: " + s962
+system { "Section 965." insert(t961) insert(s962) "{c963}" }
+instruction { insert(in960) insert(doc) }
+var u967 = "{t961} / {c963}"
+input in968
+var t969 = "Rule 969: be concise. {persona}"
+var s970 = sanitize(in968 + doc)
+var c971 = "Note " + safe_msg + " in {lang}"
+s970 = "Reset 972: " + s970
+system { "Section 973." insert(t969) insert(s970) "{c971}" }
+instruction { insert(in968) insert(doc) }
+var u975 = "{t969} / {c971}"
+input in976
+var t977 = "Rule 977: be concise. {persona}"
+var s978 = sanitize(in976 + doc)
+var c979 = "Note " + safe_msg + " in {lang}"
+s978 = "Reset 980: " + s978
+system { "Section 981." insert(t977) insert(s978) "{c979}" }
+instruction { insert(in976) insert(doc) }
+var u983 = "{t977} / {c979}"
+input in984
+var t985 = "Rule 985: be concise. {persona}"
+var s986 = sanitize(in984 + doc)
+var c987 = "Note " + safe_msg + " in {lang}"
+s986 = "Reset 988: " + s986
+system { "Section 989." insert(t985) insert(s986) "{c987}" }
+instruction { insert(in984) insert(doc) }
+var u991 = "{t985} / {c987}"
+input in992
+var t993 = "Rule 993: be concise. {persona}"
+var s994 = sanitize(in992 + doc)
+var c995 = "Note " + safe_msg + " in {lang}"
+s994 = "Reset 996: " + s994
+system { "Section 997." insert(t993) insert(s994) "{c995}" }
+instruction { insert(in992) insert(doc) }
+var u999 = "{t993} / {c995}"
+input in1000
+var t1001 = "Rule 1001: be concise. {persona}"
+var s1002 = sanitize(in1000 + doc)
+var c1003 = "Note " + safe_msg + " in {lang}"
+s1002 = "Reset 1004: " + s1002
+system { "Section 1005." insert(t1001) insert(s1002) "{c1003}" }
+instruction { insert(in1000) insert(doc) }
+var u1007 = "{t1001} / {c1003}"
+input in1008
+var t1009 = "Rule 1009: be concise. {persona}"
+var s1010 = sanitize(in1008 + doc)
+var c1011 = "Note " + safe_msg + " in {lang}"
+s1010 = "Reset 1012: " + s1010
+system { "Section 1013." insert(t1009) insert(s1010) "{c1011}" }
+instruction { insert(in1008) insert(doc) }
+var u1015 = "{t1009} / {c1011}"
+input in1016
+var t1017 = "Rule 1017: be concise. {persona}"
+var s1018 = sanitize(in1016 + doc)
+var c1019 = "Note " + safe_msg + " in {lang}"
+s1018 = "Reset 1020: " + s1018
+system { "Section 1021." insert(t1017) insert(s1018) "{c1019}" }
+instruction { insert(in1016) insert(doc) }
+var u1023 = "{t1017} / {c1019}"
+input in1024
+var t1025 = "Rule 1025: be concise. {persona}"
+var s1026 = sanitize(in1024 + doc)
+var c1027 = "Note " + safe_msg + " in {lang}"
+s1026 = "Reset 1028: " + s1026
+system { "Section 1029." insert(t1025) insert(s1026) "{c1027}" }
+instruction { insert(in1024) insert(doc) }
+var u1031 = "{t1025} / {c1027}"
+input in1032
+var t1033 = "Rule 1033: be concise. {persona}"
+var s1034 = sanitize(in1032 + doc)
+var c1035 = "Note " + safe_msg + " in {lang}"
+s1034 = "Reset 1036: " + s1034
+system { "Section 1037." insert(t1033) insert(s1034) "{c1035}" }
+instruction { insert(in1032) insert(doc) }
+var u1039 = "{t1033} / {c1035}"
+input in1040
+var t1041 = "Rule 1041: be concise. {persona}"
+var s1042 = sanitize(in1040 + doc)
+var c1043 = "Note " + safe_msg + " in {lang}"
+s1042 = "Reset 1044: " + s1042
+system { "Section 1045." insert(t1041) insert(s1042) "{c1043}" }
+instruction { insert(in1040) insert(doc) }
+var u1047 = "{t1041} / {c1043}"
+input in1048
+var t1049 = "Rule 1049: be concise. {persona}"
+var s1050 = sanitize(in1048 + doc)
+var c1051 = "Note " + safe_msg + " in {lang}"
+s1050 = "Reset 1052: " + s1050
+system { "Section 1053." insert(t1049) insert(s1050) "{c1051}" }
+instruction { insert(in1048) insert(doc) }
+var u1055 = "{t1049} / {c1051}"
+input in1056
+var t1057 = "Rule 1057: be concise. {persona}"
+var s1058 = sanitize(in1056 + doc)
+var c1059 = "Note " + safe_msg + " in {lang}"
+s1058 = "Reset 1060: " + s1058
+system { "Section 1061." insert(t1057) insert(s1058) "{c1059}" }
+instruction { insert(in1056) insert(doc) }
+var u1063 = "{t1057} / {c1059}"
+input in1064
+var t1065 = "Rule 1065: be concise. {persona}"
+var s1066 = sanitize(in1064 + doc)
+var c1067 = "Note " + safe_msg + " in {lang}"
+s1066 = "Reset 1068: " + s1066
+system { "Section 1069." insert(t1065) insert(s1066) "{c1067}" }
+instruction { insert(in1064) insert(doc) }
+var u1071 = "{t1065} / {c1067}"
+input in1072
+var t1073 = "Rule 1073: be concise. {persona}"
+var s1074 = sanitize(in1072 + doc)
+var c1075 = "Note " + safe_msg + " in {lang}"
+s1074 = "Reset 1076: " + s1074
+system { "Section 1077." insert(t1073) insert(s1074) "{c1075}" }
+instruction { insert(in1072) insert(doc) }
+var u1079 = "{t1073} / {c1075}"
+input in1080
+var t1081 = "Rule 1081: be concise. {persona}"
+var s1082 = sanitize(in1080 + doc)
+var c1083 = "Note " + safe_msg + " in {lang}"
+s1082 = "Reset 1084: " + s1082
+system { "Section 1085." insert(t1081) insert(s1082) "{c1083}" }
+instruction { insert(in1080) insert(doc) }
+var u1087 = "{t1081} / {c1083}"
+input in1088
+var t1089 = "Rule 1089: be concise. {persona}"
+var s1090 = sanitize(in1088 + doc)
+var c1091 = "Note " + safe_msg + " in {lang}"
+s1090 = "Reset 1092: " + s1090
+system { "Section 1093." insert(t1089) insert(s1090) "{c1091}" }
+instruction { insert(in1088) insert(doc) }
+var u1095 = "{t1089} / {c1091}"
+input in1096
+var t1097 = "Rule 1097: be concise. {persona}"
+var s1098 = sanitize(in1096 + doc)
+var c1099 = "Note " + safe_msg + " in {lang}"
+s1098 = "Reset 1100: " + s1098
+system { "Section 1101." insert(t1097) insert(s1098) "{c1099}" }
+instruction { insert(in1096) insert(doc) }
+var u1103 = "{t1097} / {c1099}"
+input in1104
+var t1105 = "Rule 1105: be concise. {persona}"
+var s1106 = sanitize(in1104 + doc)
+var c1107 = "Note " + safe_msg + " in {lang}"
+s1106 = "Reset 1108: " + s1106
+system { "Section 1109." insert(t1105) insert(s1106) "{c1107}" }
+instruction { insert(in1104) insert(doc) }
+var u1111 = "{t1105} / {c1107}"
+input in1112
+var t1113 = "Rule 1113: be concise. {persona}"
+var s1114 = sanitize(in1112 + doc)
+var c1115 = "Note " + safe_msg + " in {lang}"
+s1114 = "Reset 1116: " + s1114
+system { "Section 1117." insert(t1113) insert(s1114) "{c1115}" }
+instruction { insert(in1112) insert(doc) }
+var u1119 = "{t1113} / {c1115}"
+input in1120
+var t1121 = "Rule 1121: be concise. {persona}"
+var s1122 = sanitize(in1120 + doc)
+var c1123 = "Note " + safe_msg + " in {lang}"
+s1122 = "Reset 1124: " + s1122
+system { "Section 1125." insert(t1121) insert(s1122) "{c1123}" }
+instruction { insert(in1120) insert(doc) }
+var u1127 = "{t1121} / {c1123}"
+input in1128
+var t1129 = "Rule 1129: be concise. {persona}"
+var s1130 = sanitize(in1128 + doc)
+var c1131 = "Note " + safe_msg + " in {lang}"
+s1130 = "Reset 1132: " + s1130
+system { "Section 1133." insert(t1129) insert(s1130) "{c1131}" }
+instruction { insert(in1128) insert(doc) }
+var u1135 = "{t1129} / {c1131}"
+input in1136
+var t1137 = "Rule 1137: be concise. {persona}"
+var s1138 = sanitize(in1136 + doc)
+var c1139 = "Note " + safe_msg + " in {lang}"
+s1138 = "Reset 1140: " + s1138
+system { "Section 1141." insert(t1137) insert(s1138) "{c1139}" }
+instruction { insert(in1136) insert(doc) }
+var u1143 = "{t1137} / {c1139}"
+input in1144
+var t1145 = "Rule 1145: be concise. {persona}"
+var s1146 = sanitize(in1144 + doc)
+var c1147 = "Note " + safe_msg + " in {lang}"
+s1146 = "Reset 1148: " + s1146
+system { "Section 1149." insert(t1145) insert(s1146) "{c1147}" }
+instruction { insert(in1144) insert(doc) }
+var u1151 = "{t1145} / {c1147}"
+input in1152
+var t1153 = "Rule 1153: be concise. {persona}"
+var s1154 = sanitize(in1152 + doc)
+var c1155 = "Note " + safe_msg + " in {lang}"
+s1154 = "Reset 1156: " + s1154
+system { "Section 1157." insert(t1153) insert(s1154) "{c1155}" }
+instruction { insert(in1152) insert(doc) }
+var u1159 = "{t1153} / {c1155}"
+input in1160
+var t1161 = "Rule 1161: be concise. {persona}"
+var s1162 = sanitize(in1160 + doc)
+var c1163 = "Note " + safe_msg + " in {lang}"
+s1162 = "Reset 1164: " + s1162
+system { "Section 1165." insert(t1161) insert(s1162) "{c1163}" }
+instruction { insert(in1160) insert(doc) }
+var u1167 = "{t1161} / {c1163}"
+input in1168
+var t1169 = "Rule 1169: be concise. {persona}"
+var s1170 = sanitize(in1168 + doc)
+var c1171 = "Note " + safe_msg + " in {lang}"
+s1170 = "Reset 1172: " + s1170
+system { "Section 1173." insert(t1169) insert(s1170) "{c1171}" }
+instruction { insert(in1168) insert(doc) }
+var u1175 = "{t1169} / {c1171}"
+input in1176
+var t1177 = "Rule 1177: be concise. {persona}"
+var s1178 = sanitize(in1176 + doc)
+var c1179 = "Note " + safe_msg + " in {lang}"
+s1178 = "Reset 1180: " + s1178
+system { "Section 1181." insert(t1177) insert(s1178) "{c1179}" }
+instruction { insert(in1176) insert(doc) }
+var u1183 = "{t1177} / {c1179}"
+input in1184
+var t1185 = "Rule 1185: be concise. {persona}"
+var s1186 = sanitize(in1184 + doc)
+var c1187 = "Note " + safe_msg + " in {lang}"
+s1186 = "Reset 1188: " + s1186
+system { "Section 1189." insert(t1185) insert(s1186) "{c1187}" }
+instruction { insert(in1184) insert(doc) }
+var u1191 = "{t1185} / {c1187}"
+input in1192
+var t1193 = "Rule 1193: be concise. {persona}"
+var s1194 = sanitize(in1192 + doc)
+var c1195 = "Note " + safe_msg + " in {lang}"
+s1194 = "Reset 1196: " + s1194
+system { "Section 1197." insert(t1193) insert(s1194) "{c1195}" }
+instruction { insert(in1192) insert(doc) }
+var u1199 = "{t1193} / {c1195}"
+input in1200
+var t1201 = "Rule 1201: be concise. {persona}"
+var s1202 = sanitize(in1200 + doc)
+var c1203 = "Note " + safe_msg + " in {lang}"
+s1202 = "Reset 1204: " + s1202
+system { "Section 1205." insert(t1201) insert(s1202) "{c1203}" }
+instruction { insert(in1200) insert(doc) }
+var u1207 = "{t1201} / {c1203}"
+input in1208
+var t1209 = "Rule 1209: be concise. {persona}"
+var s1210 = sanitize(in1208 + doc)
+var c1211 = "Note " + safe_msg + " in {lang}"
+s1210 = "Reset 1212: " + s1210
+system { "Section 1213." insert(t1209) insert(s1210) "{c1211}" }
+instruction { insert(in1208) insert(doc) }
+var u1215 = "{t1209} / {c1211}"
+input in1216
+var t1217 = "Rule 1217: be concise. {persona}"
+var s1218 = sanitize(in1216 + doc)
+var c1219 = "Note " + safe_msg + " in {lang}"
+s1218 = "Reset 1220: " + s1218
+system { "Section 1221." insert(t1217) insert(s1218) "{c1219}" }
+instruction { insert(in1216) insert(doc) }
+var u1223 = "{t1217} / {c1219}"
+input in1224
+var t1225 = "Rule 1225: be concise. {persona}"
+var s1226 = sanitize(in1224 + doc)
+var c1227 = "Note " + safe_msg + " in {lang}"
+s1226 = "Reset 1228: " + s1226
+system { "Section 1229." insert(t1225) insert(s1226) "{c1227}" }
+instruction { insert(in1224) insert(doc) }
+var u1231 = "{t1225} / {c1227}"
+input in1232
+var t1233 = "Rule 1233: be concise. {persona}"
+var s1234 = sanitize(in1232 + doc)
+var c1235 = "Note " + safe_msg + " in {lang}"
+s1234 = "Reset 1236: " + s1234
+system { "Section 1237." insert(t1233) insert(s1234) "{c1235}" }
+instruction { insert(in1232) insert(doc) }
+var u1239 = "{t1233} / {c1235}"
+input in1240
+var t1241 = "Rule 1241: be concise. {persona}"
+var s1242 = sanitize(in1240 + doc)
+var c1243 = "Note " + safe_msg + " in {lang}"
+s1242 = "Reset 1244: " + s1242
+system { "Section 1245." insert(t1241) insert(s1242) "{c1243}" }
+instruction { insert(in1240) insert(doc) }
+var u1247 = "{t1241} / {c1243}"
+input in1248
+var t1249 = "Rule 1249: be concise. {persona}"
+var s1250 = sanitize(in1248 + doc)
+var c1251 = "Note " + safe_msg + " in {lang}"
+s1250 = "Reset 1252: " + s1250
+system { "Section 1253." insert(t1249) insert(s1250) "{c1251}" }
+instruction { insert(in1248) insert(doc) }
+var u1255 = "{t1249} / {c1251}"
+input in1256
+var t1257 = "Rule 1257: be concise. {persona}"
+var s1258 = sanitize(in1256 + doc)
+var c1259 = "Note " + safe_msg + " in {lang}"
+s1258 = "Reset 1260: " + s1258
+system { "Section 1261." insert(t1257) insert(s1258) "{c1259}" }
+instruction { insert(in1256) insert(doc) }
+var u1263 = "{t1257} / {c1259}"
+input in1264
+var t1265 = "Rule 1265: be concise. {persona}"
+var s1266 = sanitize(in1264 + doc)
+var c1267 = "Note " + safe_msg + " in {lang}"
+s1266 = "Reset 1268: " + s1266
+system { "Section 1269." insert(t1265) insert(s1266) "{c1267}" }
+instruction { insert(in1264) insert(doc) }
+var u1271 = "{t1265} / {c1267}"
+input in1272
+var t1273 = "Rule 1273: be concise. {persona}"
+var s1274 = sanitize(in1272 + doc)
+var c1275 = "Note " + safe_msg + " in {lang}"
+s1274 = "Reset 1276: " + s1274
+system { "Section 1277." insert(t1273) insert(s1274) "{c1275}" }
+instruction { insert(in1272) insert(doc) }
+var u1279 = "{t1273} / {c1275}"
+input in1280
+var t1281 = "Rule 1281: be concise. {persona}"
+var s1282 = sanitize(in1280 + doc)
+var c1283 = "Note " + safe_msg + " in {lang}"
+s1282 = "Reset 1284: " + s1282
+system { "Section 1285." insert(t1281) insert(s1282) "{c1283}" }
+instruction { insert(in1280) insert(doc) }
+var u1287 = "{t1281} / {c1283}"
+input in1288
+var t1289 = "Rule 1289: be concise. {persona}"
+var s1290 = sanitize(in1288 + doc)
+var c1291 = "Note " + safe_msg + " in {lang}"
+s1290 = "Reset 1292: " + s1290
+system { "Section 1293." insert(t1289) insert(s1290) "{c1291}" }
+instruction { insert(in1288) insert(doc) }
+var u1295 = "{t1289} / {c1291}"
+input in1296
+var t1297 = "Rule 1297: be concise. {persona}"
+var s1298 = sanitize(in1296 + doc)
+var c1299 = "Note " + safe_msg + " in {lang}"
+s1298 = "Reset 1300: " + s1298
+system { "Section 1301." insert(t1297) insert(s1298) "{c1299}" }
+instruction { insert(in1296) insert(doc) }
+var u1303 = "{t1297} / {c1299}"
+input in1304
+var t1305 = "Rule 1305: be concise. {persona}"
+var s1306 = sanitize(in1304 + doc)
+var c1307 = "Note " + safe_msg + " in {lang}"
+s1306 = "Reset 1308: " + s1306
+system { "Section 1309." insert(t1305) insert(s1306) "{c1307}" }
+instruction { insert(in1304) insert(doc) }
+var u1311 = "{t1305} / {c1307}"
+input in1312
+var t1313 = "Rule 1313: be concise. {persona}"
+var s1314 = sanitize(in1312 + doc)
+var c1315 = "Note " + safe_msg + " in {lang}"
+s1314 = "Reset 1316: " + s1314
+system { "Section 1317." insert(t1313) insert(s1314) "{c1315}" }
+instruction { insert(in1312) insert(doc) }
+var u1319 = "{t1313} / {c1315}"
+input in1320
+var t1321 = "Rule 1321: be concise. {persona}"
+var s1322 = sanitize(in1320 + doc)
+var c1323 = "Note " + safe_msg + " in {lang}"
+s1322 = "Reset 1324: " + s1322
+system { "Section 1325." insert(t1321) insert(s1322) "{c1323}" }
+instruction { insert(in1320) insert(doc) }
+var u1327 = "{t1321} / {c1323}"
+input in1328
+var t1329 = "Rule 1329: be concise. {persona}"
+var s1330 = sanitize(in1328 + doc)
+var c1331 = "Note " + safe_msg + " in {lang}"
+s1330 = "Reset 1332: " + s1330
+system { "Section 1333." insert(t1329) insert(s1330) "{c1331}" }
+instruction { insert(in1328) insert(doc) }
+var u1335 = "{t1329} / {c1331}"
+input in1336
+var t1337 = "Rule 1337: be concise. {persona}"
+var s1338 = sanitize(in1336 + doc)
+var c1339 = "Note " + safe_msg + " in {lang}"
+s1338 = "Reset 1340: " + s1338
+system { "Section 1341." insert(t1337) insert(s1338) "{c1339}" }
+instruction { insert(in1336) insert(doc) }
+var u1343 = "{t1337} / {c1339}"
+input in1344
+var t1345 = "Rule 1345: be concise. {persona}"
+var s1346 = sanitize(in1344 + doc)
+var c1347 = "Note " + safe_msg + " in {lang}"
+s1346 = "Reset 1348: " + s1346
+system { "Section 1349." insert(t1345) insert(s1346) "{c1347}" }
+instruction { insert(in1344) insert(doc) }
+var u1351 = "{t1345} / {c1347}"
+input in1352
+var t1353 = "Rule 1353: be concise. {persona}"
+var s1354 = sanitize(in1352 + doc)
+var c1355 = "Note " + safe_msg + " in {lang}"
+s1354 = "Reset 1356: " + s1354
+system { "Section 1357." insert(t1353) insert(s1354) "{c1355}" }
+instruction { insert(in1352) insert(doc) }
+var u1359 = "{t1353} / {c1355}"
+input in1360
+var t1361 = "Rule 1361: be concise. {persona}"
+var s1362 = sanitize(in1360 + doc)
+var c1363 = "Note " + safe_msg + " in {lang}"
+s1362 = "Reset 1364: " + s1362
+system { "Section 1365." insert(t1361) insert(s1362) "{c1363}" }
+instruction { insert(in1360) insert(doc) }
+var u1367 = "{t1361} / {c1363}"
+input in1368
+var t1369 = "Rule 1369: be concise. {persona}"
+var s1370 = sanitize(in1368 + doc)
+var c1371 = "Note " + safe_msg + " in {lang}"
+s1370 = "Reset 1372: " + s1370
+system { "Section 1373." insert(t1369) insert(s1370) "{c1371}" }
+instruction { insert(in1368) insert(doc) }
+var u1375 = "{t1369} / {c1371}"
+input in1376
+var t1377 = "Rule 1377: be concise. {persona}"
+var s1378 = sanitize(in1376 + doc)
+var c1379 = "Note " + safe_msg + " in {lang}"
+s1378 = "Reset 1380: " + s1378
+system { "Section 1381." insert(t1377) insert(s1378) "{c1379}" }
+instruction { insert(in1376) insert(doc) }
+var u1383 = "{t1377} / {c1379}"
+input in1384
+var t1385 = "Rule 1385: be concise. {persona}"
+var s1386 = sanitize(in1384 + doc)
+var c1387 = "Note " + safe_msg + " in {lang}"
+s1386 = "Reset 1388: " + s1386
+system { "Section 1389." insert(t1385) insert(s1386) "{c1387}" }
+instruction { insert(in1384) insert(doc) }
+var u1391 = "{t1385} / {c1387}"
+input in1392
+var t1393 = "Rule 1393: be concise. {persona}"
+var s1394 = sanitize(in1392 + doc)
+var c1395 = "Note " + safe_msg + " in {lang}"
+s1394 = "Reset 1396: " + s1394
+system { "Section 1397." insert(t1393) insert(s1394) "{c1395}" }
+instruction { insert(in1392) insert(doc) }
+var u1399 = "{t1393} / {c1395}"
+input in1400
+var t1401 = "Rule 1401: be concise. {persona}"
+var s1402 = sanitize(in1400 + doc)
+var c1403 = "Note " + safe_msg + " in {lang}"
+s1402 = "Reset 1404: " + s1402
+system { "Section 1405." insert(t1401) insert(s1402) "{c1403}" }
+instruction { insert(in1400) insert(doc) }
+var u1407 = "{t1401} / {c1403}"
+input in1408
+var t1409 = "Rule 1409: be concise. {persona}"
+var s1410 = sanitize(in1408 + doc)
+var c1411 = "Note " + safe_msg + " in {lang}"
+s1410 = "Reset 1412: " + s1410
+system { "Section 1413." insert(t1409) insert(s1410) "{c1411}" }
+instruction { insert(in1408) insert(doc) }
+var u1415 = "{t1409} / {c1411}"
+input in1416
+var t1417 = "Rule 1417: be concise. {persona}"
+var s1418 = sanitize(in1416 + doc)
+var c1419 = "Note " + safe_msg + " in {lang}"
+s1418 = "Reset 1420: " + s1418
+system { "Section 1421." insert(t1417) insert(s1418) "{c1419}" }
+instruction { insert(in1416) insert(doc) }
+var u1423 = "{t1417} / {c1419}"
+input in1424
+var t1425 = "Rule 1425: be concise. {persona}"
+var s1426 = sanitize(in1424 + doc)
+var c1427 = "Note " + safe_msg + " in {lang}"
+s1426 = "Reset 1428: " + s1426
+system { "Section 1429." insert(t1425) insert(s1426) "{c1427}" }
+instruction { insert(in1424) insert(doc) }
+var u1431 = "{t1425} / {c1427}"
+input in1432
+var t1433 = "Rule 1433: be concise. {persona}"
+var s1434 = sanitize(in1432 + doc)
+var c1435 = "Note " + safe_msg + " in {lang}"
+s1434 = "Reset 1436: " + s1434
+system { "Section 1437." insert(t1433) insert(s1434) "{c1435}" }
+instruction { insert(in1432) insert(doc) }
+var u1439 = "{t1433} / {c1435}"
+input in1440
+var t1441 = "Rule 1441: be concise. {persona}"
+var s1442 = sanitize(in1440 + doc)
+var c1443 = "Note " + safe_msg + " in {lang}"
+s1442 = "Reset 1444: " + s1442
+system { "Section 1445." insert(t1441) insert(s1442) "{c1443}" }
+instruction { insert(in1440) insert(doc) }
+var u1447 = "{t1441} / {c1443}"
+input in1448
+var t1449 = "Rule 1449: be concise. {persona}"
+var s1450 = sanitize(in1448 + doc)
+var c1451 = "Note " + safe_msg + " in {lang}"
+s1450 = "Reset 1452: " + s1450
+system { "Section 1453." insert(t1449) insert(s1450) "{c1451}" }
+instruction { insert(in1448) insert(doc) }
+var u1455 = "{t1449} / {c1451}"
+input in1456
+var t1457 = "Rule 1457: be concise. {persona}"
+var s1458 = sanitize(in1456 + doc)
+var c1459 = "Note " + safe_msg + " in {lang}"
+s1458 = "Reset 1460: " + s1458
+system { "Section 1461." insert(t1457) insert(s1458) "{c1459}" }
+instruction { insert(in1456) insert(doc) }
+var u1463 = "{t1457} / {c1459}"
+input in1464
+var t1465 = "Rule 1465: be concise. {persona}"
+var s1466 = sanitize(in1464 + doc)
+var c1467 = "Note " + safe_msg + " in {lang}"
+s1466 = "Reset 1468: " + s1466
+system { "Section 1469." insert(t1465) insert(s1466) "{c1467}" }
+instruction { insert(in1464) insert(doc) }
+var u1471 = "{t1465} / {c1467}"
+input in1472
+var t1473 = "Rule 1473: be concise. {persona}"
+var s1474 = sanitize(in1472 + doc)
+var c1475 = "Note " + safe_msg + " in {lang}"
+s1474 = "Reset 1476: " + s1474
+system { "Section 1477." insert(t1473) insert(s1474) "{c1475}" }
+instruction { insert(in1472) insert(doc) }
+var u1479 = "{t1473} / {c1475}"
+input in1480
+var t1481 = "Rule 1481: be concise. {persona}"
+var s1482 = sanitize(in1480 + doc)
+var c1483 = "Note " + safe_msg + " in {lang}"
+s1482 = "Reset 1484: " + s1482
+system { "Section 1485." insert(t1481) insert(s1482) "{c1483}" }
+instruction { insert(in1480) insert(doc) }
+var u1487 = "{t1481} / {c1483}"
+input in1488
+var t1489 = "Rule 1489: be concise. {persona}"
+var s1490 = sanitize(in1488 + doc)
+var c1491 = "Note " + safe_msg + " in {lang}"
+s1490 = "Reset 1492: " + s1490
+system { "Section 1493." insert(t1489) insert(s1490) "{c1491}" }
+instruction { insert(in1488) insert(doc) }
+var u1495 = "{t1489} / {c1491}"
+input in1496
+var t1497 = "Rule 1497: be concise. {persona}"
+var s1498 = sanitize(in1496 + doc)
+var c1499 = "Note " + safe_msg + " in {lang}"
+s1498 = "Reset 1500: " + s1498
+system { "Section 1501." insert(t1497) insert(s1498) "{c1499}" }
+instruction { insert(in1496) insert(doc) }
+var u1503 = "{t1497} / {c1499}"
+input in1504
+var t1505 = "Rule 1505: be concise. {persona}"
+var s1506 = sanitize(in1504 + doc)
+var c1507 = "Note " + safe_msg + " in {lang}"
+s1506 = "Reset 1508: " + s1506
+system { "Section 1509." insert(t1505) insert(s1506) "{c1507}" }
+instruction { insert(in1504) insert(doc) }
+var u1511 = "{t1505} / {c1507}"
+input in1512
+var t1513 = "Rule 1513: be concise. {persona}"
+var s1514 = sanitize(in1512 + doc)
+var c1515 = "Note " + safe_msg + " in {lang}"
+s1514 = "Reset 1516: " + s1514
+system { "Section 1517." insert(t1513) insert(s1514) "{c1515}" }
+instruction { insert(in1512) insert(doc) }
+var u1519 = "{t1513} / {c1515}"
+input in1520
+var t1521 = "Rule 1521: be concise. {persona}"
+var s1522 = sanitize(in1520 + doc)
+var c1523 = "Note " + safe_msg + " in {lang}"
+s1522 = "Reset 1524: " + s1522
+system { "Section 1525." insert(t1521) insert(s1522) "{c1523}" }
+instruction { insert(in1520) insert(doc) }
+var u1527 = "{t1521} / {c1523}"
+input in1528
+var t1529 = "Rule 1529: be concise. {persona}"
+var s1530 = sanitize(in1528 + doc)
+var c1531 = "Note " + safe_msg + " in {lang}"
+s1530 = "Reset 1532: " + s1530
+system { "Section 1533." insert(t1529) insert(s1530) "{c1531}" }
+instruction { insert(in1528) insert(doc) }
+var u1535 = "{t1529} / {c1531}"
+input in1536
+var t1537 = "Rule 1537: be concise. {persona}"
+var s1538 = sanitize(in1536 + doc)
+var c1539 = "Note " + safe_msg + " in {lang}"
+s1538 = "Reset 1540: " + s1538
+system { "Section 1541." insert(t1537) insert(s1538) "{c1539}" }
+instruction { insert(in1536) insert(doc) }
+var u1543 = "{t1537} / {c1539}"
+input in1544
+var t1545 = "Rule 1545: be concise. {persona}"
+var s1546 = sanitize(in1544 + doc)
+var c1547 = "Note " + safe_msg + " in {lang}"
+s1546 = "Reset 1548: " + s1546
+system { "Section 1549." insert(t1545) insert(s1546) "{c1547}" }
+instruction { insert(in1544) insert(doc) }
+var u1551 = "{t1545} / {c1547}"
+input in1552
+var t1553 = "Rule 1553: be concise. {persona}"
+var s1554 = sanitize(in1552 + doc)
+var c1555 = "Note " + safe_msg + " in {lang}"
+s1554 = "Reset 1556: " + s1554
+system { "Section 1557." insert(t1553) insert(s1554) "{c1555}" }
+instruction { insert(in1552) insert(doc) }
+var u1559 = "{t1553} / {c1555}"
+input in1560
+var t1561 = "Rule 1561: be concise. {persona}"
+var s1562 = sanitize(in1560 + doc)
+var c1563 = "Note " + safe_msg + " in {lang}"
+s1562 = "Reset 1564: " + s1562
+system { "Section 1565." insert(t1561) insert(s1562) "{c1563}" }
+instruction { insert(in1560) insert(doc) }
+var u1567 = "{t1561} / {c1563}"
+input in1568
+var t1569 = "Rule 1569: be concise. {persona}"
+var s1570 = sanitize(in1568 + doc)
+var c1571 = "Note " + safe_msg + " in {lang}"
+s1570 = "Reset 1572: " + s1570
+system { "Section 1573." insert(t1569) insert(s1570) "{c1571}" }
+instruction { insert(in1568) insert(doc) }
+var u1575 = "{t1569} / {c1571}"
+input in1576
+var t1577 = "Rule 1577: be concise. {persona}"
+var s1578 = sanitize(in1576 + doc)
+var c1579 = "Note " + safe_msg + " in {lang}"
+s1578 = "Reset 1580: " + s1578
+system { "Section 1581." insert(t1577) insert(s1578) "{c1579}" }
+instruction { insert(in1576) insert(doc) }
+var u1583 = "{t1577} / {c1579}"
+input in1584
+var t1585 = "Rule 1585: be concise. {persona}"
+var s1586 = sanitize(in1584 + doc)
+var c1587 = "Note " + safe_msg + " in {lang}"
+s1586 = "Reset 1588: " + s1586
+system { "Section 1589." insert(t1585) insert(s1586) "{c1587}" }
+instruction { insert(in1584) insert(doc) }
+var u1591 = "{t1585} / {c1587}"
+input in1592
+var t1593 = "Rule 1593: be concise. {persona}"
+var s1594 = sanitize(in1592 + doc)
+var c1595 = "Note " + safe_msg + " in {lang}"
+s1594 = "Reset 1596: " + s1594
+system { "Section 1597." insert(t1593) insert(s1594) "{c1595}" }
+instruction { insert(in1592) insert(doc) }
+var u1599 = "{t1593} / {c1595}"
+input in1600
+var t1601 = "Rule 1601: be concise. {persona}"
+var s1602 = sanitize(in1600 + doc)
+var c1603 = "Note " + safe_msg + " in {lang}"
+s1602 = "Reset 1604: " + s1602
+system { "Section 1605." insert(t1601) insert(s1602) "{c1603}" }
+instruction { insert(in1600) insert(doc) }
+var u1607 = "{t1601} / {c1603}"
+input in1608
+var t1609 = "Rule 1609: be concise. {persona}"
+var s1610 = sanitize(in1608 + doc)
+var c1611 = "Note " + safe_msg + " in {lang}"
+s1610 = "Reset 1612: " + s1610
+system { "Section 1613." insert(t1609) insert(s1610) "{c1611}" }
+instruction { insert(in1608) insert(doc) }
+var u1615 = "{t1609} / {c1611}"
+input in1616
+var t1617 = "Rule 1617: be concise. {persona}"
+var s1618 = sanitize(in1616 + doc)
+var c1619 = "Note " + safe_msg + " in {lang}"
+s1618 = "Reset 1620: " + s1618
+system { "Section 1621." insert(t1617) insert(s1618) "{c1619}" }
+instruction { insert(in1616) insert(doc) }
+var u1623 = "{t1617} / {c1619}"
+input in1624
+var t1625 = "Rule 1625: be concise. {persona}"
+var s1626 = sanitize(in1624 + doc)
+var c1627 = "Note " + safe_msg + " in {lang}"
+s1626 = "Reset 1628: " + s1626
+system { "Section 1629." insert(t1625) insert(s1626) "{c1627}" }
+instruction { insert(in1624) insert(doc) }
+var u1631 = "{t1625} / {c1627}"
+input in1632
+var t1633 = "Rule 1633: be concise. {persona}"
+var s1634 = sanitize(in1632 + doc)
+var c1635 = "Note " + safe_msg + " in {lang}"
+s1634 = "Reset 1636: " + s1634
+system { "Section 1637." insert(t1633) insert(s1634) "{c1635}" }
+instruction { insert(in1632) insert(doc) }
+var u1639 = "{t1633} / {c1635}"
+input in1640
+var t1641 = "Rule 1641: be concise. {persona}"
+var s1642 = sanitize(in1640 + doc)
+var c1643 = "Note " + safe_msg + " in {lang}"
+s1642 = "Reset 1644: " + s1642
+system { "Section 1645." insert(t1641) insert(s1642) "{c1643}" }
+instruction { insert(in1640) insert(doc) }
+var u1647 = "{t1641} / {c1643}"
+input in1648
+var t1649 = "Rule 1649: be concise. {persona}"
+var s1650 = sanitize(in1648 + doc)
+var c1651 = "Note " + safe_msg + " in {lang}"
+s1650 = "Reset 1652: " + s1650
+system { "Section 1653." insert(t1649) insert(s1650) "{c1651}" }
+instruction { insert(in1648) insert(doc) }
+var u1655 = "{t1649} / {c1651}"
+input in1656
+var t1657 = "Rule 1657: be concise. {persona}"
+var s1658 = sanitize(in1656 + doc)
+var c1659 = "Note " + safe_msg + " in {lang}"
+s1658 = "Reset 1660: " + s1658
+system { "Section 1661." insert(t1657) insert(s1658) "{c1659}" }
+instruction { insert(in1656) insert(doc) }
+var u1663 = "{t1657} / {c1659}"
+input in1664
+var t1665 = "Rule 1665: be concise. {persona}"
+var s1666 = sanitize(in1664 + doc)
+var c1667 = "Note " + safe_msg + " in {lang}"
+s1666 = "Reset 1668: " + s1666
+system { "Section 1669." insert(t1665) insert(s1666) "{c1667}" }
+instruction { insert(in1664) insert(doc) }
+var u1671 = "{t1665} / {c1667}"
+input in1672
+var t1673 = "Rule 1673: be concise. {persona}"
+var s1674 = sanitize(in1672 + doc)
+var c1675 = "Note " + safe_msg + " in {lang}"
+s1674 = "Reset 1676: " + s1674
+system { "Section 1677." insert(t1673) insert(s1674) "{c1675}" }
+instruction { insert(in1672) insert(doc) }
+var u1679 = "{t1673} / {c1675}"
+input in1680
+var t1681 = "Rule 1681: be concise. {persona}"
+var s1682 = sanitize(in1680 + doc)
+var c1683 = "Note " + safe_msg + " in {lang}"
+s1682 = "Reset 1684: " + s1682
+system { "Section 1685." insert(t1681) insert(s1682) "{c1683}" }
+instruction { insert(in1680) insert(doc) }
+var u1687 = "{t1681} / {c1683}"
+input in1688
+var t1689 = "Rule 1689: be concise. {persona}"
+var s1690 = sanitize(in1688 + doc)
+var c1691 = "Note " + safe_msg + " in {lang}"
+s1690 = "Reset 1692: " + s1690
+system { "Section 1693." insert(t1689) insert(s1690) "{c1691}" }
+instruction { insert(in1688) insert(doc) }
+var u1695 = "{t1689} / {c1691}"
+input in1696
+var t1697 = "Rule 1697: be concise. {persona}"
+var s1698 = sanitize(in1696 + doc)
+var c1699 = "Note " + safe_msg + " in {lang}"
+s1698 = "Reset 1700: " + s1698
+system { "Section 1701." insert(t1697) insert(s1698) "{c1699}" }
+instruction { insert(in1696) insert(doc) }
+var u1703 = "{t1697} / {c1699}"
+input in1704
+var t1705 = "Rule 1705: be concise. {persona}"
+var s1706 = sanitize(in1704 + doc)
+var c1707 = "Note " + safe_msg + " in {lang}"
+s1706 = "Reset 1708: " + s1706
+system { "Section 1709." insert(t1705) insert(s1706) "{c1707}" }
+instruction { insert(in1704) insert(doc) }
+var u1711 = "{t1705} / {c1707}"
+input in1712
+var t1713 = "Rule 1713: be concise. {persona}"
+var s1714 = sanitize(in1712 + doc)
+var c1715 = "Note " + safe_msg + " in {lang}"
+s1714 = "Reset 1716: " + s1714
+system { "Section 1717." insert(t1713) insert(s1714) "{c1715}" }
+instruction { insert(in1712) insert(doc) }
+var u1719 = "{t1713} / {c1715}"
+input in1720
+var t1721 = "Rule 1721: be concise. {persona}"
+var s1722 = sanitize(in1720 + doc)
+var c1723 = "Note " + safe_msg + " in {lang}"
+s1722 = "Reset 1724: " + s1722
+system { "Section 1725." insert(t1721) insert(s1722) "{c1723}" }
+instruction { insert(in1720) insert(doc) }
+var u1727 = "{t1721} / {c1723}"
+input in1728
+var t1729 = "Rule 1729: be concise. {persona}"
+var s1730 = sanitize(in1728 + doc)
+var c1731 = "Note " + safe_msg + " in {lang}"
+s1730 = "Reset 1732: " + s1730
+system { "Section 1733." insert(t1729) insert(s1730) "{c1731}" }
+instruction { insert(in1728) insert(doc) }
+var u1735 = "{t1729} / {c1731}"
+input in1736
+var t1737 = "Rule 1737: be concise. {persona}"
+var s1738 = sanitize(in1736 + doc)
+var c1739 = "Note " + safe_msg + " in {lang}"
+s1738 = "Reset 1740: " + s1738
+system { "Section 1741." insert(t1737) insert(s1738) "{c1739}" }
+instruction { insert(in1736) insert(doc) }
+var u1743 = "{t1737} / {c1739}"
+input in1744
+var t1745 = "Rule 1745: be concise. {persona}"
+var s1746 = sanitize(in1744 + doc)
+var c1747 = "Note " + safe_msg + " in {lang}"
+s1746 = "Reset 1748: " + s1746
+system { "Section 1749." insert(t1745) insert(s1746) "{c1747}" }
+instruction { insert(in1744) insert(doc) }
+var u1751 = "{t1745} / {c1747}"
+input in1752
+var t1753 = "Rule 1753: be concise. {persona}"
+var s1754 = sanitize(in1752 + doc)
+var c1755 = "Note " + safe_msg + " in {lang}"
+s1754 = "Reset 1756: " + s1754
+system { "Section 1757." insert(t1753) insert(s1754) "{c1755}" }
+instruction { insert(in1752) insert(doc) }
+var u1759 = "{t1753} / {c1755}"
+input in1760
+var t1761 = "Rule 1761: be concise. {persona}"
+var s1762 = sanitize(in1760 + doc)
+var c1763 = "Note " + safe_msg + " in {lang}"
+s1762 = "Reset 1764: " + s1762
+system { "Section 1765." insert(t1761) insert(s1762) "{c1763}" }
+instruction { insert(in1760) insert(doc) }
+var u1767 = "{t1761} / {c1763}"
+input in1768
+var t1769 = "Rule 1769: be concise. {persona}"
+var s1770 = sanitize(in1768 + doc)
+var c1771 = "Note " + safe_msg + " in {lang}"
+s1770 = "Reset 1772: " + s1770
+system { "Section 1773." insert(t1769) insert(s1770) "{c1771}" }
+instruction { insert(in1768) insert(doc) }
+var u1775 = "{t1769} / {c1771}"
+input in1776
+var t1777 = "Rule 1777: be concise. {persona}"
+var s1778 = sanitize(in1776 + doc)
+var c1779 = "Note " + safe_msg + " in {lang}"
+s1778 = "Reset 1780: " + s1778
+system { "Section 1781." insert(t1777) insert(s1778) "{c1779}" }
+instruction { insert(in1776) insert(doc) }
+var u1783 = "{t1777} / {c1779}"
+input in1784
+var t1785 = "Rule 1785: be concise. {persona}"
+var s1786 = sanitize(in1784 + doc)
+var c1787 = "Note " + safe_msg + " in {lang}"
+s1786 = "Reset 1788: " + s1786
+system { "Section 1789." insert(t1785) insert(s1786) "{c1787}" }
+instruction { insert(in1784) insert(doc) }
+var u1791 = "{t1785} / {c1787}"
+input in1792
+var t1793 = "Rule 1793: be concise. {persona}"
+var s1794 = sanitize(in1792 + doc)
+var c1795 = "Note " + safe_msg + " in {lang}"
+s1794 = "Reset 1796: " + s1794
+system { "Section 1797." insert(t1793) insert(s1794) "{c1795}" }
+instruction { insert(in1792) insert(doc) }
+var u1799 = "{t1793} / {c1795}"
+input in1800
+var t1801 = "Rule 1801: be concise. {persona}"
+var s1802 = sanitize(in1800 + doc)
+var c1803 = "Note " + safe_msg + " in {lang}"
+s1802 = "Reset 1804: " + s1802
+system { "Section 1805." insert(t1801) insert(s1802) "{c1803}" }
+instruction { insert(in1800) insert(doc) }
+var u1807 = "{t1801} / {c1803}"
+input in1808
+var t1809 = "Rule 1809: be concise. {persona}"
+var s1810 = sanitize(in1808 + doc)
+var c1811 = "Note " + safe_msg + " in {lang}"
+s1810 = "Reset 1812: " + s1810
+system { "Section 1813." insert(t1809) insert(s1810) "{c1811}" }
+instruction { insert(in1808) insert(doc) }
+var u1815 = "{t1809} / {c1811}"
+input in1816
+var t1817 = "Rule 1817: be concise. {persona}"
+var s1818 = sanitize(in1816 + doc)
+var c1819 = "Note " + safe_msg + " in {lang}"
+s1818 = "Reset 1820: " + s1818
+system { "Section 1821." insert(t1817) insert(s1818) "{c1819}" }
+instruction { insert(in1816) insert(doc) }
+var u1823 = "{t1817} / {c1819}"
+input in1824
+var t1825 = "Rule 1825: be concise. {persona}"
+var s1826 = sanitize(in1824 + doc)
+var c1827 = "Note " + safe_msg + " in {lang}"
+s1826 = "Reset 1828: " + s1826
+system { "Section 1829." insert(t1825) insert(s1826) "{c1827}" }
+instruction { insert(in1824) insert(doc) }
+var u1831 = "{t1825} / {c1827}"
+input in1832
+var t1833 = "Rule 1833: be concise. {persona}"
+var s1834 = sanitize(in1832 + doc)
+var c1835 = "Note " + safe_msg + " in {lang}"
+s1834 = "Reset 1836: " + s1834
+system { "Section 1837." insert(t1833) insert(s1834) "{c1835}" }
+instruction { insert(in1832) insert(doc) }
+var u1839 = "{t1833} / {c1835}"
+input in1840
+var t1841 = "Rule 1841: be concise. {persona}"
+var s1842 = sanitize(in1840 + doc)
+var c1843 = "Note " + safe_msg + " in {lang}"
+s1842 = "Reset 1844: " + s1842
+system { "Section 1845." insert(t1841) insert(s1842) "{c1843}" }
+instruction { insert(in1840) insert(doc) }
+var u1847 = "{t1841} / {c1843}"
+input in1848
+var t1849 = "Rule 1849: be concise. {persona}"
+var s1850 = sanitize(in1848 + doc)
+var c1851 = "Note " + safe_msg + " in {lang}"
+s1850 = "Reset 1852: " + s1850
+system { "Section 1853." insert(t1849) insert(s1850) "{c1851}" }
+instruction { insert(in1848) insert(doc) }
+var u1855 = "{t1849} / {c1851}"
+input in1856
+var t1857 = "Rule 1857: be concise. {persona}"
+var s1858 = sanitize(in1856 + doc)
+var c1859 = "Note " + safe_msg + " in {lang}"
+s1858 = "Reset 1860: " + s1858
+system { "Section 1861." insert(t1857) insert(s1858) "{c1859}" }
+instruction { insert(in1856) insert(doc) }
+var u1863 = "{t1857} / {c1859}"
+input in1864
+var t1865 = "Rule 1865: be concise. {persona}"
+var s1866 = sanitize(in1864 + doc)
+var c1867 = "Note " + safe_msg + " in {lang}"
+s1866 = "Reset 1868: " + s1866
+system { "Section 1869." insert(t1865) insert(s1866) "{c1867}" }
+instruction { insert(in1864) insert(doc) }
+var u1871 = "{t1865} / {c1867}"
+input in1872
+var t1873 = "Rule 1873: be concise. {persona}"
+var s1874 = sanitize(in1872 + doc)
+var c1875 = "Note " + safe_msg + " in {lang}"
+s1874 = "Reset 1876: " + s1874
+system { "Section 1877." insert(t1873) insert(s1874) "{c1875}" }
+instruction { insert(in1872) insert(doc) }
+var u1879 = "{t1873} / {c1875}"
+input in1880
+var t1881 = "Rule 1881: be concise. {persona}"
+var s1882 = sanitize(in1880 + doc)
+var c1883 = "Note " + safe_msg + " in {lang}"
+s1882 = "Reset 1884: " + s1882
+system { "Section 1885." insert(t1881) insert(s1882) "{c1883}" }
+instruction { insert(in1880) insert(doc) }
+var u1887 = "{t1881} / {c1883}"
+input in1888
+var t1889 = "Rule 1889: be concise. {persona}"
+var s1890 = sanitize(in1888 + doc)
+var c1891 = "Note " + safe_msg + " in {lang}"
+s1890 = "Reset 1892: " + s1890
+system { "Section 1893." insert(t1889) insert(s1890) "{c1891}" }
+instruction { insert(in1888) insert(doc) }
+var u1895 = "{t1889} / {c1891}"
+input in1896
+var t1897 = "Rule 1897: be concise. {persona}"
+var s1898 = sanitize(in1896 + doc)
+var c1899 = "Note " + safe_msg + " in {lang}"
+s1898 = "Reset 1900: " + s1898
+system { "Section 1901." insert(t1897) insert(s1898) "{c1899}" }
+instruction { insert(in1896) insert(doc) }
+var u1903 = "{t1897} / {c1899}"
+input in1904
+var t1905 = "Rule 1905: be concise. {persona}"
+var s1906 = sanitize(in1904 + doc)
+var c1907 = "Note " + safe_msg + " in {lang}"
+s1906 = "Reset 1908: " + s1906
+system { "Section 1909." insert(t1905) insert(s1906) "{c1907}" }
+instruction { insert(in1904) insert(doc) }
+var u1911 = "{t1905} / {c1907}"
+input in1912
+var t1913 = "Rule 1913: be concise. {persona}"
+var s1914 = sanitize(in1912 + doc)
+var c1915 = "Note " + safe_msg + " in {lang}"
+s1914 = "Reset 1916: " + s1914
+system { "Section 1917." insert(t1913) insert(s1914) "{c1915}" }
+instruction { insert(in1912) insert(doc) }
+var u1919 = "{t1913} / {c1915}"
+input in1920
+var t1921 = "Rule 1921: be concise. {persona}"
+var s1922 = sanitize(in1920 + doc)
+var c1923 = "Note " + safe_msg + " in {lang}"
+s1922 = "Reset 1924: " + s1922
+system { "Section 1925." insert(t1921) insert(s1922) "{c1923}" }
+instruction { insert(in1920) insert(doc) }
+var u1927 = "{t1921} / {c1923}"
+input in1928
+var t1929 = "Rule 1929: be concise. {persona}"
+var s1930 = sanitize(in1928 + doc)
+var c1931 = "Note " + safe_msg + " in {lang}"
+s1930 = "Reset 1932: " + s1930
+system { "Section 1933." insert(t1929) insert(s1930) "{c1931}" }
+instruction { insert(in1928) insert(doc) }
+var u1935 = "{t1929} / {c1931}"
+input in1936
+var t1937 = "Rule 1937: be concise. {persona}"
+var s1938 = sanitize(in1936 + doc)
+var c1939 = "Note " + safe_msg + " in {lang}"
+s1938 = "Reset 1940: " + s1938
+system { "Section 1941." insert(t1937) insert(s1938) "{c1939}" }
+instruction { insert(in1936) insert(doc) }
+var u1943 = "{t1937} / {c1939}"
+input in1944
+var t1945 = "Rule 1945: be concise. {persona}"
+var s1946 = sanitize(in1944 + doc)
+var c1947 = "Note " + safe_msg + " in {lang}"
+s1946 = "Reset 1948: " + s1946
+system { "Section 1949." insert(t1945) insert(s1946) "{c1947}" }
+instruction { insert(in1944) insert(doc) }
+var u1951 = "{t1945} / {c1947}"
+input in1952
+var t1953 = "Rule 1953: be concise. {persona}"
+var s1954 = sanitize(in1952 + doc)
+var c1955 = "Note " + safe_msg + " in {lang}"
+s1954 = "Reset 1956: " + s1954
+system { "Section 1957." insert(t1953) insert(s1954) "{c1955}" }
+instruction { insert(in1952) insert(doc) }
+var u1959 = "{t1953} / {c1955}"
+input in1960
+var t1961 = "Rule 1961: be concise. {persona}"
+var s1962 = sanitize(in1960 + doc)
+var c1963 = "Note " + safe_msg + " in {lang}"
+s1962 = "Reset 1964: " + s1962
+system { "Section 1965." insert(t1961) insert(s1962) "{c1963}" }
+instruction { insert(in1960) insert(doc) }
+var u1967 = "{t1961} / {c1963}"
+input in1968
+var t1969 = "Rule 1969: be concise. {persona}"
+var s1970 = sanitize(in1968 + doc)
+var c1971 = "Note " + safe_msg + " in {lang}"
+s1970 = "Reset 1972: " + s1970
+system { "Section 1973." insert(t1969) insert(s1970) "{c1971}" }
+instruction { insert(in1968) insert(doc) }
+var u1975 = "{t1969} / {c1971}"
+input in1976
+var t1977 = "Rule 1977: be concise. {persona}"
+var s1978 = sanitize(in1976 + doc)
+var c1979 = "Note " + safe_msg + " in {lang}"
+s1978 = "Reset 1980: " + s1978
+system { "Section 1981." insert(t1977) insert(s1978) "{c1979}" }
+instruction { insert(in1976) insert(doc) }
+var u1983 = "{t1977} / {c1979}"
+input in1984
+var t1985 = "Rule 1985: be concise. {persona}"
+var s1986 = sanitize(in1984 + doc)
+var c1987 = "Note " + safe_msg + " in {lang}"
+s1986 = "Reset 1988: " + s1986
+system { "Section 1989." insert(t1985) insert(s1986) "{c1987}" }
+instruction { insert(in1984) insert(doc) }
+var u1991 = "{t1985} / {c1987}"
+input in1992
+var t1993 = "Rule 1993: be concise. {persona}"
+instruction { "Answer the user." insert(user_msg) }
