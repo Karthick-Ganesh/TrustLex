@@ -56,7 +56,7 @@ The model itself is not custom; the *application* is. What makes each applicatio
 
 ### 1.2 The problem: one string, many authors
 
-Every such application builds its prompt by *gluing strings together*: developer instructions + the customer's message + a retrieved document + a tool result. The model receives a single sequence of tokens and has no reliable way to tell **who wrote which part**. An attacker who controls any of the outside text can therefore write text that *looks like* developer instructions:
+Every such application builds its prompt by *concatenating strings*: developer instructions + the customer's message + a retrieved document + a tool result. The model receives a single sequence of tokens and has no reliable way to tell **who wrote which part**. An attacker who controls any of the outside text can therefore write text that *looks like* developer instructions:
 
 - **Direct prompt injection** — the customer types "Ignore all previous instructions and …" [Perez & Ribeiro 2022].
 - **Indirect prompt injection** — the attacker plants the instruction in a web page, document, email or API response that the application later retrieves [Greshake et al. 2023].
@@ -68,7 +68,7 @@ OWASP lists prompt injection as risk LLM01 — the top risk — for LLM applicat
 This resembles **SQL injection**. In the early web, applications built SQL queries by concatenating user input into query strings, so input could become code. The remedy was a change of *construction*: **prepared statements**, where the query structure is fixed by the developer and user input can only fill typed slots.
 
 > **TrustLex applies the prepared-statement idea to prompt construction, checked by a compiler.**
-> Untrusted text can fill a slot, and the compiler guarantees it never enters the privileged system prompt or forges message structure.
+> Untrusted text can fill a slot, and the compiler guarantees it never reaches the privileged system prompt *raw* — only through an explicit, visible `sanitize()` or as a value of a validated type — and never forges message structure.
 
 **The analogy is deliberately limited.** A database parses the query before binding, so a bound value can never execute. An LLM reads every channel with the same attention mechanism and may still follow instructions inside data. TrustLex therefore guarantees *where* untrusted text is placed, not how the model interprets it, and pairs that structural guarantee with spotlighting and with refinement types that remove free text altogether.
 
@@ -111,7 +111,7 @@ The attacker controls the content of one or more inputs: the customer message (d
 
 ### 2.3 Security goal
 
-**Untrusted text must never become part of the developer's instructions (the system prompt).** Formally (§4.4): the rendered system prompt may depend on an untrusted input only through the sanitizer, or through choosing a value from a validated type's fixed, instruction-free language.
+**Untrusted text must never reach the developer's instructions (the system prompt) raw.** Formally (§4.4): the rendered system prompt may depend on an untrusted input only through the sanitizer, or through choosing a value from a validated type's fixed, instruction-free language.
 
 ### 2.4 Where TrustLex applies — and API calls
 
@@ -190,7 +190,7 @@ expr       : expr "+" term | term
 term       : STRING | IDENT | "sanitize" "(" expr ")" | "(" expr ")"
 ```
 
-### 3.4 The one rule
+### 3.4 Core typing rule
 
 > **Data from an `input` may enter a `system` block only through `sanitize()`, unless the input is validated** — however it gets there: directly, through `{interpolation}`, or through any chain of variables and reassignments.
 
@@ -486,7 +486,9 @@ All columns are peer-reviewed work; industrial practice (Semantic Kernel, Lakera
 - **Hand-written corpus and attacks** — mitigated by the Tensor Trust benchmark (§7.5).
 - **Few models, free tiers.** Three models; hosted free models change or are retired; exact IDs and dates are recorded and all responses cached.
 - **Sample size.** 32–64 attack trials per condition give wide intervals; 5 of the 24 paired comparisons are significant, all in the indirect scenario. Repeats at temperature 0 vary only the canary and are correlated.
-- **Empty replies.** About 4–5 of 64 gpt-oss-20b replies per condition were empty because its reasoning used up the 1,024-token output budget; they count as unsuccessful attacks.
+- **Empty replies.** Some replies were empty (gpt-oss-20b reasoning that used up the 1,024-token output budget, or a provider's safety filter); they count as unsuccessful attacks. They occur mostly in the naive condition A (51 of 76), so they bias the comparison against TrustLex; excluding them moves no success rate by more than 4.5 points and changes no significance verdict.
+- **Fix-it for `TL-S010`.** It proposes the minimal type-correct change, sanitizing in place. A `sanitize()` in `system` is an explicit declassification the developer opts into; moving free text to the `instruction` channel (condition C) is usually preferable, and a policy forbidding declassification into `system` is future work.
+- **Exponential worst case is not attacker-reachable.** Programs are written by the trusted developer; attacker-controlled values enter only at bind time, which is linear in their length.
 - **Canary-based success is a proxy**: attacks that change behaviour without repeating the canary are not counted; a refusal-aware judge prevents counting refusals that quote the canary.
 - **Benchmark adaptation**: Tensor Trust attacks were written against the game's defences, not our application; attacks that spell the target phrase indirectly are excluded.
 - **Condition D is a guarantee check, not a behavioural measurement.**
