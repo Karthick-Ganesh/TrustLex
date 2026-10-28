@@ -190,7 +190,7 @@ e &::= \mathit{str} \mid x \mid e + e \mid \code{sanitize(}e\code{)} \mid (e)
 \textbf{Core typing rule.} \emph{Data from an \code{input} may enter a \code{system} block only through \code{sanitize()}, unless the input is validated}---however it gets there: directly, by interpolation, or through any chain of variables and reassignments. Untrusted data may always enter \code{instruction} blocks, where the runtime delimits it. A \code{sanitize()} inside \code{system} is an explicit declassification that the developer opts into (e.g.\ to include a customer's name); because the sanitizer removes structure but not natural-language instructions, the recommended layout---evaluated below as condition~C---keeps free text in the \code{instruction} channel.
 
 % =====================================================================
-\section{Security Type System}
+\section{Security Type System}\label{sec:types}
 
 \subsection{Trust lattice and clearances}
 Labels form the chain
@@ -200,10 +200,45 @@ Labels form the chain
 \end{gather*}
 ordered by taint, with join $\sqcup$ the less trusted level. Literals are \lab{TRUSTED}; typed inputs \lab{VALIDATED}; user inputs \lab{UNTRUSTED}; \code{rag}/\code{tool} inputs \lab{SEMI\_TRUSTED}; $\mathit{label}(a+b) = \mathit{label}(a)\sqcup\mathit{label}(b)$, likewise for interpolation; \code{sanitize(e)} lowers every external part of $e$ to \lab{SANITIZED}. Content may enter a block only if its label is below the block's clearance: \lab{SANITIZED} for \code{system}, \lab{UNTRUSTED} (anything) for \code{instruction}. Although acceptance under the strict policy is a threshold test, the levels carry operational meaning: \lab{SEMI\_TRUSTED} and \lab{UNTRUSTED} differ under a relaxed policy that downgrades rag/tool data in \code{system} to a warning, and \lab{SANITIZED} and \lab{VALIDATED} slots take different bind-time paths (the runtime sanitizer versus a type check).
 
+\subsection{Typing rules}
+Fig.~\ref{fig:rules} gives the rules for labels. The environment $\Gamma$ maps names to labels and is threaded through statements ($\Gamma \vdash s \dashv \Gamma'$), which makes the analysis flow-sensitive; $\mathit{src}(\code{user}) = \lab{UNTRUSTED}$, $\mathit{src}(\code{rag}) = \mathit{src}(\code{tool}) = \lab{SEMI\_TRUSTED}$, and unknown sources map to \lab{UNTRUSTED}. Interpolation desugars to concatenation, and \code{var} is assignment to a fresh name. Because the lattice is a chain, meet distributes over join, so (\textsc{San}) agrees with lowering each external part of $e$ to \lab{SANITIZED}.
+
+\begin{figure}[t]
+\centering\small
+\[
+\frac{}{\Gamma \vdash \texttt{"}s\texttt{"} : \lab{TRUSTED}}\ \textsc{(Lit)}
+\qquad
+\frac{\Gamma(x) = \ell}{\Gamma \vdash x : \ell}\ \textsc{(Var)}
+\]
+\[
+\frac{\Gamma \vdash e_1 : \ell_1 \qquad \Gamma \vdash e_2 : \ell_2}{\Gamma \vdash e_1 + e_2 : \ell_1 \sqcup \ell_2}\ \textsc{(Cat)}
+\]
+\[
+\frac{\Gamma \vdash e : \ell}{\Gamma \vdash \code{sanitize}(e) : \ell \sqcap \lab{SANITIZED}}\ \textsc{(San)}
+\]
+\[
+\frac{}{\Gamma \vdash \code{input}\ x\ \code{from}\ s \dashv \Gamma[x \mapsto \mathit{src}(s)]}\ \textsc{(In)}
+\]
+\[
+\frac{\mathit{safe}(\tau)}{\Gamma \vdash \code{input}\ x \code{:}\ \tau \dashv \Gamma[x \mapsto \lab{VALIDATED}]}\ \textsc{(InT)}
+\]
+\[
+\frac{\Gamma \vdash e : \ell}{\Gamma \vdash x = e \dashv \Gamma[x \mapsto \ell]}\ \textsc{(Asg)}
+\]
+\[
+\frac{\Gamma \vdash e_i : \ell_i \qquad \ell_i \sqsubseteq \lab{SANITIZED}\ \ (\forall i)}{\Gamma \vdash \code{system}\,\{\dots \code{insert}(e_i) \dots\} \dashv \Gamma}\ \textsc{(Sys)}
+\]
+\[
+\frac{\Gamma \vdash e_i : \ell_i\ \ (\forall i)}{\Gamma \vdash \code{instruction}\,\{\dots \code{insert}(e_i) \dots\} \dashv \Gamma}\ \textsc{(Ins)}
+\]
+\caption{Typing rules for trust labels. $\mathit{safe}(\tau)$ is the pattern-safety check of Section~\ref{sec:patterns}; a failed premise of (\textsc{Sys}) is reported as \code{TL-S010} or \code{TL-S011}, and of (\textsc{InT}) as \code{TL-S012}.}
+\label{fig:rules}
+\end{figure}
+
 \subsection{Exact flow-sensitive evaluation}
 Instead of approximating, the checker evaluates the program symbolically. The value of each variable at each program point is a \emph{template}: literal text interleaved with input \emph{slots}, each recording whether it was sanitized and the path by which it arrived. Assignment is a strong update, so an overwritten variable is clean again (a flow-insensitive analysis would report a false positive); each block sees values at its own position; and partial sanitization such as \code{sanitize(u) + u} keeps a raw slot and is rejected.
 
-\subsection{Refinement types and pattern safety}
+\subsection{Refinement types and pattern safety}\label{sec:patterns}
 A \code{pattern} validates only if it cannot match free text. The pattern is parsed with Python's regular-expression parser and its syntax tree walked; it is rejected (\code{TL-S012}) if it can match whitespace or invisible characters, uses \code{.} or a negated class, has an unbounded repeat, uses backreferences or lookarounds, or can match more than 64 characters. A value of an accepted type can select an option but cannot spell an instruction sentence. \code{bind()} checks every value against its type (\code{TL-G006}).
 
 \subsection{Non-interference}
@@ -351,6 +386,9 @@ CaMeL~\cite{debenedetti2025camel} & run time & 77\% of AgentDojo tasks solved wi
 \end{table}
 
 Three points stand out. First, unlike the keyword filter, \TL{} decides from where text is placed rather than what it says, so it has no false positives on benign inputs and its compile-time verdict cannot be evaded by rephrasing an attack. Second, our spotlighting gains are smaller than the figure Hines et al.\ report; their experiments use GPT-family models and their own spotlighting variants and attacks, while we use the default delimiting sanitizer with smaller open models and include the public Tensor Trust attacks, so the comparison illustrates how strongly prompt-level defences depend on the model and the attacks. This is exactly why \TL{} pairs spotlighting with model-independent compile-time guarantees. Third, CaMeL and StruQ protect a different layer (agent tool calls and model weights) and compose with \TL{}: a \TL{} program can supply the trusted prompt of a CaMeL-style system or be sent to a StruQ-trained model.
+
+\subsection{Guidance for developers}
+The results suggest a layered use of \TL{}. (1)~Give every input whose values can be enumerated or bounded a refinement type: such inputs blocked every attack on every model before any request. (2)~Keep customer messages and retrieved documents in the \code{instruction} channel, sanitized and spotlighted; this layout significantly reduced indirect injection on two of the three models. (3)~Treat \code{sanitize()} inside \code{system} as a reviewed declassification, reserved for short values such as a customer's name. (4)~Send the compiled prompt to a model trained to respect the instruction hierarchy~\cite{wallace2024hierarchy}, since the remaining risk lies in persuasion within the user turn, which no prompt-construction discipline can remove.
 
 % =====================================================================
 \section{Limitations and Threats to Validity}
