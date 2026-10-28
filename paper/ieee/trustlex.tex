@@ -81,8 +81,7 @@ Vellore, Tamil Nadu 632014, India\\
 karthick.ganesh2024@vitstudent.ac.in}
 \and
 \IEEEauthorblockN{Dr. Krishnaraj N}
-\IEEEauthorblockA{\textit{Department of Database Systems}\\
-\textit{School of Computer Science}\\
+\IEEEauthorblockA{\textit{School of Computer Science}\\
 \textit{and Engineering (SCOPE)}\\
 \textit{Vellore Institute of Technology}\\
 Vellore, Tamil Nadu 632014, India\\
@@ -185,8 +184,10 @@ instruction {
 The grammar is LALR(1) with no conflicts:
 {\small
 \begin{align*}
-\mathit{stmt} &::= \code{var}\ x = e \mid \code{input}\ x\ [\code{from}\ s]\ [\code{:}\ \tau] \mid x = e \mid \mathit{block}\\
-\mathit{block} &::= (\code{system} \mid \code{instruction})\ \code{\{}\ (\mathit{str} \mid \code{insert(}e\code{)})^{*}\ \code{\}}\\
+\mathit{stmt} &::= \code{var}\ x = e \mid x = e \mid \mathit{block}\\
+ &\mid\ \code{input}\ x\ [\code{from}\ s]\ [\code{:}\ \tau]\\
+\mathit{block} &::= (\code{system} \mid \code{instruction})\\
+ &\phantom{::=}\ \code{\{}\ (\mathit{str} \mid \code{insert(}e\code{)})^{*}\ \code{\}}\\
 e &::= \mathit{str} \mid x \mid e + e \mid \code{sanitize(}e\code{)} \mid (e)
 \end{align*}}
 
@@ -197,9 +198,10 @@ e &::= \mathit{str} \mid x \mid e + e \mid \code{sanitize(}e\code{)} \mid (e)
 
 \subsection{Trust lattice and clearances}
 Labels form the chain
-\[
-\lab{TRUSTED} \sqsubseteq \lab{VALIDATED} \sqsubseteq \lab{SANITIZED} \sqsubseteq \lab{SEMI\_TRUSTED} \sqsubseteq \lab{UNTRUSTED},
-\]
+\begin{gather*}
+\lab{TRUSTED} \sqsubseteq \lab{VALIDATED} \sqsubseteq \lab{SANITIZED}\\
+\sqsubseteq \lab{SEMI\_TRUSTED} \sqsubseteq \lab{UNTRUSTED},
+\end{gather*}
 ordered by taint, with join $\sqcup$ the less trusted level. Literals are \lab{TRUSTED}; typed inputs \lab{VALIDATED}; user inputs \lab{UNTRUSTED}; \code{rag}/\code{tool} inputs \lab{SEMI\_TRUSTED}; $\mathit{label}(a+b) = \mathit{label}(a)\sqcup\mathit{label}(b)$, likewise for interpolation; \code{sanitize(e)} lowers every external part of $e$ to \lab{SANITIZED}. Content may enter a block only if its label is below the block's clearance: \lab{SANITIZED} for \code{system}, \lab{UNTRUSTED} (anything) for \code{instruction}.
 
 \subsection{Exact flow-sensitive evaluation}
@@ -286,7 +288,7 @@ ms/stmt & .47 & .41 & .44 & .41 & .52 & .60 & .75 \\
 \textbf{Worst case.} Because templates are copied, $k$ repetitions of \code{a = a + a} build $2^k$ parts: compile time is 18.8\,ms at $k{=}10$, 305\,ms at $k{=}14$ and 2.69\,s at $k{=}17$, doubling with each statement. The cost is proportional to the prompt being built---inserting the value yields $2^{17}$ slots, beyond any model's context window---and can be bounded independently of output size by hash-consing templates into a DAG or by a size cap tied to the largest context window.
 
 % =====================================================================
-\section{Evaluation}
+\section{Evaluation}\label{sec:eval}
 
 \subsection{Setup}
 \textbf{Corpus:} 48 hand-written programs (26 unsafe, 22 safe) in 14 categories, 32 attacks in 8 categories (direct override, role tokens, nested role tokens, transcript forgery, delimiter escape, Unicode obfuscation, payload splitting, social engineering), and 10 benign inputs. \textbf{Baselines:} B1, a lexical linter; B2, a keyword blocklist on the naively rendered prompt; and a naive string-concatenation renderer. \textbf{Live models} (free API tiers, temperature 0, at most 1{,}024 output tokens): \code{openai/gpt-oss-20b} and \code{allam-2-7b} (Groq) and \code{gemma-4-26b-a4b-it} (Google). \textbf{Public benchmark:} from the Tensor Trust hijacking set~\cite{toyer2024tensortrust} (776 human-written attacks) we keep the 206 distinct attacks that name the target phrase ``Access Granted'' within 800 characters, replace the phrase with our canary, and sample 64 with a fixed seed. \textbf{Judging:} each trial embeds a fresh random canary; an attack succeeds if the reply contains it in a sentence that is not a refusal. \textbf{Statistics:} Wilson 95\% intervals~\cite{wilson1927} and exact McNemar tests~\cite{mcnemar1947} on paired trials.
@@ -378,6 +380,12 @@ The guarantee covers the privileged channel: untrusted text is still allowed, de
 \section{Conclusion}
 
 Prompt injection in LLM-integrated applications is a construction bug: trusted instructions and untrusted data are glued into one string. \TL{} addresses it as programming languages addressed SQL injection and cross-site scripting, by making the trust of every piece of text part of the program's type and refusing to build an unsafe prompt. Its exact analysis yields non-interference with no false positives, and its compiled output carries the guarantee to the API call. The experiments show the two layers working together: compile-time types and channel separation give model-independent protection, and spotlighting adds a model-dependent reduction that is largest for indirect injection. Future work includes DAG-shared templates, control flow with sound joins, trust tracking across multi-step agent pipelines, integration with capability-based runtimes, and a language server for live diagnostics.
+
+\section*{Acknowledgment}
+
+The authors thank Dr.~Krishnaraj~N for his guidance throughout this work.
+
+\textbf{Use of AI tools.} In accordance with IEEE policy on AI-generated content, the authors disclose that Claude (Anthropic), used through the Claude Code assistant, was used in this work: to help implement parts of the compiler and the evaluation harness, to run and analyse the experiments, and to draft and edit the text of all sections of this paper. The authors directed the work, reviewed and tested all code, checked the reported numbers against the logged results, and take full responsibility for the content. The language models evaluated in this paper are subjects of the experiments, not authoring tools (Section~\ref{sec:eval}).
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
