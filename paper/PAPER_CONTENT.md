@@ -65,10 +65,12 @@ OWASP lists prompt injection as risk LLM01 — the top risk — for LLM applicat
 
 ### 1.3 The analogy: SQL injection and prepared statements
 
-This is the same class of bug as **SQL injection**. In the early web, applications built SQL queries by concatenating user input into query strings, so input could become code. The fix that worked was not better input filters but a change of *construction*: **prepared statements**, where the query structure is fixed by the developer and user input can only fill typed slots, never change the structure.
+This resembles **SQL injection**. In the early web, applications built SQL queries by concatenating user input into query strings, so input could become code. The remedy was a change of *construction*: **prepared statements**, where the query structure is fixed by the developer and user input can only fill typed slots.
 
-> **TrustLex is prepared statements for prompts, checked by a compiler.**
-> Untrusted text can fill a slot, but the compiler guarantees it can never become part of the developer's instructions.
+> **TrustLex applies the prepared-statement idea to prompt construction, checked by a compiler.**
+> Untrusted text can fill a slot, and the compiler guarantees it never enters the privileged system prompt or forges message structure.
+
+**The analogy is deliberately limited.** A database parses the query before binding, so a bound value can never execute. An LLM reads every channel with the same attention mechanism and may still follow instructions inside data. TrustLex therefore guarantees *where* untrusted text is placed, not how the model interprets it, and pairs that structural guarantee with spotlighting and with refinement types that remove free text altogether.
 
 Like a type checker that refuses to compile `int x = "hello"`, TrustLex refuses to compile a prompt in which a customer's message flows into the system prompt unsanitized — and it shows the exact path the data took and a verified fix.
 
@@ -109,7 +111,7 @@ The attacker controls the content of one or more inputs: the customer message (d
 
 ### 2.3 Security goal
 
-**Untrusted text must never be able to act as developer instructions.** Formally (§4.4): the rendered system prompt may depend on an untrusted input only through the sanitizer, or through choosing a value from a validated type's fixed, instruction-free language.
+**Untrusted text must never become part of the developer's instructions (the system prompt).** Formally (§4.4): the rendered system prompt may depend on an untrusted input only through the sanitizer, or through choosing a value from a validated type's fixed, instruction-free language.
 
 ### 2.4 Where TrustLex applies — and API calls
 
@@ -437,26 +439,28 @@ The public attacks are stronger than ours (on allam-2-7b 56–75% vs. 41–59%),
 
 ## 8. Related work
 
-| Dimension | DSPy & LMQL | CaMeL | TaintP2X & DeepClause | Semantic Kernel templates | PromptShield, Lakera Guard, NeMo Guardrails | **TrustLex** |
+| Dimension | DSPy & LMQL | CaMeL | TaintP2X | CSAS | PromptShield, NeMo Guardrails | **TrustLex** |
 |---|---|---|---|---|---|---|
-| Domain | LM pipelines / constrained decoding | privileged/quarantined LLM split with capabilities | taint tracking in application code | prompt templating in an SDK | run-time detection and filtering | **purpose-built prompt DSL** |
-| Reasons about trust | No | Yes | Yes | Yes (variables unsafe by default) | implicitly / rules | **Yes, deterministically** |
-| Enforcement point | — | run time (custom interpreter) | static analysis of general code | render time | run time, after assembly | **compile time, before assembly** |
-| Flow analysis | — | run-time data flow | approximate | No | No | **exact, flow-sensitive** |
-| Trust as a grammar-level type | No | No | No | No (opt-out flag) | No | **Yes** |
-| Guarantee | — | policy over tracked flows | detection | inserted values cannot create message tags | none (best effort) | **non-interference; sound and complete** |
-| Remediation | — | deny action | report | — | block / flag | **verified fix-its** |
-| Per-request overhead | inference | extra LLM + interpreter | none (dev time) | encoding | classifier call | **none beyond linear sanitizer** |
+| Domain | LM pipelines / constrained decoding | privileged/quarantined LLM split with capabilities | taint tracking in LLM application code | web templates (XSS) | run-time detection and filtering | **purpose-built prompt DSL** |
+| Reasons about trust | No | Yes | Yes | Yes (type qualifiers) | implicitly / rules | **Yes, deterministically** |
+| Enforcement point | — | run time (custom interpreter) | static analysis of general code | compile time (inserts sanitizers) | run time, after assembly | **compile time, before assembly** |
+| Flow analysis | — | run-time data flow | approximate | flow-sensitive type inference | No | **exact, flow-sensitive** |
+| Trust as a grammar-level type | No | No | No | No (qualifiers inferred) | No | **Yes** |
+| Guarantee | — | policy over tracked flows | detection | context-correct sanitization | none (best effort) | **non-interference for the system channel; sound and complete** |
+| Remediation | — | deny action | report | automatic sanitizer insertion | block / flag | **verified fix-its** |
+| Per-request overhead | inference | extra LLM + interpreter | none (dev time) | sanitizers | classifier call | **none beyond linear sanitizer** |
+
+All columns are peer-reviewed work; industrial practice (Semantic Kernel, Lakera Guard) is discussed in the text only.
 
 **Prompt programming languages.** DSPy [Khattab et al. 2024] and LMQL [Beurer-Kellner et al. 2023] treat prompts as programs but optimize *what* the model does; they do not model where text comes from.
 
 **CaMeL** [Debenedetti et al. 2025] separates a privileged planner LLM from a quarantined LLM that reads untrusted data, and enforces capability policies on tool calls at run time. It targets agent actions; TrustLex targets prompt *construction*, one step earlier. They compose: a TrustLex program can be the trusted prompt source of a CaMeL-style system.
 
-**Static taint analysis for LLM applications.** TaintP2X [He et al. 2026] and DeepClause [Andreas 2026] retrofit taint tracking onto general-purpose code and must approximate control flow, aliasing and libraries. TrustLex designs the language so the analysis is exact.
+**Static taint analysis for LLM applications.** TaintP2X [He et al. 2026] retrofits taint tracking onto general-purpose code and must approximate control flow, aliasing and libraries. TrustLex designs the language so the analysis is exact.
 
 **Run-time detectors and guardrails** (PromptShield [Jacob et al. 2024], Lakera Guard, NeMo Guardrails [Rebedea et al. 2023]) are probabilistic, add per-request cost and give no guarantee; our keyword baseline B2 illustrates the false-positive problem. They are orthogonal: a detector can be registered as a named TrustLex sanitizer.
 
-**Auto-sanitizing templates.** CSAS [Samuel et al. 2011] showed for web templates that a compiler can infer contexts and insert sanitizers using type qualifiers. Semantic Kernel [Microsoft 2024] encodes all prompt-template variables at render time. TrustLex brings CSAS-style compile-time, flow-sensitive typing to prompts.
+**Auto-sanitizing templates.** CSAS [Samuel et al. 2011], the closest prior work, showed for web templates that a compiler can infer contexts and insert sanitizers using type qualifiers. Industrial SDKs such as Semantic Kernel [Microsoft 2024] encode prompt-template variables at render time. TrustLex brings CSAS-style compile-time, flow-sensitive typing to prompts and adds a non-interference guarantee for the privileged channel.
 
 **Model-level defences.** StruQ [Chen et al. 2025], the instruction hierarchy [Wallace et al. 2024] and spotlighting [Hines et al. 2024] train or prompt the model to separate instructions from data. TrustLex supplies the structural separation these defences assume; our allam-2-7b results show why that structure matters when the model is not trained to use it.
 
@@ -491,7 +495,7 @@ The public attacks are stronger than ours (on allam-2-7b 56–75% vs. 41–59%),
 
 ## 10. Conclusion and future work
 
-Prompt injection in LLM-integrated applications is, at its root, a construction bug: trusted instructions and untrusted data are glued into one string. TrustLex addresses it the way programming languages addressed SQL injection and cross-site scripting — by making the trust of every piece of text part of the program's type and refusing to build an unsafe prompt. Its analysis is exact for its language, yielding a non-interference guarantee with no false positives, and its compiled output carries that guarantee to the API call. The live experiments show the two layers working together: compile-time types and channel separation give model-independent protection, and spotlighting adds a model-dependent reduction on models trained to respect it.
+Prompt injection in LLM-integrated applications is in part a construction problem: trusted instructions and untrusted data are glued into one string. TrustLex borrows the remedy that programming languages applied to SQL injection and cross-site scripting — making the trust of every piece of text part of the program's type and refusing to build an unsafe prompt — while acknowledging that, unlike a database engine, a model can still be persuaded by data it is shown. Its analysis is exact for its language, yielding non-interference for the privileged channel with no false positives, and its compiled output carries that guarantee to the API call. The live experiments show the layers working together: refinement types block attacks independently of the model, channel separation keeps untrusted text out of the system prompt, and spotlighting adds a model-dependent reduction that is significant only for indirect injection.
 
 **Future work:** hash-consed (DAG) templates for linear worst-case analysis; conditionals and loops with sound joins; trust tracking through *model outputs* and multi-step agent pipelines (output of one call as `input from tool` of the next); integration with capability-based runtimes such as CaMeL for tool-call policies; learned or classifier-backed sanitizers registered by name; IDE integration (language server) for live diagnostics.
 
@@ -499,7 +503,6 @@ Prompt injection in LLM-integrated applications is, at its root, a construction 
 
 ## References
 
-- Andreas. *Static Taint Analysis for LLM Agents.* DeepClause (blog), 2026.
 - Beurer-Kellner, L., Fischer, M., Vechev, M. *Prompting Is Programming: A Query Language for Large Language Models.* PLDI 2023.
 - Chen, S., Piet, J., Sitawarin, C., Wagner, D. *StruQ: Defending Against Prompt Injection with Structured Queries.* USENIX Security 2025.
 - Debenedetti, E., et al. *Defeating Prompt Injections by Design* (CaMeL). arXiv:2503.18813, 2025.
@@ -546,7 +549,7 @@ Prompt injection in LLM-integrated applications is, at its root, a construction 
 
 ## Presentation notes (for the review, not for the paper)
 
-**One-sentence pitch.** "Companies put a general LLM inside their own app with a secret system prompt; customers and documents can slip instructions into it. TrustLex is a compiler that refuses to build a prompt where that is possible — prepared statements for prompts."
+**One-sentence pitch.** "Companies put a general LLM inside their own app with a secret system prompt; customers and documents can slip instructions into it. TrustLex is a compiler that refuses to build a prompt where outside text can reach the system prompt — the prepared-statement idea applied to prompts. It controls where text goes; the model can still be persuaded by text in the user turn, which is why we also measure that."
 
 **If asked "why not just filter bad words?"** Our keyword baseline catches only 56% of attacks that reach the system prompt and wrongly flags 30% of normal messages; attackers rephrase, filters can't keep up. TrustLex doesn't look for bad words — it controls *where* outside text is allowed to go.
 
