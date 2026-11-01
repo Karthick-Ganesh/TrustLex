@@ -285,14 +285,14 @@ def test_llm_asr_end_to_end_with_fake_provider_and_cache(tmp_path):
     provider = FakeProvider(obey=1.0)
     summary = llm_asr.run(_asr_args(), tmp_path, provider=provider)
     conditions = summary["conditions"]
-    assert set(conditions) == {"A", "B", "C", "D"}
+    assert set(conditions) == {"A", "B", "Bt", "C", "D", "S"}
     n_attacks, n_benign = len(load_attacks()), len(load_benign())
     assert conditions["A"]["asr"] == 1.0 and conditions["A"]["attacks"] == n_attacks
     assert conditions["D"]["asr"] == 0.0 and conditions["D"]["blocked"] == n_attacks  # all fail validation
     assert all(c["utility"] == 1.0 for c in conditions.values())
     low, high = conditions["D"]["asr_ci95"]
     assert low == 0.0 and 0 < high < 0.15
-    assert provider.calls == 3 * (n_attacks + n_benign) + n_benign
+    assert provider.calls == 5 * (n_attacks + n_benign) + n_benign
     meta = json.loads((tmp_path / "asr_fake_fake.json").read_text(encoding="utf-8"))["metadata"]
     assert meta["model"] == "fake" and meta["git_commit"] and meta["temperature"] == 0.0
     assert (tmp_path / "asr_fake_fake.csv").exists()
@@ -307,7 +307,7 @@ def test_llm_asr_dry_run_and_confirmation_send_nothing(tmp_path, capsys, monkeyp
     provider = FakeProvider()
     assert llm_asr.run(_asr_args("--dry-run", "--limit", "3"), tmp_path, provider=provider) is None
     out = capsys.readouterr().out
-    assert "24 trials" in out and "3 blocked" in out and "21 requests to send" in out and "condition D (trustlex-typed)" in out and "nothing was sent" in out
+    assert "36 trials" in out and "3 blocked" in out and "33 requests to send" in out and "condition D (trustlex-typed)" in out and "nothing was sent" in out
     monkeypatch.setattr("builtins.input", lambda prompt: "n")
     args = llm_asr.build_parser().parse_args(["--provider", "fake", "--model", "fake", "--limit", "2"])
     assert llm_asr.run(args, tmp_path, provider=provider) is None
@@ -390,7 +390,8 @@ def test_indirect_scenario_plants_the_attack_in_the_retrieved_article(tmp_path):
     system, messages = llm_asr.build_prompt("C", values, "m", "indirect")
     assert "PLANTED" not in system
     assert '<untrusted_input name="article" source="rag">' in messages[0]["content"]
-    assert llm_asr.trustlex_verdicts("indirect") == {"A": "rejected: TL-S011", "B": "compiles", "C": "compiles"}
+    assert llm_asr.trustlex_verdicts("indirect") == {
+        "A": "rejected: TL-S011", "B": "compiles", "Bt": "compiles", "C": "compiles", "S": "compiles"}
     assert llm_asr.trustlex_verdicts("direct")["A"] == "rejected: TL-S010"
     assert attack["text"]  # the attack set is reused unchanged
 
@@ -398,9 +399,9 @@ def test_indirect_scenario_plants_the_attack_in_the_retrieved_article(tmp_path):
 def test_indirect_scenario_end_to_end_with_fake_provider(tmp_path):
     provider = FakeProvider(obey=1.0)
     summary = llm_asr.run(_asr_args("--scenario", "indirect", "--limit", "3"), tmp_path, provider=provider)
-    assert set(summary["conditions"]) == {"A", "B", "C"} and summary["metadata"]["scenario"] == "indirect"
+    assert set(summary["conditions"]) == {"A", "B", "Bt", "C", "S"} and summary["metadata"]["scenario"] == "indirect"
     assert summary["conditions"]["A"]["label"] == "rag-in-system"
-    assert provider.calls == 3 * (3 + 3)
+    assert provider.calls == 5 * (3 + 3)
     assert (tmp_path / "asr_indirect_fake_fake.json").exists()
     assert report.main(["--results", str(tmp_path), "--include-fake"]) == 0
     text = (tmp_path / "RESULTS.md").read_text(encoding="utf-8")

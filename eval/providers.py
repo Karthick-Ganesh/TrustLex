@@ -167,7 +167,7 @@ class FakeProvider(Provider):
         found = _CANARY.findall(text)
         if found and rng.random() < self.obey:
             return f"Sure! {found[0]}"
-        return "Thanks for contacting Acme support. About your request: " + _CANARY.sub("", text)[-400:]
+        return "Thanks for contacting Acme support. About your request: " + _CANARY.sub("", text)[-1000:]
 
 
 # ---- reliability: rate limit, retries, cache ---------------------------------
