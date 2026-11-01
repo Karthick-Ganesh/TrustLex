@@ -51,8 +51,8 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 **Choices for A.**
 1. **Name and syntax: DECIDED.** `declassify(x, "reason")`.
 2. **Justification required: DECIDED.** Yes, a non-empty string literal. The compiler quotes the reason in the warning it prints for every declassification.
-3. **Default severity of `declassify` (open):** recommended: a warning by default, an error with `--no-declassify`.
-4. **New live condition S** ("sanitized text in system", the layout today's compiler accepts): recommended if API quota allows, as empirical support for rejecting it. Cost: about +33% API calls. The gpt-oss runs are the slow ones (daily token limit).
+3. **Severity: DECIDED.** A warning by default, quoting the reason; `--no-declassify` turns it into an error. Plain sanitized text in `system`, without `declassify`, is always an error (TL-S013).
+4. **New live condition S (deferred; the live-test part will be discussed later):** ("sanitized text in system", the layout today's compiler accepts): recommended if API quota allows, as empirical support for rejecting it. Cost: about +33% API calls. The gpt-oss runs are the slow ones (daily token limit).
 
 ---
 
@@ -72,6 +72,21 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 | — | One public benchmark, not indirect | add BIPIA or AgentDojo | 🟠 | 🛠/🧱 |
 | — | gpt-oss n=32 in three settings; repeats not run | quota time only | 🟢 | ⚡ |
 | — | Utility on only 10 benign inputs | a few hundred real support questions | 🟠 | 🛠 |
+
+## Evaluation design (proposal, not decided)
+
+**How industry builds prompts today.** Developer rules and persona go in the `system` message. The customer's message goes in the `user` message. Tool and API results go in `tool` messages. For retrieved documents, both layouts are common:
+- in the system message (RAG templates of the form "use the following context: {context}");
+- in the user message, often wrapped in XML tags, which is the current best-practice advice.
+
+**Proposed baselines** (each one a real industry layout):
+- **Direct:** B (customer message in the user turn) is the standard; A is an anti-pattern, kept only for reference.
+- **Indirect:** A (documents in the system prompt, the common template default); B (documents raw in the user turn); and a new **B-tagged** (user turn plus XML tags, the best-practice advice). C vs. B-tagged isolates what TrustLex adds over best practice.
+
+**Proposed metrics, one per layer:**
+1. **Compile-time guarantee** (the main contribution): leaks found in real open-source LLM apps, false positives on those apps, and porting effort. This needs the real-app study.
+2. **Typed inputs:** the share of real apps' inputs that can be refinement-typed. Multiplied by D's 100% blocking, this gives the share of the attack surface removed by construction.
+3. **Runtime layer:** attack success vs. B and B-tagged, with paired McNemar tests, reported together with **utility** (benign task success). Run it on frontier models as well as small ones, and on a standard indirect benchmark (BIPIA or AgentDojo) so the numbers are comparable with published work.
 
 ## Questions raised in discussion
 - **Adoption:** industry is slow to adopt a new language. Should we also offer TrustLex as an embedded Python library or linter (typed prompt strings checked by the same analysis)? This would help the "industry benefit" argument and the real-app case study.
