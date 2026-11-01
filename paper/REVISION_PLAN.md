@@ -83,6 +83,54 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 
 **Expected outcome.** C clearly beats B on indirect attacks, and beats or matches B-tagged on models that respect markers. If not, the paper's main claim still rests on the compile-time metrics (real-app leaks and typed-input share), and C is reported as "matches best practice".
 
+### E1. Evaluated only on our own corpus (circular F1) 🔴 · 🧱 — AGREED, not started
+
+**Problem.** F1 = 1.00 comes from 48 programs we wrote around TrustLex's own rules. The property-based tests show the theory is sound, but not that real prompts have these leaks, or that TrustLex can express real apps.
+
+**Planned fix: a real-app case study (about 1.5–2 weeks).**
+1. **Selection (Claude automates).**
+   - Write the selection criteria down before looking at any result:
+     - the app uses a system prompt;
+     - it has at least one outside input (user, retrieved document, or tool/API result);
+     - it meets a minimum star count and recent-activity threshold;
+     - it is open source.
+   - Pick **20 apps**, mixing support bots, RAG Q&A, tool-using agents and email or summariser apps.
+   - Also include the official example templates of popular frameworks (LangChain, LlamaIndex).
+   - Record every candidate considered and why it was kept or excluded.
+2. **Translation into TrustLex.**
+   - Claude locates each app's prompt-construction code and drafts the TrustLex translation, tagging each input as `user`, `rag` or `tool`.
+   - **For independence, at least one author translates independently** (all 20 if time allows, otherwise a sample of at least 30–50%). We report the agreement.
+   - Disagreements are resolved by discussion, and all translations are published in the repo.
+3. **Analysis.**
+   - For each app, record:
+     - the compiler verdict;
+     - each leak and its source;
+     - the fix needed (move, refinement type or `declassify`);
+     - the porting effort.
+   - Confirm every finding by hand.
+   - Run the keyword filter and the lexical linter on the same apps.
+4. **Proofs of concept.**
+   - Show 3–5 confirmed leaks with a working attack.
+   - Run them only on **local copies with our own API key**, never on deployed services.
+5. **Metrics:**
+   - % of apps with at least one leak, by source;
+   - false alarms;
+   - share of inputs that can be refinement-typed (also answers E2);
+   - features TrustLex could not express, such as loops over documents and if/else (feeds the novelty discussion);
+   - the baselines' results on the same apps.
+
+**Decided.**
+- 20 apps.
+- Manual translation now; an automatic converter for common template formats (e.g. LangChain prompts) is a later option.
+- Proofs of concept for 3–5 leaks.
+
+**Disclosure to maintainers.** Claude reports each confirmed leak in a maintained project to Karthick first. Karthick drafts the message and informs the maintainers. Claude does not contact anyone.
+
+**Paper.**
+- A new "Real-world case study" subsection with its metrics.
+- Selection criteria and threats to validity: translation is manual, and TrustLex has no loops or branches.
+- Update the AI-use disclosure, since Claude assisted with selection and draft translations.
+
 ---
 
 ## To discuss next (from the review)
@@ -93,7 +141,7 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 | C | Lattice levels act like two | one sentence in paper; A partly helps; option: a `context{}` channel for RAG data at SEMI_TRUSTED | 🟠 | 🛠 |
 | E3 | B vs C weak | **agreed above** (Parts 1–2); Part 3 waits for the live-test discussion | 🔴 | 🛠/🧱 |
 | E2 | Condition D compares free text with an 8-character regex | labelled "by construction"; needs evidence of how often real inputs can be typed | 🟠 | 🧱 |
-| E1 | Own corpus only (circular F1) | wording fixed; needs a real-app case study | 🔴 | 🧱 |
+| E1 | Own corpus only (circular F1) | **agreed above** (real-app case study) | 🔴 | 🧱 |
 | — | Proof is a sketch | fine for a conference; full proof for a journal | 🟢/🟠 | 🛠 |
 | — | Semantic Kernel cited as a developer blog [15] | text mention only | 🟢 | ⚡ |
 | — | Novelty: exact analysis is easy without control flow | add `if`/`match`/functions, or a practical contribution | 🔴 | 🧱 |
