@@ -22,15 +22,17 @@ Open-source LLM-integrated applications on GitHub that build prompts for a chat-
 - Apps whose prompts are built at run time from a remote prompt-management service, so the prompt is not in the repository.
 - Repositories with no licence.
 
-## Strata (20 apps)
+## Strata (12 apps)
+
+> **Amendment, 2026-11-02, before any candidate was screened:** the study was reduced from 20 to 12 apps (and the independent translations from 6 to 4) to fit the submission deadline. The strata keep their proportions. The search results in `search/` had been downloaded, but no candidate had been opened or judged when this change was made.
 
 | Stratum | Apps | Typical outside input |
 |---|---|---|
-| S1 Customer-facing chat / support bots | 5 | user message |
-| S2 Retrieval-augmented Q&A over documents | 5 | retrieved chunks |
-| S3 Agents and tool-using assistants | 5 | tool / API / web results |
-| S4 Email, summarisation and other text-processing apps | 3 | emails, web pages, files |
-| S5 Official framework templates (LangChain, LlamaIndex) | 2 | retrieved chunks, user message |
+| S1 Customer-facing chat / support bots | 3 | user message |
+| S2 Retrieval-augmented Q&A over documents | 3 | retrieved chunks |
+| S3 Agents and tool-using assistants | 3 | tool / API / web results |
+| S4 Email, summarisation and other text-processing apps | 2 | emails, web pages, files |
+| S5 Official framework templates (LangChain, LlamaIndex) | 1 | retrieved chunks, user message |
 
 ## Search procedure (fixed in advance)
 
@@ -56,7 +58,7 @@ For each stratum, the GitHub repository search below is run once, sorted by star
 
 ## Independence
 
-Claude (the AI assistant) drafts each translation. At least one author independently translates a sample of at least 6 of the 20 apps from the original source code, without seeing the draft, and agreement between the two translations is reported. Disagreements are resolved by discussion and recorded.
+Claude (the AI assistant) drafts each translation. At least one author independently translates a sample of at least 4 of the 12 apps from the original source code, without seeing the draft, and agreement between the two translations is reported. Disagreements are resolved by discussion and recorded.
 
 ## Ethics
 
