@@ -29,7 +29,7 @@ Twelve open-source LLM applications, chosen by the pre-registered protocol in [S
 | Findings (errors) | 13: 9 × TL-S011 (retrieved / tool / LLM-written text in system), 3 × TL-S013 (sanitized free text in system), 1 × TL-S012 (unbounded validation pattern) |
 | Sources behind the leaks | retrieved or third-party text 7 (documents, job ads, project files, skill descriptions), LLM-written memory or summaries 4, user-editable text 1, plus the pattern |
 | False positives on the 4 safe apps | **0** |
-| Lexical linter (B1) on the same translations | finds 9 of the 13; misses all 3 sanitized-in-system leaks; 1 false positive (serviette's integer count) |
+| Lexical linter (B1) on the same translations | finds 10 of the 13; misses all 3 sanitized-in-system leaks; 1 false positive (serviette's integer count) |
 | Inputs that could be refinement-typed | **2 of 31 (6%)**: real apps pass almost everything as free text, so typed fields (condition D) protect a small share of today's inputs |
 | Features TrustLex cannot express | loops over documents, skills or tool calls (6 apps), optional prompt sections / conditionals (all 12), LLM calls whose output re-enters a prompt (summaries and memory, 6 apps) |
 
