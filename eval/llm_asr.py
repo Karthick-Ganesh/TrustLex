@@ -382,15 +382,23 @@ def run(args, out: Path, provider=None, sleep=None) -> dict | None:
         return None
 
     rows = []
+    stop_after = getattr(args, "max_consecutive_errors", None)
+    consecutive = 0
     for i, t in enumerate(trials, 1):
         reply, from_cache, error = None, False, ""
         if not t.blocked:
-            try:
-                reply, from_cache = client.complete(t.system, t.messages, args.temperature, args.max_tokens)
-            except MissingKeyError:
-                raise
-            except ProviderError as exc:
-                error = str(exc)[:200]
+            if stop_after and consecutive >= stop_after and not client.is_cached(t.system, t.messages, args.temperature):
+                # A daily quota is exhausted: stop sending; a later re-run resumes from the cache.
+                error = f"skipped after {consecutive} consecutive provider errors"
+            else:
+                try:
+                    reply, from_cache = client.complete(t.system, t.messages, args.temperature, args.max_tokens)
+                    consecutive = 0
+                except MissingKeyError:
+                    raise
+                except ProviderError as exc:
+                    error = str(exc)[:200]
+                    consecutive += 1
         verdict = judge(t, reply) if not error else {"success": "", "canary_mentioned": "", "utility": ""}
         rows.append({
             "scenario": scenario, "condition": t.condition, "condition_label": labels[t.condition],
@@ -444,6 +452,9 @@ def build_parser() -> argparse.ArgumentParser:
                                                 "e.g. one made by eval/import_tensor_trust.py")
     p.add_argument("--conditions", help="comma-separated conditions to run (default: the scenario's own; "
                                         "the development variants C0 and Cdm only when named)")
+    p.add_argument("--max-consecutive-errors", type=int, metavar="N",
+                   help="stop sending after N provider errors in a row (an exhausted daily quota); "
+                        "the remaining trials are recorded as errors and a re-run resumes them")
     p.add_argument("--repeats", type=int, default=1)
     p.add_argument("--limit", type=int, help="use only the first N attacks and N benign inputs")
     p.add_argument("--rpm", type=float, default=20, help="requests per minute (default 20)")

@@ -483,3 +483,20 @@ def test_llm_asr_runs_an_external_attack_file_and_reports_it_separately(tmp_path
     assert "### Direct injection: the attack is the customer's message (Tensor Trust benchmark attacks)" in text
     assert "Paired comparison (exact McNemar test" in text and "| A vs C | 1 |" in text
     assert (tmp_path / "asr_tensor_trust.png").exists()
+
+
+class _QuotaExhausted(FakeProvider):
+    """Every request fails, as when a provider's daily quota is used up."""
+
+    def complete(self, system, messages, temperature, max_tokens):
+        self.calls += 1
+        raise ProviderError("HTTP 429: daily quota exhausted")
+
+
+def test_max_consecutive_errors_stops_sending(tmp_path, monkeypatch):
+    monkeypatch.setattr("providers.MAX_RETRIES", 0)
+    provider = _QuotaExhausted()
+    summary = llm_asr.run(_asr_args("--limit", "3", "--max-consecutive-errors", "2"), tmp_path, provider=provider,
+                          sleep=lambda s: None)
+    assert provider.calls == 2  # the rest are skipped, not sent
+    assert summary["metadata"]["errors"] == 33  # 36 trials, 3 blocked by TrustLex (D), every other one an error
