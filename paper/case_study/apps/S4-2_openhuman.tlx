@@ -1,0 +1,42 @@
+# about: OpenHuman channel agent: answers messages arriving from chat platforms with tools and skills
+# repo: tinyhumansai/openhuman (GPL-3.0, 42,476 stars)
+# commit: 36ba3fde823d3c9eade965b440c72bfdba20810d
+# prompt code: crates/openhuman-core/src/channels/system_prompt.rs:192-222 (render),
+#              crates/openhuman-core/src/channels/prompt.rs:129-191 (tools, task, safety, skills),
+#              :58-90 (render_project_context: SOUL.md, IDENTITY.md)
+# stratum: S4 (rank 14)
+#
+# Sources
+#   task, safety, workspace, runtime, channel sections     developer-written          -> literals
+#   tool catalogue                                         built-in tool descriptions -> var
+#   SOUL.md, IDENTITY.md in the workspace root             the owner's identity files
+#                                                          (operator configuration)   -> var
+#   skills          name and description of each installed skill, inserted
+#                   without escaping; skills can be downloaded third-party
+#                   packages                                                          -> input from rag
+#   message         a message arriving on a chat channel                              -> input (user)
+#
+# Not expressible: the skills loop (one <skill> element each) is modelled as one
+# input; optional sections are conditionals on configuration.
+
+var tools = "<render_description_catalogue(tools)>"
+var identity = "<## Project Context: SOUL.md, IDENTITY.md>"
+
+input skills from rag
+input message
+
+system {
+    insert(tools)
+    "## Your Task\n\nWhen the user sends a message, ACT on it. Use the tools to fulfill their request."
+    "## Safety\n\n- Do not exfiltrate private data.\n- Do not run destructive commands without asking."
+    "## Available Skills\n\nSkills are loaded on demand. Use `read` on the skill path to get full instructions."
+    "<available_skills>"
+    insert(skills)
+    "</available_skills>"
+    "## Workspace / Current Date & Time / Runtime / Channel Capabilities ..."
+    insert(identity)
+}
+
+instruction {
+    insert(message)
+}

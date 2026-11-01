@@ -1,0 +1,39 @@
+# about: agent-browser chat mode: an LLM drives a headless browser through tool calls
+# repo: vercel-labs/agent-browser (Apache-2.0, 45,121 stars)
+# commit: 5868f7c05020e047c00e68e4abf9253cce864f41
+# prompt code: cli/src/chat.rs:113-126 (system prompt + user message), :157 (user input),
+#              :159-176 (compaction: the LLM summary of earlier messages is re-inserted as a
+#              role "system" message), :374-378 (browser output as role "tool" messages)
+# stratum: S4 (rank 12)
+#
+# Sources
+#   chat::system_prompt_for(session)       developer-written                          -> literal
+#   request                                the user's instruction                     -> input (user)
+#   page                                   browser command output: snapshots and text
+#                                          of the visited web pages                   -> input from tool
+#   summary                                written by the model from the earlier
+#                                          messages, tool results (web pages) included -> input from tool
+#
+# The summary is second-order: web-page text passes through an LLM call and
+# comes back as privileged text. TrustLex treats a model's output as at most as
+# trusted as what it read, so the summary is SEMI_TRUSTED.
+# Not expressible: compaction runs only past a size threshold (a conditional),
+# and the tool loop repeats; translated after one compaction.
+
+input summary from tool
+input request
+input page from tool
+
+system {
+    "<system_prompt_for(session): you control a browser through agent-browser commands ...>"
+}
+
+system {
+    "[Conversation summary]"
+    insert(summary)
+}
+
+instruction {
+    insert(request)
+    insert(page)
+}

@@ -1,0 +1,44 @@
+# about: Open Design: a collaborative AI design agent that builds artifacts from a brief
+# repo: nexu-io/open-design (Apache-2.0, 105,321 stars)
+# commit: 12d970eacc8971150e3c76470d2a9afe16dc2ed1
+# prompt code: apps/daemon/src/prompts/system.ts:1-31 (layer order), :66-67 (injection-resistance
+#              block first), :744-854 (ComposeInput: skillBody, designSystemBody, memoryBody,
+#              userInstructions, projectInstructions), :1209-1219 (personal memory section)
+# stratum: S3 (rank 23)
+#
+# Sources
+#   official designer prompt, discovery layer, PROMPT_INJECTION_RESISTANCE,
+#   bundled skills and design systems                 developer-written / shipped    -> var
+#   userInstructions, projectInstructions             typed by the user in settings
+#                                                     (operator configuration)       -> var
+#   memoryBody                                        "auto-extracted from past
+#                                                     chats" by the memory loop      -> input from tool
+#   brief                                             the user's request             -> input (user)
+#
+# Design systems a user imports from outside (e.g. a brand site) would be
+# retrieved third-party text; bundled ones are translated as developer text,
+# which is the conservative choice.
+# Not expressible: the composer's many optional layers and the deck/media
+# branches are conditionals on configuration; translated with memory present.
+
+var charter = "<PROMPT_INJECTION_RESISTANCE + official designer prompt + discovery layer>"
+var instructions = "<user-level and project-level instructions from settings>"
+var design_system = "<active bundled DESIGN.md>"
+var skill = "<active bundled SKILL.md>"
+
+input memory from tool
+input brief
+
+system {
+    insert(charter)
+    "## Personal memory (auto-extracted from past chats)"
+    "Preferences and context sedimented from this user's previous conversations — authoritative for tone, terminology, and what they already told you; never re-ask what is captured here."
+    insert(memory)
+    insert(instructions)
+    insert(design_system)
+    insert(skill)
+}
+
+instruction {
+    insert(brief)
+}

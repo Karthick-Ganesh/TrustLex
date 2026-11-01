@@ -1,0 +1,362 @@
+stratum,rank,repo,stars,license,language,fork,pushed,description,decision,reason
+S1,1,sindresorhus/awesome,528425,CC0-1.0,,false,2026-09-02,😎 Awesome lists about all kinds of interesting topics [NOTE: Pull requests are temporarily,exclude,"a list or collection, not an application"
+S1,2,awesome-selfhosted/awesome-selfhosted,332702,NOASSERTION,,false,2026-10-31,A list of Free Software network services and web applications which can be hosted on your ,exclude,no OSI licence stated (criterion 1)
+S1,3,Shubhamsaboo/awesome-llm-apps,143657,Apache-2.0,Python,false,2026-10-22,"100+ AI Agents, Agent Skills and RAG Apps - Free and Open Source.",exclude,"a list or collection, not an application"
+S1,4,ripienaar/free-for-dev,141354,none,HTML,false,2026-11-01,"A list of SaaS, PaaS and IaaS offerings that have free tiers of interest to devops and inf",exclude,no OSI licence stated (criterion 1)
+S1,5,paperclipai/paperclip,109823,MIT,TypeScript,false,2026-11-01,The open-source app everyone uses to manage agents at work,include,app; developer-written board-chat system prompt; user and agent comments as input
+S1,6,bytedance/deer-flow,84837,MIT,Python,false,2026-11-01,"An open-source long-horizon SuperAgent harness that researches, codes, and creates. With t",include,"app; developer-written lead-agent prompt; soul, skills, memory, user messages as input"
+S1,7,mlabonne/llm-course,84836,Apache-2.0,,false,2026-02-05,Course to get into Large Language Models (LLMs) with roadmaps and Colab notebooks.,exclude,a course or tutorial
+S1,8,lobehub/lobehub,83675,NOASSERTION,TypeScript,false,2026-11-01,"🤯 LobeHub is your Chief Agent Operator, organizing your agents into 7×24 operations by hir",exclude,no OSI licence stated (criterion 1)
+S1,9,career-ops-hq/career-ops,79222,MIT,JavaScript,false,2026-11-01,"Open-source AI job search agent and job finder: scan job boards, score each job 1-5 agains",include,app; developer-written evaluator prompt; job description as input
+S1,10,rohitg00/ai-engineering-from-scratch,76220,MIT,Python,false,2026-10-29,Learn AI Engineering! Learn it. Build it. Ship it for others.,exclude,a course or tutorial
+S1,11,asgeirtj/system_prompts_leaks,70580,CC0-1.0,Python,false,2026-11-01,"Documented system prompts from Anthropic - Claude Fable 5.1, Opus 5.5, Claude Design, Clau",exclude,"a prompt collection, not an application"
+S1,12,mem0ai/mem0,68233,Apache-2.0,Python,false,2026-10-30,The Memory Layer for AI Agents - Drop-in memory infrastructure for AI agents and apps. Con,not reached,stratum already full
+S1,13,1c7/chinese-independent-developer,61976,none,,false,2026-11-01,👩🏿‍💻👨🏾‍💻👩🏼‍💻👨🏽‍💻👩🏻‍💻中国独立开发者项目列表 -- 分享大家都在做什么,exclude,no OSI licence stated (criterion 1)
+S1,14,crewAIInc/crewAI,60384,MIT,Python,false,2026-11-01,"Framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative",exclude,"a framework, library or infrastructure, not an end-user application"
+S1,15,GitHubDaily/GitHubDaily,48339,none,,false,2025-12-31,"坚持分享 GitHub 上高质量、有趣实用的开源技术教程、开发者工具、编程网站、技术资讯。A list cool, interesting projects of GitHub.",exclude,no OSI licence stated (criterion 1)
+S1,16,LibreChat-AI/LibreChat,46611,MIT,TypeScript,false,2026-11-01,"Enhanced ChatGPT Clone: Features Agents, MCP, Skills, DeepSeek, Anthropic, AWS, OpenAI, Re",not reached,stratum already full
+S1,17,deepseek-ai/awesome-deepseek-integration,39666,CC0-1.0,,false,2026-02-23,Integrate the DeepSeek API into popular software,exclude,"a list or collection, not an application"
+S1,18,lm-sys/FastChat,39550,Apache-2.0,Python,false,2026-05-01,"An open platform for training, serving, and evaluating large language models. Release repo",exclude,a model or model-serving repository
+S1,19,langfuse/langfuse,36838,NOASSERTION,TypeScript,false,2026-11-01,"🪢 Open source agent evals & observability: Trace, evaluate, and improve LLM applications w",exclude,no OSI licence stated (criterion 1)
+S1,20,VoltAgent/awesome-agent-skills,36709,MIT,,false,2026-10-30,"A curated collection of 1000+ agent skills from official dev teams and the community, comp",exclude,"a list or collection, not an application"
+S1,21,e2b-dev/awesome-ai-agents,30742,NOASSERTION,,false,2026-08-21,A list of AI autonomous agents,exclude,no OSI licence stated (criterion 1)
+S1,22,microsoft/semantic-kernel,28725,MIT,C#,false,2026-10-31,Integrate cutting-edge LLM technology quickly and easily into your apps,not reached,stratum already full
+S1,23,QwenLM/Qwen3,27697,none,Python,false,2026-01-09,"Qwen3 is the large language model series developed by Qwen team, Alibaba Cloud.",exclude,no OSI licence stated (criterion 1)
+S1,24,vercel/ai,27676,NOASSERTION,TypeScript,false,2026-11-01,"The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-sou",exclude,no OSI licence stated (criterion 1)
+S1,25,Hannibal046/Awesome-LLM,27467,CC0-1.0,,false,2025-07-31,Awesome-LLM: a curated list of Large Language Model,exclude,"a list or collection, not an application"
+S1,26,enescingoz/awesome-n8n-templates,26216,NOASSERTION,,false,2026-09-12,"280+ free n8n automation templates — ready-to-use workflows for Gmail, Telegram, Slack, Di",exclude,no OSI licence stated (criterion 1)
+S1,27,NirDiamant/GenAI_Agents,24773,NOASSERTION,Jupyter Notebook,false,2026-11-01,"50+ tutorials and implementations for Generative AI Agent techniques, from basic conversat",exclude,no OSI licence stated (criterion 1)
+S1,28,AZeC4/TelegramGroup,23880,none,,false,2026-11-01,2026最新悄咪咪收集的10000+个Telegram群合集，附全网最有趣好用的机器人BOT🤖【dianbaodaohang.com】,exclude,no OSI licence stated (criterion 1)
+S1,29,mikeroyal/Self-Hosting-Guide,23428,none,Dockerfile,false,2025-06-27,Self-Hosting Guide. Learn all about  locally hosting (on premises & private web servers) a,exclude,no OSI licence stated (criterion 1)
+S1,30,AiHubCN/Awesome-Chinese-LLM,22772,none,,false,2026-05-10,整理开源的中文大语言模型，以规模较小、可私有化部署、训练成本较低的模型为主，包括底座模型，垂直领域微调及应用，数据集与教程等。,exclude,no OSI licence stated (criterion 1)
+S1,31,dipakkr/awesome-ai-engineering,22511,MIT,,false,2026-10-21,"🚀 A curated collection of AI engineering resources, roadmaps, tools, and projects covering",exclude,"a list or collection, not an application"
+S1,32,EthicalML/awesome-production-machine-learning,21062,MIT,,false,2026-11-01,"A curated list of awesome open source libraries to deploy, monitor, version and scale your",exclude,"a list or collection, not an application"
+S1,33,birobirobiro/awesome-shadcn-ui,20740,MIT,TypeScript,false,2026-10-31,A curated list of awesome things related to shadcn/ui.,exclude,"a list or collection, not an application"
+S1,34,confident-ai/deepeval,19227,Apache-2.0,Python,false,2026-10-29,The LLM Evaluation Framework,exclude,"a framework, library or infrastructure, not an end-user application"
+S1,35,keon/awesome-nlp,19119,CC0-1.0,,false,2026-10-12,:book: A curated list of resources dedicated to Natural Language Processing (NLP),exclude,"a list or collection, not an application"
+S1,36,xming521/WeClone,18341,AGPL-3.0,Python,false,2026-11-01,Build a portrait of your life. Assistants that know you. Clones that talk like you.,not reached,stratum already full
+S1,37,RightNow-AI/openfang,18244,Apache-2.0,Rust,false,2026-07-02,Open-source Agent Operating System,not reached,stratum already full
+S1,38,microsoft/mcp-for-beginners,17579,MIT,Jupyter Notebook,false,2026-10-30,This open-source curriculum introduces the fundamentals of Model Context Protocol (MCP) th,exclude,a course or tutorial
+S1,39,QwenLM/Qwen-Agent,17239,Apache-2.0,Python,false,2026-03-04,"Agent framework and applications built upon Qwen>=3.0, featuring Function Calling, MCP, Co",exclude,"a framework, library or infrastructure, not an end-user application"
+S1,40,Arindam200/awesome-ai-apps,16655,MIT,Python,false,2026-10-30,"A collection of projects showcasing RAG, agents, workflows, and other AI use cases",exclude,"a list or collection, not an application"
+S1,41,mayooear/ai-pdf-chatbot-langchain,16584,MIT,TypeScript,false,2026-03-27,AI PDF chatbot agent built with LangChain & LangGraph ,not reached,stratum already full
+S1,42,huggingface/transformers.js,16395,Apache-2.0,JavaScript,false,2026-10-30,State-of-the-art Machine Learning for the web. Run 🤗 Transformers directly in your browser,not reached,stratum already full
+S1,43,raga-ai-hub/RagaAI-Catalyst,16184,Apache-2.0,Python,false,2026-02-11,"Python SDK for Agent AI Observability, Monitoring and Evaluation Framework. Includes featu",exclude,"a framework, library or infrastructure, not an end-user application"
+S1,44,HKUDS/OpenHarness,16149,MIT,Python,false,2026-06-04,"""OpenHarness: Open Agent Harness with a Built-in Personal Agent--Ohmo!""",not reached,stratum already full
+S1,45,llmware-ai/llmware,14818,Apache-2.0,Python,false,2026-10-01,"Unified framework for building enterprise RAG pipelines with small, specialized models",exclude,"a framework, library or infrastructure, not an end-user application"
+S1,46,supertone-oss-archive/supertonic,13756,MIT,Swift,false,2026-09-09,"Lightning-Fast, On-Device, Multilingual TTS — running natively via ONNX.",not reached,stratum already full
+S1,47,ShishirPatil/gorilla,13062,Apache-2.0,Python,false,2026-10-17,Gorilla: Training and Evaluating LLMs for Function Calls (Tool Calls),exclude,a model or model-serving repository
+S1,48,steven2358/awesome-generative-ai,12793,CC0-1.0,,false,2026-10-30,A curated list of modern Generative Artificial Intelligence projects and services,exclude,"a list or collection, not an application"
+S1,49,ritchieng/the-incredible-pytorch,12669,MIT,,false,2026-10-31,"The Incredible PyTorch: a curated list of tutorials, papers, projects, communities and mor",exclude,"a list or collection, not an application"
+S1,50,jnv/lists,11620,CC0-1.0,,false,2026-10-31,The definitive list of lists (of lists) curated on GitHub and elsewhere,exclude,"a list or collection, not an application"
+S1,51,adongwanai/AgentGuide,11508,none,MDX,false,2026-10-31,https://adongwanai.github.io/AgentGuide | AI Agent开发指南 | LangGraph实战 | 高级RAG | 转行大模型 | 大模型,exclude,no OSI licence stated (criterion 1)
+S1,52,microsoft/promptflow,11258,MIT,Python,false,2026-10-31,"Build high-quality LLM apps - from prototyping, testing to production deployment and monit",not reached,stratum already full
+S1,53,VoltAgent/voltagent,10908,MIT,TypeScript,false,2026-10-15,AI Agent Engineering Platform built on an Open Source TypeScript AI Agent Framework,exclude,"a framework, library or infrastructure, not an end-user application"
+S1,54,KalyanKS-NLP/llm-engineer-toolkit,10896,Apache-2.0,,false,2026-10-25,A curated list of  120+ LLM libraries category wise. ,exclude,"a list or collection, not an application"
+S1,55,PatrickJS/awesome-angular,10102,CC0-1.0,HTML,false,2026-11-01,:page_facing_up: A curated list of awesome Angular resources,exclude,"a list or collection, not an application"
+S1,56,marcelscruz/public-apis,9664,MIT,JavaScript,false,2026-11-01,A collaborative list of public APIs for developers,exclude,"a list or collection, not an application"
+S1,57,kyrolabs/awesome-langchain,9584,CC0-1.0,,false,2026-10-17,😎 Awesome list of tools and projects with the awesome LangChain framework,exclude,"a list or collection, not an application"
+S1,58,xberg-io/xberg,9505,MIT,Rust,false,2026-11-01,"The fast, precise document-intelligence engine for every language: text, tables and metada",exclude,"a framework, library or infrastructure, not an end-user application"
+S1,59,nlpxucan/WizardLM,9471,none,Python,false,2025-06-07,"LLMs build upon Evol Insturct: WizardLM, WizardCoder, WizardMath",exclude,no OSI licence stated (criterion 1)
+S1,60,ai-collection/ai-collection,9261,MIT,,false,2026-10-29,The Generative AI Landscape - A Collection of Awesome Generative AI Applications,exclude,"a list or collection, not an application"
+S1,61,datawhalechina/Agent-Learning-Hub,9168,MIT,HTML,false,2026-07-19,AI Agent 学习路线与资料库收集,not reached,stratum already full
+S1,62,We5ter/Scanners-Box,9166,NOASSERTION,,false,2026-10-30,"The Ultimate Open-Source Security Arsenal for Hackers, Enterprises, and AI Agents——面向极客、企业",exclude,no OSI licence stated (criterion 1)
+S1,63,WangRongsheng/awesome-LLM-resources,9062,Apache-2.0,,false,2026-11-01,🧑‍🚀 全世界最好的LLM资料总结（多模态生成、Agent、辅助编程、AI审稿、数据处理、模型训练、模型推理、o1 模型、MCP、小语言模型、视觉语言模型） | Summary o,exclude,"a list or collection, not an application"
+S1,64,cipher387/osint_stuff_tool_collection,9031,GPL-3.0,,false,2026-11-01,A collection of several hundred online tools for OSINT,exclude,"a list or collection, not an application"
+S1,65,anbeime/skill,9005,none,Python,false,2026-11-01,收录最全、更新最快的技能Skills商店：精选原创技能包（涵盖文档处理、内容创作、编程开发、机器学习、自动化工作流），全部打包好可直接安装使用！同时自动抓取GitHub上万个Ski,exclude,no OSI licence stated (criterion 1)
+S1,66,dair-ai/ML-Papers-Explained,8920,none,,false,2025-06-30,Explanation to key concepts in ML,exclude,no OSI licence stated (criterion 1)
+S1,67,digoal/blog,8605,GPL-2.0,HTML,false,2026-11-01,"AI,Opensource,Database,Business,Finance,Minds. git clone --depth 1 https://github.com/digo",not reached,stratum already full
+S1,68,AIPentest/CyberStrikeAI,8302,Apache-2.0,Go,false,2026-10-31,"The system of action for AI-native cybersecurity—where intent becomes governed execution, ",not reached,stratum already full
+S1,69,cporter202/API-mega-list,8266,none,JavaScript,false,2026-10-20,This GitHub repo is a powerhouse collection of APIs you can start using immediately to bui,exclude,no OSI licence stated (criterion 1)
+S1,70,nomi-sec/PoC-in-GitHub,8173,CC0-1.0,,false,2026-11-01,📡 PoC auto collect from GitHub. ⚠️ Be careful Malware.,not reached,stratum already full
+S1,71,01-ai/Yi,7836,Apache-2.0,Jupyter Notebook,false,2024-11-27,A series of large language models trained from scratch by developers @01-ai,exclude,a course or tutorial
+S1,72,2FastLabs/agent-squad,7795,Apache-2.0,Python,false,2026-10-08,Flexible and powerful framework for managing multiple AI agents and handling complex conve,exclude,"a framework, library or infrastructure, not an end-user application"
+S1,73,weaviate/Verba,7692,BSD-3-Clause,Python,false,2026-06-08,Retrieval Augmented Generation (RAG) chatbot powered by Weaviate,not reached,stratum already full
+S1,74,microsoft/TinyTroupe,7630,MIT,Jupyter Notebook,false,2026-10-23,LLM-powered multiagent persona simulation for imagination enhancement and business insight,not reached,stratum already full
+S1,75,daviddao/awful-ai,7569,none,,false,2025-02-20,😈Awful AI is a curated list to track current scary usages of AI - hoping to raise awarenes,exclude,no OSI licence stated (criterion 1)
+S1,76,NVIDIA-NeMo/Guardrails,7405,NOASSERTION,Python,false,2026-11-01,NeMo Guardrails is an open-source toolkit for easily adding programmable guardrails to LLM,exclude,no OSI licence stated (criterion 1)
+S1,77,bhaskatripathi/pdfGPT,7168,MIT,Python,false,2026-03-06,PDF GPT allows you to chat with the contents of your PDF file by using GPT capabilities. T,not reached,stratum already full
+S1,78,Orkas-AI/Orkas,7154,MIT,JavaScript,false,2026-11-01,"Orkas is an open-source (MIT), local-first AI team for your desktop: a Commander turns you",not reached,stratum already full
+S1,79,amitness/learning,6989,MIT,,false,2026-11-01,A log of things I'm learning,not reached,stratum already full
+S1,80,georgezouq/awesome-ai-in-finance,6713,CC0-1.0,,false,2026-09-08,🔬 A curated list of awesome LLMs & deep learning strategies & tools in financial market.,exclude,"a list or collection, not an application"
+S1,81,langchain-ai/opengpts,6705,MIT,Rich Text Format,false,2025-06-26,,not reached,stratum already full
+S1,82,punkpeye/awesome-mcp-clients,6619,MIT,,false,2026-06-07,A collection of MCP clients.,exclude,"a list or collection, not an application"
+S1,83,genkit-ai/genkit,6563,Apache-2.0,TypeScript,false,2026-11-01,"Open-source framework for building agentic apps in JavaScript, Go, Dart, and Python, built",exclude,"a framework, library or infrastructure, not an end-user application"
+S1,84,mahseema/awesome-ai-tools,6524,MIT,,false,2025-12-31,A curated list of Artificial Intelligence Top Tools,exclude,"a list or collection, not an application"
+S1,85,sindresorhus/awesome-chatgpt,6480,CC0-1.0,,false,2026-02-15,🤖 Awesome list for ChatGPT — an artificial intelligence chatbot developed by OpenAI [SUBMI,exclude,"a list or collection, not an application"
+S1,86,reorx/awesome-chatgpt-api,6441,none,Python,false,2026-03-23,"Curated list of apps and tools that not only use the new ChatGPT API, but also allow users",exclude,no OSI licence stated (criterion 1)
+S1,87,promptslab/Awesome-Prompt-Engineering,6431,Apache-2.0,TypeScript,false,2026-11-01,This repository contains a hand-curated resources for Prompt Engineering with a focus on G,exclude,"a list or collection, not an application"
+S1,88,aymericdamien/TopDeepLearning,6401,MIT,Python,false,2026-07-15,A list of popular github projects related to deep learning,exclude,"a list or collection, not an application"
+S1,89,langgptai/wonderful-prompts,6383,MIT,,false,2026-08-25,🔥中文 prompt 精选🔥，ChatGPT 使用指南，提升 ChatGPT 可玩性和可用性！🚀,not reached,stratum already full
+S1,90,Eigenwise/atomic-agents,6314,MIT,Python,false,2026-10-29,"Building AI agents, atomically",not reached,stratum already full
+S2,1,codecrafters-io/build-your-own-x,558122,none,Markdown,false,2026-07-14,Master programming by recreating your favorite technologies from scratch.,exclude,no OSI licence stated (criterion 1)
+S2,2,public-apis/public-apis,494337,MIT,Python,false,2026-11-01,A collective list of free APIs,exclude,"a list or collection, not an application"
+S2,3,awesome-selfhosted/awesome-selfhosted,332702,NOASSERTION,,false,2026-10-31,A list of Free Software network services and web applications which can be hosted on your ,exclude,already listed under an earlier stratum
+S2,4,vinta/awesome-python,331762,NOASSERTION,Python,false,2026-11-01,"The definitive list that answers ""I want to do X in Python, which tool should I use?""",exclude,no OSI licence stated (criterion 1)
+S2,5,avelino/awesome-go,191495,MIT,Go,false,2026-10-30,"A curated list of awesome Go frameworks, libraries and software",exclude,"a list or collection, not an application"
+S2,6,ollama/ollama,185572,MIT,Go,false,2026-10-31,"Get up and running with Kimi, GLM, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other model",exclude,"a model runtime, not an application that builds prompts (criterion 2)"
+S2,7,langgenius/dify,160165,NOASSERTION,Python,false,2026-11-01,"Build Agentic workflows, RAG pipelines, with rich AI model and tool support on one collabo",exclude,no OSI licence stated (criterion 1)
+S2,8,open-webui/open-webui,157466,NOASSERTION,Python,false,2026-11-01,"User-friendly AI Interface (Supports Ollama, OpenAI API, ...)",exclude,no OSI licence stated (criterion 1)
+S2,9,Shubhamsaboo/awesome-llm-apps,143657,Apache-2.0,Python,false,2026-10-22,"100+ AI Agents, Agent Skills and RAG Apps - Free and Open Source.",exclude,already listed under an earlier stratum
+S2,10,ripienaar/free-for-dev,141354,none,HTML,false,2026-11-01,"A list of SaaS, PaaS and IaaS offerings that have free tiers of interest to devops and inf",exclude,already listed under an earlier stratum
+S2,11,punkpeye/awesome-mcp-servers,97164,MIT,,false,2026-10-23,A collection of MCP servers.,exclude,"a list or collection, not an application"
+S2,12,MunGell/awesome-for-beginners,90963,none,,false,2026-10-01,A list of awesome beginners-friendly projects.,exclude,no OSI licence stated (criterion 1)
+S2,13,mlabonne/llm-course,84836,Apache-2.0,,false,2026-02-05,Course to get into Large Language Models (LLMs) with roadmaps and Colab notebooks.,exclude,already listed under an earlier stratum
+S2,14,cheaper-inference/OmniRoute,83542,MIT,TypeScript,false,2026-11-01,"Never stop coding. Free MIT AI gateway: one endpoint, 375 providers (150+ free), 1,400+ mo",exclude,"a framework, library or infrastructure, not an end-user application"
+S2,15,opendatalab/MinerU,82942,NOASSERTION,Python,false,2026-10-31,Transforms complex documents like PDFs and Office docs into LLM-ready markdown/JSON for yo,exclude,no OSI licence stated (criterion 1)
+S2,16,rohitg00/ai-engineering-from-scratch,76220,MIT,Python,false,2026-10-29,Learn AI Engineering! Learn it. Build it. Ship it for others.,exclude,already listed under an earlier stratum
+S2,17,hiyouga/LlamaFactory,75824,Apache-2.0,Python,false,2026-10-31,Unified Efficient Fine-Tuning of 100+ LLMs & VLMs (ACL 2024),exclude,a model or model-serving repository
+S2,18,josephmisiti/awesome-machine-learning,74711,NOASSERTION,Python,false,2026-11-01,"A curated list of awesome Machine Learning frameworks, libraries and software.",exclude,no OSI licence stated (criterion 1)
+S2,19,vuejs/awesome-vue,73492,MIT,,false,2026-10-19,🎉 A curated list of awesome things related to Vue.js,exclude,"a list or collection, not an application"
+S2,20,rust-unofficial/awesome-rust,60263,CC0-1.0,Rust,false,2026-11-01,A curated list of Rust code and resources.,exclude,"a list or collection, not an application"
+S2,21,meilisearch/meilisearch,59742,NOASSERTION,Rust,false,2026-11-01,A lightning-fast search engine API bringing AI-powered hybrid search to your sites and app,exclude,no OSI licence stated (criterion 1)
+S2,22,pathwaycom/serviette,58736,MIT,Python,false,2026-10-16,A no-code RAG server that keeps answers in sync with your documents. Works with 8 vector d,include,app; developer-written grounded-answer prompt; retrieved chunks and question as input
+S2,23,vectorize-io/hindsight,57632,MIT,Python,false,2026-11-01,Hindsight: Agent Memory That Learns,exclude,"agent-memory infrastructure, not an end-user application (criterion 2)"
+S2,24,zylon-ai/private-gpt,57625,Apache-2.0,Python,false,2026-10-29,"Complete API layer for private AI applications on local models: RAG, skills, tools, MCP, t",exclude,"a framework, library or infrastructure, not an end-user application"
+S2,25,hesreallyhim/awesome-claude-code,57036,NOASSERTION,Python,false,2026-11-01,"A hand-picked collection of the finest of resources for the most awesome of agents, Claude",exclude,no OSI licence stated (criterion 1)
+S2,26,HKUDS/DeepTutor,53546,Apache-2.0,Python,false,2026-10-31,DeepTutor: Lifelong Personalized Tutoring. https://deeptutor.info/.,include,"app; developer-written tutor prompt; memory, sources, knowledge base, question as input"
+S2,27,serhii-londar/open-source-mac-os-apps,51161,CC0-1.0,,false,2026-10-31,🚀 Awesome list of open source applications for macOS. https://t.me/s/opensourcemacosapps,exclude,"a list or collection, not an application"
+S2,28,sickn33/agentic-awesome-skills,48973,MIT,Python,false,2026-11-01,"2,884+ reusable AI agent skills for Claude Code, Codex, Cursor and Gemini CLI. AAS Core ad",exclude,"a list or collection, not an application"
+S2,29,GitHubDaily/GitHubDaily,48339,none,,false,2025-12-31,"坚持分享 GitHub 上高质量、有趣实用的开源技术教程、开发者工具、编程网站、技术资讯。A list cool, interesting projects of GitHub.",exclude,already listed under an earlier stratum
+S2,30,LibreChat-AI/LibreChat,46611,MIT,TypeScript,false,2026-11-01,"Enhanced ChatGPT Clone: Features Agents, MCP, Skills, DeepSeek, Anthropic, AWS, OpenAI, Re",exclude,already listed under an earlier stratum
+S2,31,Crosstalk-Solutions/project-nomad,41584,Apache-2.0,TypeScript,false,2026-11-01,"Project NOMAD is an offline-first knowledge and education server. Wikipedia, thousands of ",include,app; developer-written chat prompt; knowledge-base chunks and chat as input
+S2,32,volcengine/OpenViking,41300,AGPL-3.0,Python,false,2026-11-01,"Self-evolving Context Database for AI Agents. Unify Agent Memory, Knowledge RAG and Skills",not reached,stratum already full
+S2,33,HKUDS/LightRAG,40467,MIT,Python,false,2026-10-29,[EMNLP2025] LightRAG: Simple and Fast Retrieval-Augmented Generation,not reached,stratum already full
+S2,34,patchy631/ai-engineering-hub,40063,MIT,Jupyter Notebook,false,2026-11-01,"In-depth tutorials on LLMs, RAGs and real-world AI agent applications.",exclude,a course or tutorial
+S2,35,VectifyAI/PageIndex,39938,MIT,Python,false,2026-10-29,"📑 PageIndex: Document Index for Vectorless, Reasoning-based RAG",not reached,stratum already full
+S2,36,deepseek-ai/awesome-deepseek-integration,39666,CC0-1.0,,false,2026-02-23,Integrate the DeepSeek API into popular software,exclude,already listed under an earlier stratum
+S2,37,ashishpatel26/500-AI-Agents-Projects,39215,MIT,Python,false,2026-07-27,The 500 AI Agents Projects is a curated collection of AI agent use cases across various in,exclude,"a list or collection, not an application"
+S2,38,chatchat-space/Langchain-Chatchat,38711,Apache-2.0,Python,false,2025-11-10,"Langchain-Chatchat（原Langchain-ChatGLM）基于 Langchain 与 ChatGLM, Qwen 与 Llama 等语言模型的 RAG 与 Ag",not reached,stratum already full
+S2,39,langfuse/langfuse,36839,NOASSERTION,TypeScript,false,2026-11-01,"🪢 Open source agent evals & observability: Trace, evaluate, and improve LLM applications w",exclude,already listed under an earlier stratum
+S2,40,VoltAgent/awesome-agent-skills,36709,MIT,,false,2026-10-30,"A curated collection of 1000+ agent skills from official dev teams and the community, comp",exclude,already listed under an earlier stratum
+S2,41,Tencent/WeKnora,36179,NOASSERTION,Go,false,2026-11-01,"Open-source LLM knowledge platform: turn raw documents into a queryable RAG, an autonomous",exclude,no OSI licence stated (criterion 1)
+S2,42,sahat/hackathon-starter,35259,MIT,JavaScript,false,2026-10-30,A boilerplate for Node.js web applications,not reached,stratum already full
+S2,43,onyx-dot-app/onyx,33147,NOASSERTION,Python,false,2026-11-01,Open Source AI Platform - AI Chat with advanced features that works with every LLM,exclude,no OSI licence stated (criterion 1)
+S2,44,vxcontrol/pentagi,32925,MIT,Go,false,2026-10-22,Fully autonomous AI Agents system capable of performing complex penetration testing tasks,not reached,stratum already full
+S2,45,e2b-dev/awesome-ai-agents,30742,NOASSERTION,,false,2026-08-21,A list of AI autonomous agents,exclude,already listed under an earlier stratum
+S2,46,jivoi/awesome-osint,30632,NOASSERTION,,false,2026-10-31,:scream: A curated list of amazingly awesome OSINT,exclude,no OSI licence stated (criterion 1)
+S2,47,TencentCloud/TencentDB-Agent-Memory,30323,NOASSERTION,TypeScript,false,2026-10-28,"TencentDB Agent Memory is a team-level memory hub for AI Agents — turning conversations, d",exclude,no OSI licence stated (criterion 1)
+S2,48,academic/awesome-datascience,30261,MIT,,false,2026-10-31,:memo: An awesome Data Science repository to learn and apply for real world problems.,exclude,"a list or collection, not an application"
+S2,49,Hannibal046/Awesome-LLM,27467,CC0-1.0,,false,2025-07-31,Awesome-LLM: a curated list of Large Language Model,exclude,already listed under an earlier stratum
+S2,50,enescingoz/awesome-n8n-templates,26216,NOASSERTION,,false,2026-09-12,"280+ free n8n automation templates — ready-to-use workflows for Gmail, Telegram, Slack, Di",exclude,already listed under an earlier stratum
+S2,51,Cinnamon/kotaemon,25846,Apache-2.0,Python,false,2026-07-14,An open-source RAG-based tool for chatting with your documents.,not reached,stratum already full
+S2,52,NirDiamant/GenAI_Agents,24773,NOASSERTION,Jupyter Notebook,false,2026-11-01,"50+ tutorials and implementations for Generative AI Agent techniques, from basic conversat",exclude,already listed under an earlier stratum
+S2,53,lukasmasuch/best-of-ml-python,23849,CC-BY-SA-4.0,,false,2026-10-29,🏆 A ranked list of awesome machine learning Python libraries. Updated weekly.,exclude,"a list or collection, not an application"
+S2,54,mikeroyal/Self-Hosting-Guide,23428,none,Dockerfile,false,2025-06-27,Self-Hosting Guide. Learn all about  locally hosting (on premises & private web servers) a,exclude,already listed under an earlier stratum
+S2,55,comet-ml/opik,23093,Apache-2.0,Python,false,2026-11-01,"Debug, evaluate, and monitor your LLM applications, RAG systems, and agentic workflows wit",not reached,stratum already full
+S2,56,PromtEngineer/localGPT,22199,MIT,Python,false,2026-08-26,Chat with your documents on your local device using GPT models. No data leaves your device,not reached,stratum already full
+S2,57,NirDiamant/agents-towards-production,21806,NOASSERTION,Jupyter Notebook,false,2026-11-01,"End-to-end, code-first tutorials for building production-grade GenAI agents. From prototyp",exclude,no OSI licence stated (criterion 1)
+S2,58,rockerBOO/awesome-neovim,21535,CC0-1.0,Shell,false,2026-10-31,Collections of awesome neovim plugins.,exclude,"a list or collection, not an application"
+S2,59,nashsu/llm_wiki,21264,NOASSERTION,TypeScript,false,2026-10-21,LLM Wiki is a cross-platform desktop application that turns your documents into an organiz,exclude,no OSI licence stated (criterion 1)
+S2,60,EthicalML/awesome-production-machine-learning,21062,MIT,,false,2026-11-01,"A curated list of awesome open source libraries to deploy, monitor, version and scale your",exclude,already listed under an earlier stratum
+S2,61,birobirobiro/awesome-shadcn-ui,20740,MIT,TypeScript,false,2026-10-31,A curated list of awesome things related to shadcn/ui.,exclude,already listed under an earlier stratum
+S2,62,eosphoros-ai/DB-GPT,20233,MIT,Python,false,2026-10-31,open-source agentic AI data assistant for the next generation of AI + Data products.,not reached,stratum already full
+S2,63,teng-lin/notebooklm-py,20052,MIT,Python,false,2026-10-31,Unofficial Python API and agentic skill for Google Gemini Notebook. Full programmatic acce,not reached,stratum already full
+S2,64,rocketride-org/rocketride-server,19504,MIT,Python,false,2026-11-01,High-performance AI pipeline engine with a C++ core and 50+ Python-extensible nodes. Build,exclude,"a framework, library or infrastructure, not an end-user application"
+S2,65,keon/awesome-nlp,19119,CC0-1.0,,false,2026-10-12,:book: A curated list of resources dedicated to Natural Language Processing (NLP),exclude,already listed under an earlier stratum
+S2,66,avante-corp/avante.nvim,18183,Apache-2.0,Lua,false,2026-11-01,Use your Neovim like using Cursor AI IDE!,not reached,stratum already full
+S2,67,BradyFU/Awesome-Multimodal-Large-Language-Models,18070,none,,false,2026-10-29,:sparkles::sparkles:Latest Advances on Multimodal Large Language Models,exclude,no OSI licence stated (criterion 1)
+S2,68,camel-ai/camel,18006,Apache-2.0,Python,false,2026-10-27,🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. ,exclude,"a framework, library or infrastructure, not an end-user application"
+S2,69,QwenLM/Qwen-Agent,17239,Apache-2.0,Python,false,2026-03-04,"Agent framework and applications built upon Qwen>=3.0, featuring Function Calling, MCP, Co",exclude,already listed under an earlier stratum
+S2,70,xx025/carrot,17214,none,,false,2026-09-05,AI 工具导航大全，帮你快速筛选免费、实用、高效的网站资源,exclude,no OSI licence stated (criterion 1)
+S2,71,Arindam200/awesome-ai-apps,16655,MIT,Python,false,2026-10-30,"A collection of projects showcasing RAG, agents, workflows, and other AI use cases",exclude,already listed under an earlier stratum
+S2,72,raga-ai-hub/RagaAI-Catalyst,16184,Apache-2.0,Python,false,2026-02-11,"Python SDK for Agent AI Observability, Monitoring and Evaluation Framework. Includes featu",exclude,already listed under an earlier stratum
+S2,73,yusufkaraaslan/Skill_Seekers,15263,MIT,Python,false,2026-09-30,"Convert documentation websites, GitHub repositories, and PDFs into Claude AI skills with a",not reached,stratum already full
+S2,74,llmware-ai/llmware,14818,Apache-2.0,Python,false,2026-10-01,"Unified framework for building enterprise RAG pipelines with small, specialized models",exclude,already listed under an earlier stratum
+S2,75,netease-youdao/QAnything,14210,AGPL-3.0,Python,false,2026-09-23,Question and Answer based on Anything.,not reached,stratum already full
+S2,76,Orchestra-Research/AI-Research-SKILLs,14172,MIT,TeX,false,2026-10-11,Comprehensive open-source library of AI research and engineering skills for any AI model. ,exclude,"a framework, library or infrastructure, not an end-user application"
+S2,77,StarTrail-org/LEANN,13743,MIT,Python,false,2026-10-30,[MLsys2026 Best Paper]: https://arxiv.org/abs/2506.08276. RAG on Everything with LEANN. En,not reached,stratum already full
+S2,78,ShishirPatil/gorilla,13062,Apache-2.0,Python,false,2026-10-17,Gorilla: Training and Evaluating LLMs for Function Calls (Tool Calls),exclude,already listed under an earlier stratum
+S2,79,neuml/txtai,13057,Apache-2.0,Python,false,2026-11-01,"💡 All-in-one AI framework for semantic search, LLM orchestration and language model workfl",exclude,"a framework, library or infrastructure, not an end-user application"
+S2,80,blackboardsh/electrobun,12994,MIT,Zig,false,2026-10-30,"Build ultra fast, tiny, and cross-platform desktop apps with TypeScript, Zig, Rust, Go, or",not reached,stratum already full
+S2,81,steven2358/awesome-generative-ai,12793,CC0-1.0,,false,2026-10-30,A curated list of modern Generative Artificial Intelligence projects and services,exclude,already listed under an earlier stratum
+S2,82,EvanLi/Github-Ranking,12776,MIT,Python,false,2026-11-01,:star:Github Ranking:star: Github stars and forks ranking list. Github Top100 stars list o,not reached,stratum already full
+S2,83,FlagOpen/FlagEmbedding,12292,MIT,Python,false,2026-10-27,Retrieval and Retrieval-augmented LLMs,not reached,stratum already full
+S2,84,tensorzero/tensorzero,11710,Apache-2.0,Rust,false,2026-06-11,"TensorZero is an open-source LLMOps platform that unifies an LLM gateway, observability, e",exclude,"a framework, library or infrastructure, not an end-user application"
+S2,85,jnv/lists,11620,CC0-1.0,,false,2026-10-31,The definitive list of lists (of lists) curated on GitHub and elsewhere,exclude,already listed under an earlier stratum
+S2,86,TencentCloud/Octop,11418,MIT,Python,false,2026-11-01,"A smarter, self-hosted AI assistant — multi-user, multi-agent.",not reached,stratum already full
+S2,87,The-Pocket/PocketFlow,11295,MIT,Python,false,2026-07-26,Pocket Flow: 100-line LLM framework. Let Agents build Agents!,exclude,"a framework, library or infrastructure, not an end-user application"
+S2,88,VoltAgent/voltagent,10908,MIT,TypeScript,false,2026-10-15,AI Agent Engineering Platform built on an Open Source TypeScript AI Agent Framework,exclude,already listed under an earlier stratum
+S2,89,KalyanKS-NLP/llm-engineer-toolkit,10896,Apache-2.0,,false,2026-10-25,A curated list of  120+ LLM libraries category wise. ,exclude,already listed under an earlier stratum
+S2,90,awesome-opencode/awesome-opencode,10821,CC0-1.0,JavaScript,false,2026-11-01,"A curated list of awesome plugins, themes, agents, projects, and resources for https://ope",exclude,"a list or collection, not an application"
+S3,1,public-apis/public-apis,494337,MIT,Python,false,2026-11-01,A collective list of free APIs,exclude,already listed under an earlier stratum
+S3,2,awesome-selfhosted/awesome-selfhosted,332702,NOASSERTION,,false,2026-10-31,A list of Free Software network services and web applications which can be hosted on your ,exclude,already listed under an earlier stratum
+S3,3,vinta/awesome-python,331762,NOASSERTION,Python,false,2026-11-01,"The definitive list that answers ""I want to do X in Python, which tool should I use?""",exclude,already listed under an earlier stratum
+S3,4,affaan-m/ECC,294616,MIT,JavaScript,false,2026-10-30,"The agent harness performance optimization system. Skills, instincts, memory, security, an",exclude,a bundle of skills and settings for coding agents; builds no prompts of its own (criterion 3)
+S3,5,NousResearch/hermes-agent,259437,MIT,Python,false,2026-11-01,The agent that grows with you,include,"app; developer-written agent prompt; context files, memory, skills, task as input"
+S3,6,firecrawl/firecrawl,197617,AGPL-3.0,TypeScript,false,2026-10-31,Supercharge your AI agents with data from the web and beyond. Building the library for sup,exclude,"a framework, library or infrastructure, not an end-user application"
+S3,7,avelino/awesome-go,191495,MIT,Go,false,2026-10-30,"A curated list of awesome Go frameworks, libraries and software",exclude,already listed under an earlier stratum
+S3,8,ollama/ollama,185572,MIT,Go,false,2026-10-31,"Get up and running with Kimi, GLM, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other model",exclude,already listed under an earlier stratum
+S3,9,msitarzewski/agency-agents,165855,MIT,Shell,false,2026-10-25,A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas,exclude,"a collection of agent prompt files, not an application (criterion 2)"
+S3,10,langgenius/dify,160165,NOASSERTION,Python,false,2026-11-01,"Build Agentic workflows, RAG pipelines, with rich AI model and tool support on one collabo",exclude,already listed under an earlier stratum
+S3,11,langflow-ai/langflow,156223,MIT,Python,false,2026-11-01,Langflow is a powerful tool for building and deploying AI-powered agents and workflows.,exclude,a low-code builder: its users write the system prompts (criterion 3)
+S3,12,farion1231/cc-switch,150855,MIT,Rust,false,2026-11-01,"A cross-platform desktop All-in-One assistant for Claude Code, Codex, OpenCode,DeepSeek Ha",exclude,a configuration switcher for coding CLIs; builds no prompts (criterion 3)
+S3,13,langchain-ai/langchain,148825,MIT,Python,false,2026-11-01,The agent engineering platform.,exclude,a framework (criterion 2); its official templates are stratum S5
+S3,14,Shubhamsaboo/awesome-llm-apps,143657,Apache-2.0,Python,false,2026-10-22,"100+ AI Agents, Agent Skills and RAG Apps - Free and Open Source.",exclude,already listed under an earlier stratum
+S3,15,ripienaar/free-for-dev,141354,none,HTML,false,2026-11-01,"A list of SaaS, PaaS and IaaS offerings that have free tiers of interest to devops and inf",exclude,already listed under an earlier stratum
+S3,16,Graphify-Labs/graphify,140436,Apache-2.0,Python,false,2026-11-01,"Turn any codebase, with its docs, SQL schemas, configs, and PDFs, into a queryable knowled",include,app; developer-written extraction prompt; repository files as input
+S3,17,VoltAgent/awesome-design-md,125061,MIT,,false,2026-10-28,A collection of DESIGN.md files analysis by popular brand design systems. Drop one into yo,exclude,"a list or collection, not an application"
+S3,18,microsoft/generative-ai-for-beginners,122740,MIT,Jupyter Notebook,false,2026-11-01,"21 Lessons, Get Started Building with Generative AI ",exclude,a course or tutorial
+S3,19,browser-use/browser-use,119756,MIT,Python,false,2026-10-31,"Open-source Python library for AI browser agents, plus Browser Use Cloud: stealth browsers",exclude,"a framework, library or infrastructure, not an end-user application"
+S3,20,TauricResearch/TradingAgents,119424,Apache-2.0,Python,false,2026-10-27,TradingAgents: Multi-Agents LLM Financial Trading Framework,exclude,"a framework, library or infrastructure, not an end-user application"
+S3,21,earendil-works/pi,119317,MIT,TypeScript,false,2026-11-01,"AI agent toolkit: unified LLM API, agent loop, TUI, coding agent CLI",exclude,"a framework, library or infrastructure, not an end-user application"
+S3,22,jaywcjlove/awesome-mac,117531,CC0-1.0,Swift,false,2026-11-01, This project is dedicated to collecting high-quality macOS software and organizing them ,exclude,"a list or collection, not an application"
+S3,23,nexu-io/open-design,105315,Apache-2.0,TypeScript,false,2026-11-01,The 1st Collaborative AI Design Agent Workspace. Local-first and open source. Create motio,include,app; developer-written designer prompt; memory and brief as input
+S3,24,ruvnet/RuView,101968,MIT,Rust,false,2026-11-01,"π RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign moni",not reached,stratum already full
+S3,25,pbakaus/impeccable,99126,Apache-2.0,Rust,false,2026-11-01,"The design vocabulary for your coding agent. Steer with polish and bolder, review with cri",not reached,stratum already full
+S3,26,microsoft/playwright,99046,Apache-2.0,TypeScript,false,2026-10-31,"Playwright is a framework for Web Testing and Automation. It allows testing Chromium, Fire",exclude,"a framework, library or infrastructure, not an end-user application"
+S3,27,punkpeye/awesome-mcp-servers,97164,MIT,,false,2026-10-23,A collection of MCP servers.,exclude,already listed under an earlier stratum
+S3,28,infiniflow/ragflow,93294,Apache-2.0,Go,false,2026-11-01,RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cu,exclude,"a framework, library or infrastructure, not an end-user application"
+S3,29,OpenHands/OpenHands,92426,MIT,TypeScript,false,2026-11-01,🙌 OpenHands: AI-Driven Development,not reached,stratum already full
+S3,30,PaddlePaddle/PaddleOCR,92073,Apache-2.0,Python,false,2026-09-16,"Turn any PDF or image document into structured data for your AI. A powerful, lightweight O",not reached,stratum already full
+S3,31,modelcontextprotocol/servers,91733,NOASSERTION,TypeScript,false,2026-10-29,Model Context Protocol Servers,exclude,no OSI licence stated (criterion 1)
+S3,32,D4Vinci/Scrapling,91681,BSD-3-Clause,Python,false,2026-11-01,🕷️ The BEST Web Scraping framework that handles everything from a single request to a full,exclude,"a framework, library or infrastructure, not an end-user application"
+S3,33,unclecode/crawl4ai,86712,Apache-2.0,Python,false,2026-11-01,"Open-source web crawler and scraper for LLMs and AI agents: any website into clean, LLM-re",not reached,stratum already full
+S3,34,rtk-ai/rtk,85213,Apache-2.0,Rust,false,2026-11-01,CLI proxy that reduces LLM token consumption by 60-90% on common dev commands. Single Rust,not reached,stratum already full
+S3,35,bytedance/deer-flow,84838,MIT,Python,false,2026-11-01,"An open-source long-horizon SuperAgent harness that researches, codes, and creates. With t",exclude,already listed under an earlier stratum
+S3,36,mlabonne/llm-course,84836,Apache-2.0,,false,2026-02-05,Course to get into Large Language Models (LLMs) with roadmaps and Colab notebooks.,exclude,already listed under an earlier stratum
+S3,37,Developer-Y/cs-video-courses,84468,none,,false,2026-10-31,List of Computer Science courses with video lectures.,exclude,no OSI licence stated (criterion 1)
+S3,38,lobehub/lobehub,83674,NOASSERTION,TypeScript,false,2026-11-01,"🤯 LobeHub is your Chief Agent Operator, organizing your agents into 7×24 operations by hir",exclude,already listed under an earlier stratum
+S3,39,cheaper-inference/OmniRoute,83553,MIT,TypeScript,false,2026-11-01,"Never stop coding. Free MIT AI gateway: one endpoint, 375 providers (150+ free), 1,400+ mo",exclude,already listed under an earlier stratum
+S3,40,666ghj/MiroFish,83228,AGPL-3.0,Python,false,2026-10-16,"A Simple and Universal Swarm Intelligence Engine, Predicting Anything. 简洁通用的群体智能引擎，预测万物",exclude,"a framework, library or infrastructure, not an end-user application"
+S3,41,opendatalab/MinerU,82941,NOASSERTION,Python,false,2026-10-31,Transforms complex documents like PDFs and Office docs into LLM-ready markdown/JSON for yo,exclude,already listed under an earlier stratum
+S3,42,ruvnet/ruflo,80515,MIT,TypeScript,false,2026-11-01,"🌊 The original agent harness. Deploy intelligent multi-player swarms, coordinate autonomou",not reached,stratum already full
+S3,43,awesomedata/awesome-public-datasets,79895,MIT,,false,2026-10-28,A topic-centric list of HQ open datasets.,exclude,"a list or collection, not an application"
+S3,44,dair-ai/Prompt-Engineering-Guide,79738,MIT,MDX,false,2026-03-11,"🐙 Guides, papers, lessons, notebooks and resources for prompt engineering, context enginee",exclude,"a list or collection, not an application"
+S3,45,shareAI-lab/learn-claude-code,79681,MIT,Python,false,2026-10-27,"Bash is all you need -  A nano claude code–like 「agent harness」, built from 0 to 1",exclude,a course or tutorial
+S3,46,unslothai/unsloth,78917,Apache-2.0,Python,false,2026-11-01,"Local UI to run and train LLMs and diffusion models. Supports GGUF, MLX, Qwen3.8, DeepSeek",not reached,stratum already full
+S3,47,headroomlabs-ai/headroom,78540,Apache-2.0,Python,false,2026-11-01,"Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 20% fewer to",not reached,stratum already full
+S3,48,ComposioHQ/awesome-claude-skills,78508,none,Python,false,2026-09-18,"A curated list of awesome Claude Skills, resources, and tools for customizing Claude AI wo",exclude,no OSI licence stated (criterion 1)
+S3,49,rohitg00/ai-engineering-from-scratch,76224,MIT,Python,false,2026-10-29,Learn AI Engineering! Learn it. Build it. Ship it for others.,exclude,already listed under an earlier stratum
+S3,50,hiyouga/LlamaFactory,75824,Apache-2.0,Python,false,2026-10-31,Unified Efficient Fine-Tuning of 100+ LLMs & VLMs (ACL 2024),exclude,already listed under an earlier stratum
+S3,51,josephmisiti/awesome-machine-learning,74711,NOASSERTION,Python,false,2026-11-01,"A curated list of awesome Machine Learning frameworks, libraries and software.",exclude,already listed under an earlier stratum
+S3,52,thedaviddias/Front-End-Checklist,74620,MIT,MDX,false,2026-10-31,"🗂 The essential checklist for modern web development, for humans and AI agents",not reached,stratum already full
+S3,53,calesthio/OpenMontage,74306,AGPL-3.0,Python,false,2026-10-28,"World's first open-source, agentic video production system. 12 production pipelines, 100+ ",not reached,stratum already full
+S3,54,fffaraz/awesome-cpp,74137,MIT,,false,2026-10-31,"A curated list of awesome C++ (or C) frameworks, libraries, resources, and shiny things. I",exclude,"a list or collection, not an application"
+S3,55,vuejs/awesome-vue,73492,MIT,,false,2026-10-19,🎉 A curated list of awesome things related to Vue.js,exclude,already listed under an earlier stratum
+S3,56,usestrix/strix,73201,Apache-2.0,Python,false,2026-10-30,Open-source AI penetration testing tool to find and fix your app’s vulnerabilities.,not reached,stratum already full
+S3,57,mem0ai/mem0,68233,Apache-2.0,Python,false,2026-10-30,The Memory Layer for AI Agents - Drop-in memory infrastructure for AI agents and apps. Con,exclude,already listed under an earlier stratum
+S3,58,Mintplex-Labs/anything-llm,67819,MIT,JavaScript,false,2026-10-30,Stop renting your intelligence. Own it with AnythingLLM. Everything you need for a powerfu,not reached,stratum already full
+S3,59,bradtraversy/design-resources-for-developers,67304,MIT,,false,2026-10-18,"Curated list of design and UI resources from stock photos, web templates, CSS frameworks, ",exclude,"a list or collection, not an application"
+S3,60,xtekky/gpt4free,66978,GPL-3.0,Python,false,2026-11-01,The official gpt4free repository | various collection of powerful language models | opus 4,exclude,"a list or collection, not an application"
+S3,61,jingyaogong/minimind,64732,Apache-2.0,Python,false,2026-10-27,🧠 Train a 64M-parameter LLM from scratch in just 2h!,exclude,a course or tutorial
+S3,62,upstash/context7,64045,MIT,TypeScript,false,2026-11-01,Context7 Platform -- Up-to-date docs for AI agents,not reached,stratum already full
+S3,63,sansan0/TrendRadar,63347,GPL-3.0,Python,false,2026-10-29,"⭐AI-driven public opinion & trend monitor with multi-platform aggregation, RSS, and smart ",not reached,stratum already full
+S3,64,BerriAI/litellm,62495,NOASSERTION,Python,false,2026-11-01,"The fastest, litest AI Gateway. Rust core with Python SDK. Call 100+ LLM APIs in OpenAI (o",exclude,no OSI licence stated (criterion 1)
+S3,65,pathwaycom/pathway,62027,NOASSERTION,Python,false,2026-10-30,"Python ETL framework for stream processing, real-time analytics, LLM pipelines, and RAG.",exclude,no OSI licence stated (criterion 1)
+S3,66,1c7/chinese-independent-developer,61976,none,,false,2026-11-01,👩🏿‍💻👨🏾‍💻👩🏼‍💻👨🏽‍💻👩🏻‍💻中国独立开发者项目列表 -- 分享大家都在做什么,exclude,already listed under an earlier stratum
+S3,67,microsoft/autogen,61662,CC-BY-4.0,Python,false,2026-10-28,A programming framework for agentic AI,exclude,"a framework, library or infrastructure, not an end-user application"
+S3,68,crewAIInc/crewAI,60384,MIT,Python,false,2026-11-01,"Framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative",exclude,already listed under an earlier stratum
+S3,69,rust-unofficial/awesome-rust,60263,CC0-1.0,Rust,false,2026-11-01,A curated list of Rust code and resources.,exclude,already listed under an earlier stratum
+S3,70,MemPalace/mempalace,60222,MIT,Python,false,2026-10-31,The best-benchmarked open-source AI memory system. And it's free.,not reached,stratum already full
+S3,71,meilisearch/meilisearch,59742,NOASSERTION,Rust,false,2026-11-01,A lightning-fast search engine API bringing AI-powered hybrid search to your sites and app,exclude,already listed under an earlier stratum
+S3,72,ayghri/i-have-adhd,59676,MIT,Python,false,2026-10-19,A skill to stop your coding agent from burying the answer. ADHD-friendly output.,not reached,stratum already full
+S3,73,jamiepine/voicebox,59199,MIT,Python,false,2026-10-07,"The open-source AI voice studio. Clone, dictate, create.",not reached,stratum already full
+S3,74,FoundationAgents/OpenManus,58853,MIT,Python,false,2026-10-31,"No fortress, purely open ground.  OpenManus is Coming.",not reached,stratum already full
+S3,75,HKUDS/CLI-Anything,58021,Apache-2.0,Python,false,2026-09-22,"""CLI-Anything: Making ALL Software Agent-Native"" -- CLI-Hub: https://clianything.cc/",not reached,stratum already full
+S3,76,coreyhaines31/marketingskills,57814,MIT,JavaScript,false,2026-10-31,"Marketing skills for Claude Code and AI agents. CRO, copywriting, SEO, analytics, and grow",not reached,stratum already full
+S3,77,vectorize-io/hindsight,57640,MIT,Python,false,2026-11-01,Hindsight: Agent Memory That Learns,exclude,already listed under an earlier stratum
+S3,78,zylon-ai/private-gpt,57625,Apache-2.0,Python,false,2026-10-29,"Complete API layer for private AI applications on local models: RAG, skills, tools, MCP, t",exclude,already listed under an earlier stratum
+S3,79,router-for-me/CLIProxyAPI,57194,MIT,Go,false,2026-11-01,"Wrap Antigravity, ChatGPT Codex, Claude Code, Grok Build, Muse Code, Devin as an OpenAI/Ge",not reached,stratum already full
+S3,80,hesreallyhim/awesome-claude-code,57037,NOASSERTION,Python,false,2026-11-01,"A hand-picked collection of the finest of resources for the most awesome of agents, Claude",exclude,already listed under an earlier stratum
+S3,81,cloudflare/security-audit-skill,56166,MIT,JavaScript,false,2026-09-14,"A coding-agent skill for multi-phase security audits with independently verified, machine-",not reached,stratum already full
+S3,82,Ebony-Vinyl/dsh-our-free-model,55662,MIT,JavaScript,false,2026-11-01,在 dsh 里装上这个插件即可，无需登录、注册或填 API Key，就能使用包括 DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型——完全免费，不限量。 Al,not reached,stratum already full
+S3,83,K-Dense-AI/scientific-agent-skills,55645,MIT,Python,false,2026-10-26,"Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 2",exclude,"a framework, library or infrastructure, not an end-user application"
+S3,84,Imbad0202/academic-research-skills,54865,NOASSERTION,Python,false,2026-11-01,Academic Research Skills for Claude Code: research → write → review → revise → finalize,exclude,no OSI licence stated (criterion 1)
+S3,85,HKUDS/DeepTutor,53551,Apache-2.0,Python,false,2026-10-31,DeepTutor: Lifelong Personalized Tutoring. https://deeptutor.info/.,exclude,already listed under an earlier stratum
+S3,86,VoltAgent/awesome-openclaw-skills,53481,MIT,,false,2026-10-30,"The awesome collection of OpenClaw skills. 5,400+ skills filtered and categorized from the",exclude,"a list or collection, not an application"
+S3,87,CherryHQ/cherry-studio,53160,AGPL-3.0,TypeScript,false,2026-11-01,"Your AI workspace for models, agents, and productivity.",not reached,stratum already full
+S3,88,dkhamsing/open-source-ios-apps,52943,CC0-1.0,,false,2026-11-01,:iphone: Collaborative List of Open-Source iOS Apps,exclude,"a list or collection, not an application"
+S3,89,run-llama/llama_index,52771,MIT,Python,false,2026-10-26,LlamaIndex is the document processing platform for AI,not reached,stratum already full
+S3,90,charlax/professional-programming,51669,MIT,Python,false,2026-10-27,A collection of learning resources for curious software engineers,exclude,"a list or collection, not an application"
+S4,1,TauricResearch/TradingAgents,119424,Apache-2.0,Python,false,2026-10-27,TradingAgents: Multi-Agents LLM Financial Trading Framework,exclude,already listed under an earlier stratum
+S4,2,jaywcjlove/awesome-mac,117531,CC0-1.0,Swift,false,2026-11-01, This project is dedicated to collecting high-quality macOS software and organizing them ,exclude,already listed under an earlier stratum
+S4,3,punkpeye/awesome-mcp-servers,97164,MIT,,false,2026-10-23,A collection of MCP servers.,exclude,already listed under an earlier stratum
+S4,4,bytedance/deer-flow,84837,MIT,Python,false,2026-11-01,"An open-source long-horizon SuperAgent harness that researches, codes, and creates. With t",exclude,already listed under an earlier stratum
+S4,5,lobehub/lobehub,83675,NOASSERTION,TypeScript,false,2026-11-01,"🤯 LobeHub is your Chief Agent Operator, organizing your agents into 7×24 operations by hir",exclude,already listed under an earlier stratum
+S4,6,shanraisshan/claude-code-best-practice,68416,MIT,HTML,false,2026-11-01,from vibe coding to agentic engineering - practice makes claude perfect,exclude,"documentation, not an application (criterion 2)"
+S4,7,BerriAI/litellm,62494,NOASSERTION,Python,false,2026-11-01,"The fastest, litest AI Gateway. Rust core with Python SDK. Call 100+ LLM APIs in OpenAI (o",exclude,already listed under an earlier stratum
+S4,8,rust-unofficial/awesome-rust,60263,CC0-1.0,Rust,false,2026-11-01,A curated list of Rust code and resources.,exclude,already listed under an earlier stratum
+S4,9,dkhamsing/open-source-ios-apps,52944,CC0-1.0,,false,2026-11-01,:iphone: Collaborative List of Open-Source iOS Apps,exclude,already listed under an earlier stratum
+S4,10,GitHubDaily/GitHubDaily,48339,none,,false,2025-12-31,"坚持分享 GitHub 上高质量、有趣实用的开源技术教程、开发者工具、编程网站、技术资讯。A list cool, interesting projects of GitHub.",exclude,already listed under an earlier stratum
+S4,11,LibreChat-AI/LibreChat,46611,MIT,TypeScript,false,2026-11-01,"Enhanced ChatGPT Clone: Features Agents, MCP, Skills, DeepSeek, Anthropic, AWS, OpenAI, Re",exclude,already listed under an earlier stratum
+S4,12,vercel-labs/agent-browser,45119,Apache-2.0,Rust,false,2026-11-01,Browser automation CLI for AI agents,include,"app (chat mode); developer-written prompt; web pages, summary, instruction as input"
+S4,13,danielmiessler/Fabric,44521,MIT,Go,false,2026-10-29,Fabric is an open-source framework for augmenting humans using AI. It provides a modular s,exclude,"a framework, library or infrastructure, not an end-user application"
+S4,14,tinyhumansai/openhuman,42474,GPL-3.0,Rust,false,2026-10-31,"The fastest, cheapest, most efficient open-source agent harness. Run more than 500 agents ",include,app; developer-written channel prompt; skills and channel messages as input
+S4,15,deepseek-ai/awesome-deepseek-integration,39666,CC0-1.0,,false,2026-02-23,Integrate the DeepSeek API into popular software,exclude,already listed under an earlier stratum
+S4,16,HKUDS/Vibe-Trading,37364,MIT,Python,false,2026-11-01,"""Vibe-Trading: Your Personal Trading Agent""",not reached,stratum already full
+S4,17,VoltAgent/awesome-agent-skills,36709,MIT,,false,2026-10-30,"A curated collection of 1000+ agent skills from official dev teams and the community, comp",exclude,already listed under an earlier stratum
+S4,18,freestylefly/awesome-gpt-image-2,35349,MIT,JavaScript,false,2026-10-14,Prompt as Code | GPT Image 2 / 2.5 提示词与案例库，530+ 个案例、20+ 套工业级模板与可复用 Skills，新增 2.5 同提示词对比专区，,exclude,"a list or collection, not an application"
+S4,19,sahat/hackathon-starter,35259,MIT,JavaScript,false,2026-10-30,A boilerplate for Node.js web applications,exclude,already listed under an earlier stratum
+S4,20,vxcontrol/pentagi,32925,MIT,Go,false,2026-10-22,Fully autonomous AI Agents system capable of performing complex penetration testing tasks,exclude,already listed under an earlier stratum
+S4,21,e2b-dev/awesome-ai-agents,30742,NOASSERTION,,false,2026-08-21,A list of AI autonomous agents,exclude,already listed under an earlier stratum
+S4,22,assafelovic/gpt-researcher,30416,Apache-2.0,Python,false,2026-10-10,An autonomous agent that conducts deep research on any data using any LLM providers,not reached,stratum already full
+S4,23,wilsonfreitas/awesome-quant,30401,none,HTML,false,2026-11-01,"A curated list of insanely awesome libraries, packages and resources for Quants (Quantitat",exclude,no OSI licence stated (criterion 1)
+S4,24,enescingoz/awesome-n8n-templates,26216,NOASSERTION,,false,2026-09-12,"280+ free n8n automation templates — ready-to-use workflows for Gmail, Telegram, Slack, Di",exclude,already listed under an earlier stratum
+S4,25,NirDiamant/GenAI_Agents,24773,NOASSERTION,Jupyter Notebook,false,2026-11-01,"50+ tutorials and implementations for Generative AI Agent techniques, from basic conversat",exclude,already listed under an earlier stratum
+S4,26,n0shake/Public-APIs,24054,none,,false,2026-05-03,📚 A public list of APIs from round the web.,exclude,no OSI licence stated (criterion 1)
+S4,27,Skyvern-AI/skyvern,23328,AGPL-3.0,Python,false,2026-11-01,Automate browser based workflows with AI,not reached,stratum already full
+S4,28,QwenLM/Qwen,21983,Apache-2.0,Python,false,2026-03-05,The official repo of Qwen (通义千问) chat & pretrained large language model proposed by Alibab,exclude,a model or model-serving repository
+S4,29,awesome-dsh-plugin/awesome-dsh-plugin,21897,CC0-1.0,JavaScript,false,2026-11-01,A curated list of plugins for DeepSeek Harness (dsh) · DeepSeek Harness 插件精选列表,exclude,"a list or collection, not an application"
+S4,30,SWE-agent/SWE-agent,20703,MIT,Python,false,2026-10-26,"SWE-agent takes a GitHub issue and tries to automatically fix it, using your LM of choice.",not reached,stratum already full
+S4,31,DrewThomasson/ebook2audiobook,20477,Apache-2.0,Python,false,2026-10-06,"Generate audiobooks from e-books, 50+ TTS engines with voice cloning and 1696 languages!",not reached,stratum already full
+S4,32,nesquena/hermes-webui,19334,MIT,Python,false,2026-11-01,Hermes WebUI: The best way to use Hermes Agent from the web or from your phone!,not reached,stratum already full
+S4,33,keon/awesome-nlp,19119,CC0-1.0,,false,2026-10-12,:book: A curated list of resources dedicated to Natural Language Processing (NLP),exclude,already listed under an earlier stratum
+S4,34,wanshuiyin/Auto-claude-code-research-in-sleep,18440,MIT,Python,false,2026-11-01,ARIS ⚔️ (Auto-Research-In-Sleep) — Lightweight Markdown-only skills for autonomous ML rese,not reached,stratum already full
+S4,35,camel-ai/camel,18006,Apache-2.0,Python,false,2026-10-27,🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. ,exclude,already listed under an earlier stratum
+S4,36,andrewyng/aisuite,16369,MIT,Python,false,2026-09-18,"Simple, unified interface to multiple Generative AI providers ",not reached,stratum already full
+S4,37,chenhg5/cc-connect,16193,none,Go,false,2026-11-01,"Bridge local AI coding agents (Claude Code, Cursor, Gemini CLI, Codex) to messaging platfo",exclude,no OSI licence stated (criterion 1)
+S4,38,nidhinjs/prompt-master,15366,MIT,,false,2026-10-22,A Claude skill that writes the accurate prompts for any AI tool. Zero tokens or credits wa,not reached,stratum already full
+S4,39,llmware-ai/llmware,14818,Apache-2.0,Python,false,2026-10-01,"Unified framework for building enterprise RAG pipelines with small, specialized models",exclude,already listed under an earlier stratum
+S4,40,semantica-agi/semantica,14372,MIT,Python,false,2026-11-01,Graph-Native Infrastructure for Context and Accountable AI Systems,not reached,stratum already full
+S4,41,StarTrail-org/LEANN,13743,MIT,Python,false,2026-10-30,[MLsys2026 Best Paper]: https://arxiv.org/abs/2506.08276. RAG on Everything with LEANN. En,exclude,already listed under an earlier stratum
+S4,42,huggingface/speech-to-speech,13614,Apache-2.0,Python,false,2026-10-31,Build voice agents with open-source models,not reached,stratum already full
+S4,43,steven2358/awesome-generative-ai,12793,CC0-1.0,,false,2026-10-30,A curated list of modern Generative Artificial Intelligence projects and services,exclude,already listed under an earlier stratum
+S4,44,RUCAIBox/LLMSurvey,12229,none,Python,false,2025-03-11,"The official GitHub page for the survey paper ""A Survey of Large Language Models"".",exclude,no OSI licence stated (criterion 1)
+S4,45,jnv/lists,11620,CC0-1.0,,false,2026-10-31,The definitive list of lists (of lists) curated on GitHub and elsewhere,exclude,already listed under an earlier stratum
+S4,46,spinabot/brigade,11367,MIT,TypeScript,false,2026-11-01,"Brigade — Your personal intelligence, built enterprise-grade",not reached,stratum already full
+S4,47,omnigent-ai/omnigent,11157,Apache-2.0,Python,false,2026-11-01,"Omnigent is an open-source AI agent framework and meta-harness: orchestrate Claude Code, C",exclude,"a framework, library or infrastructure, not an end-user application"
+S4,48,bytebot-ai/bytebot,11066,Apache-2.0,TypeScript,false,2025-09-12,Bytebot is a self-hosted AI desktop agent that automates computer tasks through natural la,not reached,stratum already full
+S4,49,OpenPipe/ART,10836,Apache-2.0,Python,false,2026-10-26,Agent Reinforcement Trainer: train multi-step agents for real-world tasks using GRPO. Give,not reached,stratum already full
+S4,50,awesome-opencode/awesome-opencode,10821,CC0-1.0,JavaScript,false,2026-11-01,"A curated list of awesome plugins, themes, agents, projects, and resources for https://ope",exclude,already listed under an earlier stratum
+S4,51,BehiSecc/awesome-claude-skills,10330,none,,false,2026-11-01,A curated list of Claude Skills.,exclude,no OSI licence stated (criterion 1)
+S4,52,ykdojo/claude-code-tips,10298,NOASSERTION,HTML,false,2026-09-25,"45+ tips for getting the most out of Claude Code, from basics to advanced - includes a cus",exclude,no OSI licence stated (criterion 1)
+S4,53,marcelscruz/public-apis,9664,MIT,JavaScript,false,2026-11-01,A collaborative list of public APIs for developers,exclude,already listed under an earlier stratum
+S4,54,ntegrals/openbrowser,9576,MIT,TypeScript,false,2026-04-02,Let AI agents browse the web. An autonomous toolkit for browser-based AI agents.,exclude,"a framework, library or infrastructure, not an end-user application"
+S4,55,xberg-io/xberg,9505,MIT,Rust,false,2026-11-01,"The fast, precise document-intelligence engine for every language: text, tables and metada",exclude,already listed under an earlier stratum
+S4,56,AdrienTorris/awesome-blazor,9390,CC0-1.0,,false,2026-10-29,"Resources for Blazor, a .NET web framework using C#/Razor and HTML that runs in the browse",exclude,"a list or collection, not an application"
+S4,57,ai-collection/ai-collection,9261,MIT,,false,2026-10-29,The Generative AI Landscape - A Collection of Awesome Generative AI Applications,exclude,already listed under an earlier stratum
+S4,58,ai-boost/awesome-prompts,9164,GPL-3.0,Python,false,2026-10-30,"Curated prompts, frameworks and papers for LLMs and agents, with an engineering bias. Prom",exclude,"a list or collection, not an application"
+S4,59,liaokongVFX/LangChain-Chinese-Getting-Started-Guide,9148,none,,false,2026-04-22,LangChain 的中文入门教程,exclude,no OSI licence stated (criterion 1)
+S4,60,cipher387/osint_stuff_tool_collection,9031,GPL-3.0,,false,2026-11-01,A collection of several hundred online tools for OSINT,exclude,already listed under an earlier stratum
+S4,61,anbeime/skill,9005,none,Python,false,2026-11-01,收录最全、更新最快的技能Skills商店：精选原创技能包（涵盖文档处理、内容创作、编程开发、机器学习、自动化工作流），全部打包好可直接安装使用！同时自动抓取GitHub上万个Ski,exclude,already listed under an earlier stratum
+S4,62,yogeshojha/rengine,8912,GPL-3.0,HTML,false,2026-10-31,reNgine is an automated reconnaissance framework for web applications with a focus on high,exclude,"a framework, library or infrastructure, not an end-user application"
+S4,63,windingwind/zotero-better-notes,8404,AGPL-3.0,TypeScript,false,2026-08-24,Everything about note management. All in Zotero.,not reached,stratum already full
+S4,64,cporter202/API-mega-list,8266,none,JavaScript,false,2026-10-20,This GitHub repo is a powerhouse collection of APIs you can start using immediately to bui,exclude,already listed under an earlier stratum
+S4,65,WooooDyy/LLM-Agent-Paper-List,8262,none,,false,2025-09-12,"The paper list of the 86-page SCIS cover paper ""The Rise and Potential of Large Language M",exclude,no OSI licence stated (criterion 1)
+S4,66,yzfly/Awesome-MCP-ZH,7801,MIT,,false,2026-11-01,"MCP 资源精选， MCP指南，Claude MCP，MCP Servers, MCP Clients",exclude,"a list or collection, not an application"
+S4,67,kyegomez/swarms,7341,Apache-2.0,Python,false,2026-11-01,The Enterprise-Grade Multi-Agent Orchestration Framework. Website: https://swarms.ai,exclude,"a framework, library or infrastructure, not an end-user application"
+S4,68,craft-ai-agents/craft-agents-oss,7304,Apache-2.0,TypeScript,false,2026-10-23,,not reached,stratum already full
+S4,69,mahseema/awesome-ai-tools,6524,MIT,,false,2025-12-31,A curated list of Artificial Intelligence Top Tools,exclude,already listed under an earlier stratum
+S4,70,reorx/awesome-chatgpt-api,6441,none,Python,false,2026-03-23,"Curated list of apps and tools that not only use the new ChatGPT API, but also allow users",exclude,already listed under an earlier stratum
+S4,71,heilcheng/awesome-agent-skills,6331,MIT,TypeScript,false,2026-10-27,"Tutorials, Guides and Agent Skills Directories",exclude,"a list or collection, not an application"
+S4,72,ikaijua/Awesome-AITools,6266,CC-BY-4.0,Python,false,2026-11-01,Collection of AI-related utilities. Welcome to submit pull requests /收藏AI相关的实用工具，欢迎提交pull ,exclude,"a list or collection, not an application"
+S4,73,ebertti/awesome-telegram,6187,none,,false,2026-11-01,"Collection great groups, channels, bots and libraries for Telegram",exclude,no OSI licence stated (criterion 1)
+S4,74,CopilotKit/openmuse,6068,MIT,TypeScript,false,2026-11-01,"A personal agent with a browser, terminal, files, and work that keeps going built with Cop",not reached,stratum already full
+S4,75,AboutRSS/ALL-about-RSS,5941,CC-BY-4.0,Python,false,2026-11-01,"A list of RSS related stuff: tools, services, communities and tutorials, etc.",exclude,"a list or collection, not an application"
+S4,76,0xNyk/awesome-hermes-agent,5938,NOASSERTION,,false,2026-10-27,"Independent directory of useful skills, plugins, memory providers, tools, surfaces, and gu",exclude,no OSI licence stated (criterion 1)
+S4,77,appcypher/awesome-mcp-servers,5814,none,,false,2026-05-06,Awesome MCP Servers - A curated list of Model Context Protocol servers,exclude,no OSI licence stated (criterion 1)
+S4,78,langgptai/awesome-claude-prompts,5555,none,,false,2026-10-15,This repo includes Claude prompt curation to use Claude better.,exclude,no OSI licence stated (criterion 1)
+S4,79,Marker-Inc-Korea/AutoRAG,5251,Apache-2.0,TypeScript,false,2026-11-01,"Your Personal Librarian Agent. Ask anything on your computer, organize files, remember imp",not reached,stratum already full
+S4,80,ai-boost/awesome-harness-engineering,5021,NOASSERTION,Python,false,2026-10-30,"Awesome list for AI agent harness engineering: tools, patterns, evals, memory, MCP, permis",exclude,no OSI licence stated (criterion 1)
+S4,81,alvinreal/awesome-opensource-ai,4963,CC0-1.0,Python,false,2026-11-01,"Curated list of the best truly open-source AI projects, models, tools, and infrastructure.",exclude,"a list or collection, not an application"
+S4,82,eastlondoner/vibe-tools,4817,MIT,TypeScript,false,2025-08-25,Give Cursor Agent an AI Team and Advanced Skills,not reached,stratum already full
+S4,83,NateBJones-Projects/OB1,4752,NOASSERTION,TypeScript,false,2026-11-01,"Open Brain — The infrastructure layer for your thinking. One database, one AI gateway, one",exclude,no OSI licence stated (criterion 1)
+S4,84,Astrosp/Awesome-OSINT-List,4622,GPL-3.0,Shell,false,2026-10-28,"📡 Comprehensive collection of OSINT tools for cybersecurity professionals, researchers, an",exclude,"a list or collection, not an application"
+S4,85,crmne/ruby_llm,4490,MIT,Ruby,false,2026-11-01,The Ruby AI framework.,exclude,"a framework, library or infrastructure, not an end-user application"
+S4,86,gptme/gptme,4466,MIT,Python,false,2026-11-01,"Your agent in your terminal, equipped with local tools: writes code, uses the terminal, br",not reached,stratum already full
+S4,87,wong2/awesome-mcp-servers,4397,MIT,,false,2026-07-13,A curated list of Model Context Protocol (MCP) servers,exclude,"a list or collection, not an application"
+S4,88,trinib/Linux-Bash-Commands,4164,MIT,,false,2026-01-07,":godmode: Ultimate list of Linux bash commands, cheatsheets and resources",exclude,"a list or collection, not an application"
+S4,89,cporter202/scraping-apis-for-devs,4002,none,JavaScript,false,2026-10-20,This GitHub repo is a powerhouse collection of scraping APIs for developers that you can s,exclude,no OSI licence stated (criterion 1)
+S4,90,FlagAI-Open/FlagAI,3867,Apache-2.0,Python,false,2026-07-13,"FlagAI (Fast LArge-scale General AI models) is a fast, easy-to-use and extensible toolkit ",exclude,"a framework, library or infrastructure, not an end-user application"
+S5,1,langchain-ai/chat-langchain,6470,MIT,TypeScript,false,2026-11-01,official LangChain docs chat (search/S5.tsv),include,highest-starred official template application of langchain-ai and run-llama

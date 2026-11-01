@@ -1,0 +1,50 @@
+# about: DeerFlow lead agent: a research/coding super-agent with skills, memory and sub-agents
+# repo: bytedance/deer-flow (MIT, 84,837 stars)
+# commit: 08f343f5d7240a22d4b2c3274cf84a68d8075ca5
+# prompt code: backend/packages/harness/deerflow/agents/lead_agent/prompt.py
+#              :332-340 (_render_available_skill), :1029-1039 (get_agent_soul),
+#              :1155-1290 (apply_prompt_template -> SYSTEM_PROMPT_TEMPLATE.format)
+#              config/agents_config.py:25 (AGENT_NAME_PATTERN), :164-171
+# stratum: S1 (rank 6)
+#
+# Sources
+#   SYSTEM_PROMPT_TEMPLATE and its static sections         developer-written      -> var
+#   agent_name   chosen by the user, checked against ^[A-Za-z0-9-]+$ (unbounded)  -> input : pattern(...)
+#   soul         SOUL.md of a custom agent: edited by the user in the UI, and
+#                rewritten by the agent itself through its self-update tool       -> input (user)
+#   skill_desc   name/description of installed skills, read from .skill archive
+#                frontmatter (the code calls it untrusted)                        -> input from rag
+#   memory, current uploads, date   injected per turn in the first HumanMessage;
+#                                   memory is written by the memory agent         -> input from tool, user turn
+#
+# Both soul and skill_desc are HTML-escaped by hand before they enter the
+# system prompt (html.escape): structure is removed, natural-language text is
+# not. Translated as sanitize(...).
+#
+# Not expressible: the many optional sections (subagents, deferred tools, ACP,
+# bash guidance) are conditionals on developer configuration; translated with
+# all sections present. The lead_prompt_overlay rewrite is developer config.
+
+var template = "<SYSTEM_PROMPT_TEMPLATE: role, thinking style, clarification rules, confidentiality rules, working directory>"
+var subagents = "<subagent_system section>"
+
+input agent_name : pattern("[A-Za-z0-9-]+")
+input soul
+input skill_desc from rag
+input memory from tool
+
+system {
+    "<role>You are {agent_name}, an open-source super agent.</role>"
+    insert(template)
+    insert(sanitize(soul))
+    "<skill_system> ... <available_skills>"
+    insert(sanitize(skill_desc))
+    "</available_skills></skill_system>"
+    insert(subagents)
+}
+
+instruction {
+    "<system-reminder><memory>"
+    insert(memory)
+    "</memory></system-reminder>"
+}

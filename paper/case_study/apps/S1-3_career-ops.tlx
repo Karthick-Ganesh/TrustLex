@@ -1,0 +1,45 @@
+# about: career-ops: evaluates a job description against the candidate's CV
+# repo: career-ops-hq/career-ops (MIT, 79,226 stars)
+# commit: 86979c50da59696cfef795933b9d35295796f0ba
+# prompt code: openai-eval.mjs:281-334 (system prompt), :382-386 (messages);
+#              lib/context-budget.mjs:281-298 (context body), :365-386 (assembleContext)
+# stratum: S1 (rank 9)
+#
+# Sources
+#   _shared.md, oferta.md          developer-written mode files in the repo    -> var
+#   cv.md, profile.yml, _profile.md, _custom.md
+#                                  written by the person running their own
+#                                  instance (operator configuration)           -> var
+#   jdText                         the job description, from a saved file or
+#                                  a job-board posting: third-party text       -> input from rag
+#
+# Not expressible: buildBudgetedPrompt() may compress _shared.md when the
+# prompt is over budget (a conditional on developer text only; the trust of
+# every slot is the same on both paths). Translated: the uncompressed path.
+
+var shared = "<modes/_shared.md: scoring methodology>"
+var oferta = "<modes/oferta.md: evaluation mode>"
+var cv = "<cv.md: the operator's own resume>"
+var profile = "<config/profile.yml and modes/_profile.md, _custom.md: the operator's targets and rules>"
+var rule = "═══════════════════════════════════════════════════════"
+
+input jd from rag
+
+system {
+    "You are career-ops, an AI-powered job search assistant."
+    "You evaluate job offers against the user's CV using a structured A-G scoring system."
+    "Your evaluation methodology is defined below. Follow it exactly."
+    "{rule}\nSYSTEM CONTEXT (_shared.md)\n{rule}\n{shared}"
+    "{rule}\nEVALUATION MODE (oferta.md)\n{rule}\n{oferta}"
+    "{rule}\nCANDIDATE RESUME (cv.md)\n{rule}\n{cv}"
+    "{rule}\nCANDIDATE PROFILE & TARGETS\n{rule}\n{profile}"
+    "{rule}\nJOB DESCRIPTION\n{rule}"
+    insert(jd)
+    "IMPORTANT OPERATING RULES FOR THIS SESSION ... Generate Blocks A through G in full."
+    "---SCORE_SUMMARY--- COMPANY: ... ROLE: ... SCORE: ... LEGITIMACY: ... ---END_SUMMARY---"
+}
+
+instruction {
+    "JOB DESCRIPTION TO EVALUATE:"
+    insert(jd)
+}

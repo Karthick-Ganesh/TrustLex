@@ -1,0 +1,90 @@
+public-apis/public-apis	494337	MIT	Python	false	2026-11-01	A collective list of free APIs
+awesome-selfhosted/awesome-selfhosted	332702	NOASSERTION		false	2026-10-31	A list of Free Software network services and web applications which can be hosted on your 
+vinta/awesome-python	331762	NOASSERTION	Python	false	2026-11-01	The definitive list that answers "I want to do X in Python, which tool should I use?"
+affaan-m/ECC	294616	MIT	JavaScript	false	2026-10-30	The agent harness performance optimization system. Skills, instincts, memory, security, an
+NousResearch/hermes-agent	259437	MIT	Python	false	2026-11-01	The agent that grows with you
+firecrawl/firecrawl	197617	AGPL-3.0	TypeScript	false	2026-10-31	Supercharge your AI agents with data from the web and beyond. Building the library for sup
+avelino/awesome-go	191495	MIT	Go	false	2026-10-30	A curated list of awesome Go frameworks, libraries and software
+ollama/ollama	185572	MIT	Go	false	2026-10-31	Get up and running with Kimi, GLM, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other model
+msitarzewski/agency-agents	165855	MIT	Shell	false	2026-10-25	A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas
+langgenius/dify	160165	NOASSERTION	Python	false	2026-11-01	Build Agentic workflows, RAG pipelines, with rich AI model and tool support on one collabo
+langflow-ai/langflow	156223	MIT	Python	false	2026-11-01	Langflow is a powerful tool for building and deploying AI-powered agents and workflows.
+farion1231/cc-switch	150855	MIT	Rust	false	2026-11-01	A cross-platform desktop All-in-One assistant for Claude Code, Codex, OpenCode,DeepSeek Ha
+langchain-ai/langchain	148825	MIT	Python	false	2026-11-01	The agent engineering platform.
+Shubhamsaboo/awesome-llm-apps	143657	Apache-2.0	Python	false	2026-10-22	100+ AI Agents, Agent Skills and RAG Apps - Free and Open Source.
+ripienaar/free-for-dev	141354	none	HTML	false	2026-11-01	A list of SaaS, PaaS and IaaS offerings that have free tiers of interest to devops and inf
+Graphify-Labs/graphify	140436	Apache-2.0	Python	false	2026-11-01	Turn any codebase, with its docs, SQL schemas, configs, and PDFs, into a queryable knowled
+VoltAgent/awesome-design-md	125061	MIT		false	2026-10-28	A collection of DESIGN.md files analysis by popular brand design systems. Drop one into yo
+microsoft/generative-ai-for-beginners	122740	MIT	Jupyter Notebook	false	2026-11-01	21 Lessons, Get Started Building with Generative AI 
+browser-use/browser-use	119756	MIT	Python	false	2026-10-31	Open-source Python library for AI browser agents, plus Browser Use Cloud: stealth browsers
+TauricResearch/TradingAgents	119424	Apache-2.0	Python	false	2026-10-27	TradingAgents: Multi-Agents LLM Financial Trading Framework
+earendil-works/pi	119317	MIT	TypeScript	false	2026-11-01	AI agent toolkit: unified LLM API, agent loop, TUI, coding agent CLI
+jaywcjlove/awesome-mac	117531	CC0-1.0	Swift	false	2026-11-01	 This project is dedicated to collecting high-quality macOS software and organizing them 
+nexu-io/open-design	105315	Apache-2.0	TypeScript	false	2026-11-01	The 1st Collaborative AI Design Agent Workspace. Local-first and open source. Create motio
+ruvnet/RuView	101968	MIT	Rust	false	2026-11-01	π RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign moni
+pbakaus/impeccable	99126	Apache-2.0	Rust	false	2026-11-01	The design vocabulary for your coding agent. Steer with polish and bolder, review with cri
+microsoft/playwright	99046	Apache-2.0	TypeScript	false	2026-10-31	Playwright is a framework for Web Testing and Automation. It allows testing Chromium, Fire
+punkpeye/awesome-mcp-servers	97164	MIT		false	2026-10-23	A collection of MCP servers.
+infiniflow/ragflow	93294	Apache-2.0	Go	false	2026-11-01	RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cu
+OpenHands/OpenHands	92426	MIT	TypeScript	false	2026-11-01	🙌 OpenHands: AI-Driven Development
+PaddlePaddle/PaddleOCR	92073	Apache-2.0	Python	false	2026-09-16	Turn any PDF or image document into structured data for your AI. A powerful, lightweight O
+modelcontextprotocol/servers	91733	NOASSERTION	TypeScript	false	2026-10-29	Model Context Protocol Servers
+D4Vinci/Scrapling	91681	BSD-3-Clause	Python	false	2026-11-01	🕷️ The BEST Web Scraping framework that handles everything from a single request to a full
+unclecode/crawl4ai	86712	Apache-2.0	Python	false	2026-11-01	Open-source web crawler and scraper for LLMs and AI agents: any website into clean, LLM-re
+rtk-ai/rtk	85213	Apache-2.0	Rust	false	2026-11-01	CLI proxy that reduces LLM token consumption by 60-90% on common dev commands. Single Rust
+bytedance/deer-flow	84838	MIT	Python	false	2026-11-01	An open-source long-horizon SuperAgent harness that researches, codes, and creates. With t
+mlabonne/llm-course	84836	Apache-2.0		false	2026-02-05	Course to get into Large Language Models (LLMs) with roadmaps and Colab notebooks.
+Developer-Y/cs-video-courses	84468	none		false	2026-10-31	List of Computer Science courses with video lectures.
+lobehub/lobehub	83674	NOASSERTION	TypeScript	false	2026-11-01	🤯 LobeHub is your Chief Agent Operator, organizing your agents into 7×24 operations by hir
+cheaper-inference/OmniRoute	83553	MIT	TypeScript	false	2026-11-01	Never stop coding. Free MIT AI gateway: one endpoint, 375 providers (150+ free), 1,400+ mo
+666ghj/MiroFish	83228	AGPL-3.0	Python	false	2026-10-16	A Simple and Universal Swarm Intelligence Engine, Predicting Anything. 简洁通用的群体智能引擎，预测万物
+opendatalab/MinerU	82941	NOASSERTION	Python	false	2026-10-31	Transforms complex documents like PDFs and Office docs into LLM-ready markdown/JSON for yo
+ruvnet/ruflo	80515	MIT	TypeScript	false	2026-11-01	🌊 The original agent harness. Deploy intelligent multi-player swarms, coordinate autonomou
+awesomedata/awesome-public-datasets	79895	MIT		false	2026-10-28	A topic-centric list of HQ open datasets.
+dair-ai/Prompt-Engineering-Guide	79738	MIT	MDX	false	2026-03-11	🐙 Guides, papers, lessons, notebooks and resources for prompt engineering, context enginee
+shareAI-lab/learn-claude-code	79681	MIT	Python	false	2026-10-27	Bash is all you need -  A nano claude code–like 「agent harness」, built from 0 to 1
+unslothai/unsloth	78917	Apache-2.0	Python	false	2026-11-01	Local UI to run and train LLMs and diffusion models. Supports GGUF, MLX, Qwen3.8, DeepSeek
+headroomlabs-ai/headroom	78540	Apache-2.0	Python	false	2026-11-01	Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 20% fewer to
+ComposioHQ/awesome-claude-skills	78508	none	Python	false	2026-09-18	A curated list of awesome Claude Skills, resources, and tools for customizing Claude AI wo
+rohitg00/ai-engineering-from-scratch	76224	MIT	Python	false	2026-10-29	Learn AI Engineering! Learn it. Build it. Ship it for others.
+hiyouga/LlamaFactory	75824	Apache-2.0	Python	false	2026-10-31	Unified Efficient Fine-Tuning of 100+ LLMs & VLMs (ACL 2024)
+josephmisiti/awesome-machine-learning	74711	NOASSERTION	Python	false	2026-11-01	A curated list of awesome Machine Learning frameworks, libraries and software.
+thedaviddias/Front-End-Checklist	74620	MIT	MDX	false	2026-10-31	🗂 The essential checklist for modern web development, for humans and AI agents
+calesthio/OpenMontage	74306	AGPL-3.0	Python	false	2026-10-28	World's first open-source, agentic video production system. 12 production pipelines, 100+ 
+fffaraz/awesome-cpp	74137	MIT		false	2026-10-31	A curated list of awesome C++ (or C) frameworks, libraries, resources, and shiny things. I
+vuejs/awesome-vue	73492	MIT		false	2026-10-19	🎉 A curated list of awesome things related to Vue.js
+usestrix/strix	73201	Apache-2.0	Python	false	2026-10-30	Open-source AI penetration testing tool to find and fix your app’s vulnerabilities.
+mem0ai/mem0	68233	Apache-2.0	Python	false	2026-10-30	The Memory Layer for AI Agents - Drop-in memory infrastructure for AI agents and apps. Con
+Mintplex-Labs/anything-llm	67819	MIT	JavaScript	false	2026-10-30	Stop renting your intelligence. Own it with AnythingLLM. Everything you need for a powerfu
+bradtraversy/design-resources-for-developers	67304	MIT		false	2026-10-18	Curated list of design and UI resources from stock photos, web templates, CSS frameworks, 
+xtekky/gpt4free	66978	GPL-3.0	Python	false	2026-11-01	The official gpt4free repository | various collection of powerful language models | opus 4
+jingyaogong/minimind	64732	Apache-2.0	Python	false	2026-10-27	🧠 Train a 64M-parameter LLM from scratch in just 2h!
+upstash/context7	64045	MIT	TypeScript	false	2026-11-01	Context7 Platform -- Up-to-date docs for AI agents
+sansan0/TrendRadar	63347	GPL-3.0	Python	false	2026-10-29	⭐AI-driven public opinion & trend monitor with multi-platform aggregation, RSS, and smart 
+BerriAI/litellm	62495	NOASSERTION	Python	false	2026-11-01	The fastest, litest AI Gateway. Rust core with Python SDK. Call 100+ LLM APIs in OpenAI (o
+pathwaycom/pathway	62027	NOASSERTION	Python	false	2026-10-30	Python ETL framework for stream processing, real-time analytics, LLM pipelines, and RAG.
+1c7/chinese-independent-developer	61976	none		false	2026-11-01	👩🏿‍💻👨🏾‍💻👩🏼‍💻👨🏽‍💻👩🏻‍💻中国独立开发者项目列表 -- 分享大家都在做什么
+microsoft/autogen	61662	CC-BY-4.0	Python	false	2026-10-28	A programming framework for agentic AI
+crewAIInc/crewAI	60384	MIT	Python	false	2026-11-01	Framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative
+rust-unofficial/awesome-rust	60263	CC0-1.0	Rust	false	2026-11-01	A curated list of Rust code and resources.
+MemPalace/mempalace	60222	MIT	Python	false	2026-10-31	The best-benchmarked open-source AI memory system. And it's free.
+meilisearch/meilisearch	59742	NOASSERTION	Rust	false	2026-11-01	A lightning-fast search engine API bringing AI-powered hybrid search to your sites and app
+ayghri/i-have-adhd	59676	MIT	Python	false	2026-10-19	A skill to stop your coding agent from burying the answer. ADHD-friendly output.
+jamiepine/voicebox	59199	MIT	Python	false	2026-10-07	The open-source AI voice studio. Clone, dictate, create.
+FoundationAgents/OpenManus	58853	MIT	Python	false	2026-10-31	No fortress, purely open ground.  OpenManus is Coming.
+HKUDS/CLI-Anything	58021	Apache-2.0	Python	false	2026-09-22	"CLI-Anything: Making ALL Software Agent-Native" -- CLI-Hub: https://clianything.cc/
+coreyhaines31/marketingskills	57814	MIT	JavaScript	false	2026-10-31	Marketing skills for Claude Code and AI agents. CRO, copywriting, SEO, analytics, and grow
+vectorize-io/hindsight	57640	MIT	Python	false	2026-11-01	Hindsight: Agent Memory That Learns
+zylon-ai/private-gpt	57625	Apache-2.0	Python	false	2026-10-29	Complete API layer for private AI applications on local models: RAG, skills, tools, MCP, t
+router-for-me/CLIProxyAPI	57194	MIT	Go	false	2026-11-01	Wrap Antigravity, ChatGPT Codex, Claude Code, Grok Build, Muse Code, Devin as an OpenAI/Ge
+hesreallyhim/awesome-claude-code	57037	NOASSERTION	Python	false	2026-11-01	A hand-picked collection of the finest of resources for the most awesome of agents, Claude
+cloudflare/security-audit-skill	56166	MIT	JavaScript	false	2026-09-14	A coding-agent skill for multi-phase security audits with independently verified, machine-
+Ebony-Vinyl/dsh-our-free-model	55662	MIT	JavaScript	false	2026-11-01	在 dsh 里装上这个插件即可，无需登录、注册或填 API Key，就能使用包括 DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型——完全免费，不限量。 Al
+K-Dense-AI/scientific-agent-skills	55645	MIT	Python	false	2026-10-26	Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 2
+Imbad0202/academic-research-skills	54865	NOASSERTION	Python	false	2026-11-01	Academic Research Skills for Claude Code: research → write → review → revise → finalize
+HKUDS/DeepTutor	53551	Apache-2.0	Python	false	2026-10-31	DeepTutor: Lifelong Personalized Tutoring. https://deeptutor.info/.
+VoltAgent/awesome-openclaw-skills	53481	MIT		false	2026-10-30	The awesome collection of OpenClaw skills. 5,400+ skills filtered and categorized from the
+CherryHQ/cherry-studio	53160	AGPL-3.0	TypeScript	false	2026-11-01	Your AI workspace for models, agents, and productivity.
+dkhamsing/open-source-ios-apps	52943	CC0-1.0		false	2026-11-01	:iphone: Collaborative List of Open-Source iOS Apps
+run-llama/llama_index	52771	MIT	Python	false	2026-10-26	LlamaIndex is the document processing platform for AI
+charlax/professional-programming	51669	MIT	Python	false	2026-10-27	A collection of learning resources for curious software engineers

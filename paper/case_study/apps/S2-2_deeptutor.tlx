@@ -1,0 +1,44 @@
+# about: DeepTutor: a personalised tutoring agent over the learner's knowledge bases and notebooks
+# repo: HKUDS/DeepTutor (Apache-2.0, 53,557 stars)
+# commit: f7aed0744c36c5afef16a4261c31ebee1208cac2
+# prompt code: deeptutor/agents/loop/prompt_blocks.py:119-188 (system blocks), :190-205 (foundation),
+#              :185-187 (the knowledge-base seed rides in the trailing user message)
+# stratum: S2 (rank 26)
+#
+# Sources
+#   foundation, tool-call policy, tool manifest     developer-written                       -> var
+#   workspace instructions, persona, learner profile
+#                                                    settings the learner types for their
+#                                                    own tutor (operator configuration)      -> var
+#   memory, learning journal                         written by the app's memory agent from
+#                                                    earlier conversations, which include
+#                                                    retrieved documents and web results     -> input from tool
+#   source manifest                                  names of the learner's uploaded
+#                                                    documents and sources                   -> input from rag
+#   kb_seed                                          retrieved knowledge-base chunks          -> input from rag
+#   question                                         the learner's message                    -> input (user)
+#
+# Not expressible: every block is optional (conditionals on whether the
+# context has it); translated with all blocks present.
+
+var foundation = "<foundation blocks: identity, loop rules, tool_call_policy>"
+var tools = "<tool manifest>"
+var settings = "<workspace instructions, persona style and learner profile, typed by the learner>"
+
+input memory from tool
+input sources from rag
+input kb_seed from rag
+input question
+
+system {
+    insert(foundation)
+    insert(settings)
+    insert(memory)
+    insert(tools)
+    insert(sources)
+}
+
+instruction {
+    insert(question)
+    insert(kb_seed)
+}

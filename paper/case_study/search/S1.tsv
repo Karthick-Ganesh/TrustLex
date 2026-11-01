@@ -1,0 +1,90 @@
+sindresorhus/awesome	528425	CC0-1.0		false	2026-09-02	😎 Awesome lists about all kinds of interesting topics [NOTE: Pull requests are temporarily
+awesome-selfhosted/awesome-selfhosted	332702	NOASSERTION		false	2026-10-31	A list of Free Software network services and web applications which can be hosted on your 
+Shubhamsaboo/awesome-llm-apps	143657	Apache-2.0	Python	false	2026-10-22	100+ AI Agents, Agent Skills and RAG Apps - Free and Open Source.
+ripienaar/free-for-dev	141354	none	HTML	false	2026-11-01	A list of SaaS, PaaS and IaaS offerings that have free tiers of interest to devops and inf
+paperclipai/paperclip	109823	MIT	TypeScript	false	2026-11-01	The open-source app everyone uses to manage agents at work
+bytedance/deer-flow	84837	MIT	Python	false	2026-11-01	An open-source long-horizon SuperAgent harness that researches, codes, and creates. With t
+mlabonne/llm-course	84836	Apache-2.0		false	2026-02-05	Course to get into Large Language Models (LLMs) with roadmaps and Colab notebooks.
+lobehub/lobehub	83675	NOASSERTION	TypeScript	false	2026-11-01	🤯 LobeHub is your Chief Agent Operator, organizing your agents into 7×24 operations by hir
+career-ops-hq/career-ops	79222	MIT	JavaScript	false	2026-11-01	Open-source AI job search agent and job finder: scan job boards, score each job 1-5 agains
+rohitg00/ai-engineering-from-scratch	76220	MIT	Python	false	2026-10-29	Learn AI Engineering! Learn it. Build it. Ship it for others.
+asgeirtj/system_prompts_leaks	70580	CC0-1.0	Python	false	2026-11-01	Documented system prompts from Anthropic - Claude Fable 5.1, Opus 5.5, Claude Design, Clau
+mem0ai/mem0	68233	Apache-2.0	Python	false	2026-10-30	The Memory Layer for AI Agents - Drop-in memory infrastructure for AI agents and apps. Con
+1c7/chinese-independent-developer	61976	none		false	2026-11-01	👩🏿‍💻👨🏾‍💻👩🏼‍💻👨🏽‍💻👩🏻‍💻中国独立开发者项目列表 -- 分享大家都在做什么
+crewAIInc/crewAI	60384	MIT	Python	false	2026-11-01	Framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative
+GitHubDaily/GitHubDaily	48339	none		false	2025-12-31	坚持分享 GitHub 上高质量、有趣实用的开源技术教程、开发者工具、编程网站、技术资讯。A list cool, interesting projects of GitHub.
+LibreChat-AI/LibreChat	46611	MIT	TypeScript	false	2026-11-01	Enhanced ChatGPT Clone: Features Agents, MCP, Skills, DeepSeek, Anthropic, AWS, OpenAI, Re
+deepseek-ai/awesome-deepseek-integration	39666	CC0-1.0		false	2026-02-23	Integrate the DeepSeek API into popular software
+lm-sys/FastChat	39550	Apache-2.0	Python	false	2026-05-01	An open platform for training, serving, and evaluating large language models. Release repo
+langfuse/langfuse	36838	NOASSERTION	TypeScript	false	2026-11-01	🪢 Open source agent evals & observability: Trace, evaluate, and improve LLM applications w
+VoltAgent/awesome-agent-skills	36709	MIT		false	2026-10-30	A curated collection of 1000+ agent skills from official dev teams and the community, comp
+e2b-dev/awesome-ai-agents	30742	NOASSERTION		false	2026-08-21	A list of AI autonomous agents
+microsoft/semantic-kernel	28725	MIT	C#	false	2026-10-31	Integrate cutting-edge LLM technology quickly and easily into your apps
+QwenLM/Qwen3	27697	none	Python	false	2026-01-09	Qwen3 is the large language model series developed by Qwen team, Alibaba Cloud.
+vercel/ai	27676	NOASSERTION	TypeScript	false	2026-11-01	The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-sou
+Hannibal046/Awesome-LLM	27467	CC0-1.0		false	2025-07-31	Awesome-LLM: a curated list of Large Language Model
+enescingoz/awesome-n8n-templates	26216	NOASSERTION		false	2026-09-12	280+ free n8n automation templates — ready-to-use workflows for Gmail, Telegram, Slack, Di
+NirDiamant/GenAI_Agents	24773	NOASSERTION	Jupyter Notebook	false	2026-11-01	50+ tutorials and implementations for Generative AI Agent techniques, from basic conversat
+AZeC4/TelegramGroup	23880	none		false	2026-11-01	2026最新悄咪咪收集的10000+个Telegram群合集，附全网最有趣好用的机器人BOT🤖【dianbaodaohang.com】
+mikeroyal/Self-Hosting-Guide	23428	none	Dockerfile	false	2025-06-27	Self-Hosting Guide. Learn all about  locally hosting (on premises & private web servers) a
+AiHubCN/Awesome-Chinese-LLM	22772	none		false	2026-05-10	整理开源的中文大语言模型，以规模较小、可私有化部署、训练成本较低的模型为主，包括底座模型，垂直领域微调及应用，数据集与教程等。
+dipakkr/awesome-ai-engineering	22511	MIT		false	2026-10-21	🚀 A curated collection of AI engineering resources, roadmaps, tools, and projects covering
+EthicalML/awesome-production-machine-learning	21062	MIT		false	2026-11-01	A curated list of awesome open source libraries to deploy, monitor, version and scale your
+birobirobiro/awesome-shadcn-ui	20740	MIT	TypeScript	false	2026-10-31	A curated list of awesome things related to shadcn/ui.
+confident-ai/deepeval	19227	Apache-2.0	Python	false	2026-10-29	The LLM Evaluation Framework
+keon/awesome-nlp	19119	CC0-1.0		false	2026-10-12	:book: A curated list of resources dedicated to Natural Language Processing (NLP)
+xming521/WeClone	18341	AGPL-3.0	Python	false	2026-11-01	Build a portrait of your life. Assistants that know you. Clones that talk like you.
+RightNow-AI/openfang	18244	Apache-2.0	Rust	false	2026-07-02	Open-source Agent Operating System
+microsoft/mcp-for-beginners	17579	MIT	Jupyter Notebook	false	2026-10-30	This open-source curriculum introduces the fundamentals of Model Context Protocol (MCP) th
+QwenLM/Qwen-Agent	17239	Apache-2.0	Python	false	2026-03-04	Agent framework and applications built upon Qwen>=3.0, featuring Function Calling, MCP, Co
+Arindam200/awesome-ai-apps	16655	MIT	Python	false	2026-10-30	A collection of projects showcasing RAG, agents, workflows, and other AI use cases
+mayooear/ai-pdf-chatbot-langchain	16584	MIT	TypeScript	false	2026-03-27	AI PDF chatbot agent built with LangChain & LangGraph 
+huggingface/transformers.js	16395	Apache-2.0	JavaScript	false	2026-10-30	State-of-the-art Machine Learning for the web. Run 🤗 Transformers directly in your browser
+raga-ai-hub/RagaAI-Catalyst	16184	Apache-2.0	Python	false	2026-02-11	Python SDK for Agent AI Observability, Monitoring and Evaluation Framework. Includes featu
+HKUDS/OpenHarness	16149	MIT	Python	false	2026-06-04	"OpenHarness: Open Agent Harness with a Built-in Personal Agent--Ohmo!"
+llmware-ai/llmware	14818	Apache-2.0	Python	false	2026-10-01	Unified framework for building enterprise RAG pipelines with small, specialized models
+supertone-oss-archive/supertonic	13756	MIT	Swift	false	2026-09-09	Lightning-Fast, On-Device, Multilingual TTS — running natively via ONNX.
+ShishirPatil/gorilla	13062	Apache-2.0	Python	false	2026-10-17	Gorilla: Training and Evaluating LLMs for Function Calls (Tool Calls)
+steven2358/awesome-generative-ai	12793	CC0-1.0		false	2026-10-30	A curated list of modern Generative Artificial Intelligence projects and services
+ritchieng/the-incredible-pytorch	12669	MIT		false	2026-10-31	The Incredible PyTorch: a curated list of tutorials, papers, projects, communities and mor
+jnv/lists	11620	CC0-1.0		false	2026-10-31	The definitive list of lists (of lists) curated on GitHub and elsewhere
+adongwanai/AgentGuide	11508	none	MDX	false	2026-10-31	https://adongwanai.github.io/AgentGuide | AI Agent开发指南 | LangGraph实战 | 高级RAG | 转行大模型 | 大模型
+microsoft/promptflow	11258	MIT	Python	false	2026-10-31	Build high-quality LLM apps - from prototyping, testing to production deployment and monit
+VoltAgent/voltagent	10908	MIT	TypeScript	false	2026-10-15	AI Agent Engineering Platform built on an Open Source TypeScript AI Agent Framework
+KalyanKS-NLP/llm-engineer-toolkit	10896	Apache-2.0		false	2026-10-25	A curated list of  120+ LLM libraries category wise. 
+PatrickJS/awesome-angular	10102	CC0-1.0	HTML	false	2026-11-01	:page_facing_up: A curated list of awesome Angular resources
+marcelscruz/public-apis	9664	MIT	JavaScript	false	2026-11-01	A collaborative list of public APIs for developers
+kyrolabs/awesome-langchain	9584	CC0-1.0		false	2026-10-17	😎 Awesome list of tools and projects with the awesome LangChain framework
+xberg-io/xberg	9505	MIT	Rust	false	2026-11-01	The fast, precise document-intelligence engine for every language: text, tables and metada
+nlpxucan/WizardLM	9471	none	Python	false	2025-06-07	LLMs build upon Evol Insturct: WizardLM, WizardCoder, WizardMath
+ai-collection/ai-collection	9261	MIT		false	2026-10-29	The Generative AI Landscape - A Collection of Awesome Generative AI Applications
+datawhalechina/Agent-Learning-Hub	9168	MIT	HTML	false	2026-07-19	AI Agent 学习路线与资料库收集
+We5ter/Scanners-Box	9166	NOASSERTION		false	2026-10-30	The Ultimate Open-Source Security Arsenal for Hackers, Enterprises, and AI Agents——面向极客、企业
+WangRongsheng/awesome-LLM-resources	9062	Apache-2.0		false	2026-11-01	🧑‍🚀 全世界最好的LLM资料总结（多模态生成、Agent、辅助编程、AI审稿、数据处理、模型训练、模型推理、o1 模型、MCP、小语言模型、视觉语言模型） | Summary o
+cipher387/osint_stuff_tool_collection	9031	GPL-3.0		false	2026-11-01	A collection of several hundred online tools for OSINT
+anbeime/skill	9005	none	Python	false	2026-11-01	收录最全、更新最快的技能Skills商店：精选原创技能包（涵盖文档处理、内容创作、编程开发、机器学习、自动化工作流），全部打包好可直接安装使用！同时自动抓取GitHub上万个Ski
+dair-ai/ML-Papers-Explained	8920	none		false	2025-06-30	Explanation to key concepts in ML
+digoal/blog	8605	GPL-2.0	HTML	false	2026-11-01	AI,Opensource,Database,Business,Finance,Minds. git clone --depth 1 https://github.com/digo
+AIPentest/CyberStrikeAI	8302	Apache-2.0	Go	false	2026-10-31	The system of action for AI-native cybersecurity—where intent becomes governed execution, 
+cporter202/API-mega-list	8266	none	JavaScript	false	2026-10-20	This GitHub repo is a powerhouse collection of APIs you can start using immediately to bui
+nomi-sec/PoC-in-GitHub	8173	CC0-1.0		false	2026-11-01	📡 PoC auto collect from GitHub. ⚠️ Be careful Malware.
+01-ai/Yi	7836	Apache-2.0	Jupyter Notebook	false	2024-11-27	A series of large language models trained from scratch by developers @01-ai
+2FastLabs/agent-squad	7795	Apache-2.0	Python	false	2026-10-08	Flexible and powerful framework for managing multiple AI agents and handling complex conve
+weaviate/Verba	7692	BSD-3-Clause	Python	false	2026-06-08	Retrieval Augmented Generation (RAG) chatbot powered by Weaviate
+microsoft/TinyTroupe	7630	MIT	Jupyter Notebook	false	2026-10-23	LLM-powered multiagent persona simulation for imagination enhancement and business insight
+daviddao/awful-ai	7569	none		false	2025-02-20	😈Awful AI is a curated list to track current scary usages of AI - hoping to raise awarenes
+NVIDIA-NeMo/Guardrails	7405	NOASSERTION	Python	false	2026-11-01	NeMo Guardrails is an open-source toolkit for easily adding programmable guardrails to LLM
+bhaskatripathi/pdfGPT	7168	MIT	Python	false	2026-03-06	PDF GPT allows you to chat with the contents of your PDF file by using GPT capabilities. T
+Orkas-AI/Orkas	7154	MIT	JavaScript	false	2026-11-01	Orkas is an open-source (MIT), local-first AI team for your desktop: a Commander turns you
+amitness/learning	6989	MIT		false	2026-11-01	A log of things I'm learning
+georgezouq/awesome-ai-in-finance	6713	CC0-1.0		false	2026-09-08	🔬 A curated list of awesome LLMs & deep learning strategies & tools in financial market.
+langchain-ai/opengpts	6705	MIT	Rich Text Format	false	2025-06-26	
+punkpeye/awesome-mcp-clients	6619	MIT		false	2026-06-07	A collection of MCP clients.
+genkit-ai/genkit	6563	Apache-2.0	TypeScript	false	2026-11-01	Open-source framework for building agentic apps in JavaScript, Go, Dart, and Python, built
+mahseema/awesome-ai-tools	6524	MIT		false	2025-12-31	A curated list of Artificial Intelligence Top Tools
+sindresorhus/awesome-chatgpt	6480	CC0-1.0		false	2026-02-15	🤖 Awesome list for ChatGPT — an artificial intelligence chatbot developed by OpenAI [SUBMI
+reorx/awesome-chatgpt-api	6441	none	Python	false	2026-03-23	Curated list of apps and tools that not only use the new ChatGPT API, but also allow users
+promptslab/Awesome-Prompt-Engineering	6431	Apache-2.0	TypeScript	false	2026-11-01	This repository contains a hand-curated resources for Prompt Engineering with a focus on G
+aymericdamien/TopDeepLearning	6401	MIT	Python	false	2026-07-15	A list of popular github projects related to deep learning
+langgptai/wonderful-prompts	6383	MIT		false	2026-08-25	🔥中文 prompt 精选🔥，ChatGPT 使用指南，提升 ChatGPT 可玩性和可用性！🚀
+Eigenwise/atomic-agents	6314	MIT	Python	false	2026-10-29	Building AI agents, atomically

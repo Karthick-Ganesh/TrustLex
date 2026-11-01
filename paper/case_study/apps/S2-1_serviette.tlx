@@ -1,0 +1,36 @@
+# about: Serviette: a no-code RAG server that answers questions from an indexed document folder
+# repo: pathwaycom/serviette (MIT, 58,736 stars)
+# commit: e2a7a09bbc0b272a490aba26d850d363ec3ddf14
+# prompt code: serviette/server/main.py:405-423 (system prompt: policy + corpus card + no-answer rule),
+#              serviette/server/llm.py:16-19 (DEFAULT_SYSTEM_PROMPT), :51-54 (_build_prompt),
+#              :152-169 (messages); serviette/server/documents.py:490-513 (corpus_card, labeled)
+# stratum: S2 (rank 22)
+#
+# Sources
+#   DEFAULT_SYSTEM_PROMPT / llm.system_prompt       developer default or operator config -> var
+#   no_answer marker                                operator config                      -> var
+#   doc_count  len(catalog), an integer computed by the server                          -> input : int
+#   context    retrieved chunks, each labelled with its file name                       -> input from rag
+#   query      the question                                                              -> input (user)
+#
+# Not expressible: adaptive RAG retries with a larger k while the model answers
+# with the no-answer marker (a loop); every iteration builds the same layout.
+
+var policy = "You are a helpful assistant. Answer the user's question using only the provided context. If the context is insufficient, say so."
+var no_answer = "<no-answer marker from the configuration>"
+
+input doc_count : int
+input context from rag
+input query
+
+system {
+    insert(policy)
+    "The index currently holds {doc_count} documents (files that produced text). Never derive the number of documents from the context."
+    "If the provided context does not contain the information needed to answer, reply exactly \"{no_answer}\"."
+}
+
+instruction {
+    "Context:"
+    insert(context)
+    "Question: {query}"
+}

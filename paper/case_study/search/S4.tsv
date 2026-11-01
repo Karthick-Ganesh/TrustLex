@@ -1,0 +1,90 @@
+TauricResearch/TradingAgents	119424	Apache-2.0	Python	false	2026-10-27	TradingAgents: Multi-Agents LLM Financial Trading Framework
+jaywcjlove/awesome-mac	117531	CC0-1.0	Swift	false	2026-11-01	 This project is dedicated to collecting high-quality macOS software and organizing them 
+punkpeye/awesome-mcp-servers	97164	MIT		false	2026-10-23	A collection of MCP servers.
+bytedance/deer-flow	84837	MIT	Python	false	2026-11-01	An open-source long-horizon SuperAgent harness that researches, codes, and creates. With t
+lobehub/lobehub	83675	NOASSERTION	TypeScript	false	2026-11-01	🤯 LobeHub is your Chief Agent Operator, organizing your agents into 7×24 operations by hir
+shanraisshan/claude-code-best-practice	68416	MIT	HTML	false	2026-11-01	from vibe coding to agentic engineering - practice makes claude perfect
+BerriAI/litellm	62494	NOASSERTION	Python	false	2026-11-01	The fastest, litest AI Gateway. Rust core with Python SDK. Call 100+ LLM APIs in OpenAI (o
+rust-unofficial/awesome-rust	60263	CC0-1.0	Rust	false	2026-11-01	A curated list of Rust code and resources.
+dkhamsing/open-source-ios-apps	52944	CC0-1.0		false	2026-11-01	:iphone: Collaborative List of Open-Source iOS Apps
+GitHubDaily/GitHubDaily	48339	none		false	2025-12-31	坚持分享 GitHub 上高质量、有趣实用的开源技术教程、开发者工具、编程网站、技术资讯。A list cool, interesting projects of GitHub.
+LibreChat-AI/LibreChat	46611	MIT	TypeScript	false	2026-11-01	Enhanced ChatGPT Clone: Features Agents, MCP, Skills, DeepSeek, Anthropic, AWS, OpenAI, Re
+vercel-labs/agent-browser	45119	Apache-2.0	Rust	false	2026-11-01	Browser automation CLI for AI agents
+danielmiessler/Fabric	44521	MIT	Go	false	2026-10-29	Fabric is an open-source framework for augmenting humans using AI. It provides a modular s
+tinyhumansai/openhuman	42474	GPL-3.0	Rust	false	2026-10-31	The fastest, cheapest, most efficient open-source agent harness. Run more than 500 agents 
+deepseek-ai/awesome-deepseek-integration	39666	CC0-1.0		false	2026-02-23	Integrate the DeepSeek API into popular software
+HKUDS/Vibe-Trading	37364	MIT	Python	false	2026-11-01	"Vibe-Trading: Your Personal Trading Agent"
+VoltAgent/awesome-agent-skills	36709	MIT		false	2026-10-30	A curated collection of 1000+ agent skills from official dev teams and the community, comp
+freestylefly/awesome-gpt-image-2	35349	MIT	JavaScript	false	2026-10-14	Prompt as Code | GPT Image 2 / 2.5 提示词与案例库，530+ 个案例、20+ 套工业级模板与可复用 Skills，新增 2.5 同提示词对比专区，
+sahat/hackathon-starter	35259	MIT	JavaScript	false	2026-10-30	A boilerplate for Node.js web applications
+vxcontrol/pentagi	32925	MIT	Go	false	2026-10-22	Fully autonomous AI Agents system capable of performing complex penetration testing tasks
+e2b-dev/awesome-ai-agents	30742	NOASSERTION		false	2026-08-21	A list of AI autonomous agents
+assafelovic/gpt-researcher	30416	Apache-2.0	Python	false	2026-10-10	An autonomous agent that conducts deep research on any data using any LLM providers
+wilsonfreitas/awesome-quant	30401	none	HTML	false	2026-11-01	A curated list of insanely awesome libraries, packages and resources for Quants (Quantitat
+enescingoz/awesome-n8n-templates	26216	NOASSERTION		false	2026-09-12	280+ free n8n automation templates — ready-to-use workflows for Gmail, Telegram, Slack, Di
+NirDiamant/GenAI_Agents	24773	NOASSERTION	Jupyter Notebook	false	2026-11-01	50+ tutorials and implementations for Generative AI Agent techniques, from basic conversat
+n0shake/Public-APIs	24054	none		false	2026-05-03	📚 A public list of APIs from round the web.
+Skyvern-AI/skyvern	23328	AGPL-3.0	Python	false	2026-11-01	Automate browser based workflows with AI
+QwenLM/Qwen	21983	Apache-2.0	Python	false	2026-03-05	The official repo of Qwen (通义千问) chat & pretrained large language model proposed by Alibab
+awesome-dsh-plugin/awesome-dsh-plugin	21897	CC0-1.0	JavaScript	false	2026-11-01	A curated list of plugins for DeepSeek Harness (dsh) · DeepSeek Harness 插件精选列表
+SWE-agent/SWE-agent	20703	MIT	Python	false	2026-10-26	SWE-agent takes a GitHub issue and tries to automatically fix it, using your LM of choice.
+DrewThomasson/ebook2audiobook	20477	Apache-2.0	Python	false	2026-10-06	Generate audiobooks from e-books, 50+ TTS engines with voice cloning and 1696 languages!
+nesquena/hermes-webui	19334	MIT	Python	false	2026-11-01	Hermes WebUI: The best way to use Hermes Agent from the web or from your phone!
+keon/awesome-nlp	19119	CC0-1.0		false	2026-10-12	:book: A curated list of resources dedicated to Natural Language Processing (NLP)
+wanshuiyin/Auto-claude-code-research-in-sleep	18440	MIT	Python	false	2026-11-01	ARIS ⚔️ (Auto-Research-In-Sleep) — Lightweight Markdown-only skills for autonomous ML rese
+camel-ai/camel	18006	Apache-2.0	Python	false	2026-10-27	🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. 
+andrewyng/aisuite	16369	MIT	Python	false	2026-09-18	Simple, unified interface to multiple Generative AI providers 
+chenhg5/cc-connect	16193	none	Go	false	2026-11-01	Bridge local AI coding agents (Claude Code, Cursor, Gemini CLI, Codex) to messaging platfo
+nidhinjs/prompt-master	15366	MIT		false	2026-10-22	A Claude skill that writes the accurate prompts for any AI tool. Zero tokens or credits wa
+llmware-ai/llmware	14818	Apache-2.0	Python	false	2026-10-01	Unified framework for building enterprise RAG pipelines with small, specialized models
+semantica-agi/semantica	14372	MIT	Python	false	2026-11-01	Graph-Native Infrastructure for Context and Accountable AI Systems
+StarTrail-org/LEANN	13743	MIT	Python	false	2026-10-30	[MLsys2026 Best Paper]: https://arxiv.org/abs/2506.08276. RAG on Everything with LEANN. En
+huggingface/speech-to-speech	13614	Apache-2.0	Python	false	2026-10-31	Build voice agents with open-source models
+steven2358/awesome-generative-ai	12793	CC0-1.0		false	2026-10-30	A curated list of modern Generative Artificial Intelligence projects and services
+RUCAIBox/LLMSurvey	12229	none	Python	false	2025-03-11	The official GitHub page for the survey paper "A Survey of Large Language Models".
+jnv/lists	11620	CC0-1.0		false	2026-10-31	The definitive list of lists (of lists) curated on GitHub and elsewhere
+spinabot/brigade	11367	MIT	TypeScript	false	2026-11-01	Brigade — Your personal intelligence, built enterprise-grade
+omnigent-ai/omnigent	11157	Apache-2.0	Python	false	2026-11-01	Omnigent is an open-source AI agent framework and meta-harness: orchestrate Claude Code, C
+bytebot-ai/bytebot	11066	Apache-2.0	TypeScript	false	2025-09-12	Bytebot is a self-hosted AI desktop agent that automates computer tasks through natural la
+OpenPipe/ART	10836	Apache-2.0	Python	false	2026-10-26	Agent Reinforcement Trainer: train multi-step agents for real-world tasks using GRPO. Give
+awesome-opencode/awesome-opencode	10821	CC0-1.0	JavaScript	false	2026-11-01	A curated list of awesome plugins, themes, agents, projects, and resources for https://ope
+BehiSecc/awesome-claude-skills	10330	none		false	2026-11-01	A curated list of Claude Skills.
+ykdojo/claude-code-tips	10298	NOASSERTION	HTML	false	2026-09-25	45+ tips for getting the most out of Claude Code, from basics to advanced - includes a cus
+marcelscruz/public-apis	9664	MIT	JavaScript	false	2026-11-01	A collaborative list of public APIs for developers
+ntegrals/openbrowser	9576	MIT	TypeScript	false	2026-04-02	Let AI agents browse the web. An autonomous toolkit for browser-based AI agents.
+xberg-io/xberg	9505	MIT	Rust	false	2026-11-01	The fast, precise document-intelligence engine for every language: text, tables and metada
+AdrienTorris/awesome-blazor	9390	CC0-1.0		false	2026-10-29	Resources for Blazor, a .NET web framework using C#/Razor and HTML that runs in the browse
+ai-collection/ai-collection	9261	MIT		false	2026-10-29	The Generative AI Landscape - A Collection of Awesome Generative AI Applications
+ai-boost/awesome-prompts	9164	GPL-3.0	Python	false	2026-10-30	Curated prompts, frameworks and papers for LLMs and agents, with an engineering bias. Prom
+liaokongVFX/LangChain-Chinese-Getting-Started-Guide	9148	none		false	2026-04-22	LangChain 的中文入门教程
+cipher387/osint_stuff_tool_collection	9031	GPL-3.0		false	2026-11-01	A collection of several hundred online tools for OSINT
+anbeime/skill	9005	none	Python	false	2026-11-01	收录最全、更新最快的技能Skills商店：精选原创技能包（涵盖文档处理、内容创作、编程开发、机器学习、自动化工作流），全部打包好可直接安装使用！同时自动抓取GitHub上万个Ski
+yogeshojha/rengine	8912	GPL-3.0	HTML	false	2026-10-31	reNgine is an automated reconnaissance framework for web applications with a focus on high
+windingwind/zotero-better-notes	8404	AGPL-3.0	TypeScript	false	2026-08-24	Everything about note management. All in Zotero.
+cporter202/API-mega-list	8266	none	JavaScript	false	2026-10-20	This GitHub repo is a powerhouse collection of APIs you can start using immediately to bui
+WooooDyy/LLM-Agent-Paper-List	8262	none		false	2025-09-12	The paper list of the 86-page SCIS cover paper "The Rise and Potential of Large Language M
+yzfly/Awesome-MCP-ZH	7801	MIT		false	2026-11-01	MCP 资源精选， MCP指南，Claude MCP，MCP Servers, MCP Clients
+kyegomez/swarms	7341	Apache-2.0	Python	false	2026-11-01	The Enterprise-Grade Multi-Agent Orchestration Framework. Website: https://swarms.ai
+craft-ai-agents/craft-agents-oss	7304	Apache-2.0	TypeScript	false	2026-10-23	
+mahseema/awesome-ai-tools	6524	MIT		false	2025-12-31	A curated list of Artificial Intelligence Top Tools
+reorx/awesome-chatgpt-api	6441	none	Python	false	2026-03-23	Curated list of apps and tools that not only use the new ChatGPT API, but also allow users
+heilcheng/awesome-agent-skills	6331	MIT	TypeScript	false	2026-10-27	Tutorials, Guides and Agent Skills Directories
+ikaijua/Awesome-AITools	6266	CC-BY-4.0	Python	false	2026-11-01	Collection of AI-related utilities. Welcome to submit pull requests /收藏AI相关的实用工具，欢迎提交pull 
+ebertti/awesome-telegram	6187	none		false	2026-11-01	Collection great groups, channels, bots and libraries for Telegram
+CopilotKit/openmuse	6068	MIT	TypeScript	false	2026-11-01	A personal agent with a browser, terminal, files, and work that keeps going built with Cop
+AboutRSS/ALL-about-RSS	5941	CC-BY-4.0	Python	false	2026-11-01	A list of RSS related stuff: tools, services, communities and tutorials, etc.
+0xNyk/awesome-hermes-agent	5938	NOASSERTION		false	2026-10-27	Independent directory of useful skills, plugins, memory providers, tools, surfaces, and gu
+appcypher/awesome-mcp-servers	5814	none		false	2026-05-06	Awesome MCP Servers - A curated list of Model Context Protocol servers
+langgptai/awesome-claude-prompts	5555	none		false	2026-10-15	This repo includes Claude prompt curation to use Claude better.
+Marker-Inc-Korea/AutoRAG	5251	Apache-2.0	TypeScript	false	2026-11-01	Your Personal Librarian Agent. Ask anything on your computer, organize files, remember imp
+ai-boost/awesome-harness-engineering	5021	NOASSERTION	Python	false	2026-10-30	Awesome list for AI agent harness engineering: tools, patterns, evals, memory, MCP, permis
+alvinreal/awesome-opensource-ai	4963	CC0-1.0	Python	false	2026-11-01	Curated list of the best truly open-source AI projects, models, tools, and infrastructure.
+eastlondoner/vibe-tools	4817	MIT	TypeScript	false	2025-08-25	Give Cursor Agent an AI Team and Advanced Skills
+NateBJones-Projects/OB1	4752	NOASSERTION	TypeScript	false	2026-11-01	Open Brain — The infrastructure layer for your thinking. One database, one AI gateway, one
+Astrosp/Awesome-OSINT-List	4622	GPL-3.0	Shell	false	2026-10-28	📡 Comprehensive collection of OSINT tools for cybersecurity professionals, researchers, an
+crmne/ruby_llm	4490	MIT	Ruby	false	2026-11-01	The Ruby AI framework.
+gptme/gptme	4466	MIT	Python	false	2026-11-01	Your agent in your terminal, equipped with local tools: writes code, uses the terminal, br
+wong2/awesome-mcp-servers	4397	MIT		false	2026-07-13	A curated list of Model Context Protocol (MCP) servers
+trinib/Linux-Bash-Commands	4164	MIT		false	2026-01-07	:godmode: Ultimate list of Linux bash commands, cheatsheets and resources
+cporter202/scraping-apis-for-devs	4002	none	JavaScript	false	2026-10-20	This GitHub repo is a powerhouse collection of scraping APIs for developers that you can s
+FlagAI-Open/FlagAI	3867	Apache-2.0	Python	false	2026-07-13	FlagAI (Fast LArge-scale General AI models) is a fast, easy-to-use and extensible toolkit 

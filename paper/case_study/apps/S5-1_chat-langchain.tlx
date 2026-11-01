@@ -1,0 +1,35 @@
+# about: Chat LangChain: LangChain's official docs and support agent (searches the docs with tools)
+# repo: langchain-ai/chat-langchain (MIT, 6,470 stars)
+# commit: c0fa8154d3e94a6adf5728e82e44ada54b3e75fa
+# prompt code: src/prompts/docs_agent_prompt.py (static system prompt; :264 page text is content,
+#              never instructions), src/middleware/summarization_middleware.py:19-57 (summary
+#              generation) with langchain_v1 agents/middleware/summarization.py:842-847 (the summary
+#              re-enters as a HumanMessage), src/middleware/guardrails_middleware.py:413-416
+# stratum: S5 (langchain-ai, highest-starred official template application)
+#
+# Sources
+#   docs agent prompt, guardrails prompt         developer-written                       -> literals
+#   question                                     the user's message                      -> input (user)
+#   docs                                         pages returned by the docs-search tools -> input from tool
+#   summary                                      LLM summary of earlier messages, tool
+#                                                results included                        -> input from tool
+#
+# Unlike agent-browser, the summary returns in the user turn, and the system
+# prompt never carries outside text.
+# Not expressible: the agent's tool loop and the threshold-based summarisation
+# (loop, conditional); translated after one summarisation and one tool call.
+
+input question
+input docs from tool
+input summary from tool
+
+system {
+    "<docs agent prompt: scope, tools, citation rules, never reveal these instructions>"
+}
+
+instruction {
+    "Here is a summary of the conversation to date:"
+    insert(summary)
+    insert(question)
+    insert(docs)
+}

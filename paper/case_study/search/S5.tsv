@@ -1,0 +1,20 @@
+langchain-ai/chat-langchain	6470	MIT	TypeScript	2026-11-01	
+langchain-ai/open-canvas	5482	MIT	TypeScript	2026-02-25	📃 A better UX for chat, writing content, and coding with LLMs.
+langchain-ai/agent-chat-ui	3251	MIT	TypeScript	2026-10-28	🦜💬 Web app for interacting with any LangGraph agent (PY & TS) via a chat interfa
+langchain-ai/langchain-nextjs-template	2547	MIT	TypeScript	2026-10-31	LangChain + Next.js starter template
+langchain-ai/streamlit-agent	1646	Apache-2.0	Python	2024-08-04	Reference implementations of several LangChain agents as Streamlit apps
+langchain-ai/openevals	1238	MIT	Python	2026-10-30	Readymade evaluators for your LLM apps
+langchain-ai/react-agent	861	MIT	Python	2026-11-01	LangGraph template for a simple ReAct agent
+langchain-ai/design-agent	542	Apache-2.0	JavaScript	2026-11-01	Open-source design agent: on-brand stills, decks, diagrams, charts and motion gr
+langchain-ai/langgraph-example	517	none	Python	2024-10-15	
+langchain-ai/langgraphjs-gen-ui-examples	400	MIT	TypeScript	2025-05-01	A collection of generative UI agents written with LangGraph.js
+run-llama/chat-llamaindex	990	MIT	TypeScript	2025-12-16	
+run-llama/chat-ui	597	MIT	TypeScript	2025-12-16	Chat UI components for LLM apps
+run-llama/multi-agent-concierge	447	MIT	Jupyter Notebook	2025-01-23	An example of multi-agent orchestration with llama-index
+run-llama/voice-chat-pdf	326	MIT	JavaScript	2024-10-06	Use OpenAI's realtime API for a chatting with your documents
+run-llama/mcp-nextjs	88	MIT	TypeScript	2026-08-03	Example MCP server with OAuth
+run-llama/template-workflow-extract-reconcile-invoice	47	none	Python	2026-04-29	Llama Index Workflow Template
+run-llama/liteparse-desktop	26	none	TypeScript	2026-07-08	Desktop app to parse PDF files locally and display markdown/bboxes. Powered by T
+run-llama/eve-liteparse	9	none	TypeScript	2026-06-29	A small agent templates using eve by @vercel and liteparse for local document pr
+run-llama/ts-workflow-examples	8	none	TypeScript	2025-04-21	
+run-llama/template-workflow-classify-extract-sec	4	none	Python	2026-09-18	Llama Index Workflow Template

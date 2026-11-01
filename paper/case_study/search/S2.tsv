@@ -1,0 +1,90 @@
+codecrafters-io/build-your-own-x	558122	none	Markdown	false	2026-07-14	Master programming by recreating your favorite technologies from scratch.
+public-apis/public-apis	494337	MIT	Python	false	2026-11-01	A collective list of free APIs
+awesome-selfhosted/awesome-selfhosted	332702	NOASSERTION		false	2026-10-31	A list of Free Software network services and web applications which can be hosted on your 
+vinta/awesome-python	331762	NOASSERTION	Python	false	2026-11-01	The definitive list that answers "I want to do X in Python, which tool should I use?"
+avelino/awesome-go	191495	MIT	Go	false	2026-10-30	A curated list of awesome Go frameworks, libraries and software
+ollama/ollama	185572	MIT	Go	false	2026-10-31	Get up and running with Kimi, GLM, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other model
+langgenius/dify	160165	NOASSERTION	Python	false	2026-11-01	Build Agentic workflows, RAG pipelines, with rich AI model and tool support on one collabo
+open-webui/open-webui	157466	NOASSERTION	Python	false	2026-11-01	User-friendly AI Interface (Supports Ollama, OpenAI API, ...)
+Shubhamsaboo/awesome-llm-apps	143657	Apache-2.0	Python	false	2026-10-22	100+ AI Agents, Agent Skills and RAG Apps - Free and Open Source.
+ripienaar/free-for-dev	141354	none	HTML	false	2026-11-01	A list of SaaS, PaaS and IaaS offerings that have free tiers of interest to devops and inf
+punkpeye/awesome-mcp-servers	97164	MIT		false	2026-10-23	A collection of MCP servers.
+MunGell/awesome-for-beginners	90963	none		false	2026-10-01	A list of awesome beginners-friendly projects.
+mlabonne/llm-course	84836	Apache-2.0		false	2026-02-05	Course to get into Large Language Models (LLMs) with roadmaps and Colab notebooks.
+cheaper-inference/OmniRoute	83542	MIT	TypeScript	false	2026-11-01	Never stop coding. Free MIT AI gateway: one endpoint, 375 providers (150+ free), 1,400+ mo
+opendatalab/MinerU	82942	NOASSERTION	Python	false	2026-10-31	Transforms complex documents like PDFs and Office docs into LLM-ready markdown/JSON for yo
+rohitg00/ai-engineering-from-scratch	76220	MIT	Python	false	2026-10-29	Learn AI Engineering! Learn it. Build it. Ship it for others.
+hiyouga/LlamaFactory	75824	Apache-2.0	Python	false	2026-10-31	Unified Efficient Fine-Tuning of 100+ LLMs & VLMs (ACL 2024)
+josephmisiti/awesome-machine-learning	74711	NOASSERTION	Python	false	2026-11-01	A curated list of awesome Machine Learning frameworks, libraries and software.
+vuejs/awesome-vue	73492	MIT		false	2026-10-19	🎉 A curated list of awesome things related to Vue.js
+rust-unofficial/awesome-rust	60263	CC0-1.0	Rust	false	2026-11-01	A curated list of Rust code and resources.
+meilisearch/meilisearch	59742	NOASSERTION	Rust	false	2026-11-01	A lightning-fast search engine API bringing AI-powered hybrid search to your sites and app
+pathwaycom/serviette	58736	MIT	Python	false	2026-10-16	A no-code RAG server that keeps answers in sync with your documents. Works with 8 vector d
+vectorize-io/hindsight	57632	MIT	Python	false	2026-11-01	Hindsight: Agent Memory That Learns
+zylon-ai/private-gpt	57625	Apache-2.0	Python	false	2026-10-29	Complete API layer for private AI applications on local models: RAG, skills, tools, MCP, t
+hesreallyhim/awesome-claude-code	57036	NOASSERTION	Python	false	2026-11-01	A hand-picked collection of the finest of resources for the most awesome of agents, Claude
+HKUDS/DeepTutor	53546	Apache-2.0	Python	false	2026-10-31	DeepTutor: Lifelong Personalized Tutoring. https://deeptutor.info/.
+serhii-londar/open-source-mac-os-apps	51161	CC0-1.0		false	2026-10-31	🚀 Awesome list of open source applications for macOS. https://t.me/s/opensourcemacosapps
+sickn33/agentic-awesome-skills	48973	MIT	Python	false	2026-11-01	2,884+ reusable AI agent skills for Claude Code, Codex, Cursor and Gemini CLI. AAS Core ad
+GitHubDaily/GitHubDaily	48339	none		false	2025-12-31	坚持分享 GitHub 上高质量、有趣实用的开源技术教程、开发者工具、编程网站、技术资讯。A list cool, interesting projects of GitHub.
+LibreChat-AI/LibreChat	46611	MIT	TypeScript	false	2026-11-01	Enhanced ChatGPT Clone: Features Agents, MCP, Skills, DeepSeek, Anthropic, AWS, OpenAI, Re
+Crosstalk-Solutions/project-nomad	41584	Apache-2.0	TypeScript	false	2026-11-01	Project NOMAD is an offline-first knowledge and education server. Wikipedia, thousands of 
+volcengine/OpenViking	41300	AGPL-3.0	Python	false	2026-11-01	Self-evolving Context Database for AI Agents. Unify Agent Memory, Knowledge RAG and Skills
+HKUDS/LightRAG	40467	MIT	Python	false	2026-10-29	[EMNLP2025] LightRAG: Simple and Fast Retrieval-Augmented Generation
+patchy631/ai-engineering-hub	40063	MIT	Jupyter Notebook	false	2026-11-01	In-depth tutorials on LLMs, RAGs and real-world AI agent applications.
+VectifyAI/PageIndex	39938	MIT	Python	false	2026-10-29	📑 PageIndex: Document Index for Vectorless, Reasoning-based RAG
+deepseek-ai/awesome-deepseek-integration	39666	CC0-1.0		false	2026-02-23	Integrate the DeepSeek API into popular software
+ashishpatel26/500-AI-Agents-Projects	39215	MIT	Python	false	2026-07-27	The 500 AI Agents Projects is a curated collection of AI agent use cases across various in
+chatchat-space/Langchain-Chatchat	38711	Apache-2.0	Python	false	2025-11-10	Langchain-Chatchat（原Langchain-ChatGLM）基于 Langchain 与 ChatGLM, Qwen 与 Llama 等语言模型的 RAG 与 Ag
+langfuse/langfuse	36839	NOASSERTION	TypeScript	false	2026-11-01	🪢 Open source agent evals & observability: Trace, evaluate, and improve LLM applications w
+VoltAgent/awesome-agent-skills	36709	MIT		false	2026-10-30	A curated collection of 1000+ agent skills from official dev teams and the community, comp
+Tencent/WeKnora	36179	NOASSERTION	Go	false	2026-11-01	Open-source LLM knowledge platform: turn raw documents into a queryable RAG, an autonomous
+sahat/hackathon-starter	35259	MIT	JavaScript	false	2026-10-30	A boilerplate for Node.js web applications
+onyx-dot-app/onyx	33147	NOASSERTION	Python	false	2026-11-01	Open Source AI Platform - AI Chat with advanced features that works with every LLM
+vxcontrol/pentagi	32925	MIT	Go	false	2026-10-22	Fully autonomous AI Agents system capable of performing complex penetration testing tasks
+e2b-dev/awesome-ai-agents	30742	NOASSERTION		false	2026-08-21	A list of AI autonomous agents
+jivoi/awesome-osint	30632	NOASSERTION		false	2026-10-31	:scream: A curated list of amazingly awesome OSINT
+TencentCloud/TencentDB-Agent-Memory	30323	NOASSERTION	TypeScript	false	2026-10-28	TencentDB Agent Memory is a team-level memory hub for AI Agents — turning conversations, d
+academic/awesome-datascience	30261	MIT		false	2026-10-31	:memo: An awesome Data Science repository to learn and apply for real world problems.
+Hannibal046/Awesome-LLM	27467	CC0-1.0		false	2025-07-31	Awesome-LLM: a curated list of Large Language Model
+enescingoz/awesome-n8n-templates	26216	NOASSERTION		false	2026-09-12	280+ free n8n automation templates — ready-to-use workflows for Gmail, Telegram, Slack, Di
+Cinnamon/kotaemon	25846	Apache-2.0	Python	false	2026-07-14	An open-source RAG-based tool for chatting with your documents.
+NirDiamant/GenAI_Agents	24773	NOASSERTION	Jupyter Notebook	false	2026-11-01	50+ tutorials and implementations for Generative AI Agent techniques, from basic conversat
+lukasmasuch/best-of-ml-python	23849	CC-BY-SA-4.0		false	2026-10-29	🏆 A ranked list of awesome machine learning Python libraries. Updated weekly.
+mikeroyal/Self-Hosting-Guide	23428	none	Dockerfile	false	2025-06-27	Self-Hosting Guide. Learn all about  locally hosting (on premises & private web servers) a
+comet-ml/opik	23093	Apache-2.0	Python	false	2026-11-01	Debug, evaluate, and monitor your LLM applications, RAG systems, and agentic workflows wit
+PromtEngineer/localGPT	22199	MIT	Python	false	2026-08-26	Chat with your documents on your local device using GPT models. No data leaves your device
+NirDiamant/agents-towards-production	21806	NOASSERTION	Jupyter Notebook	false	2026-11-01	End-to-end, code-first tutorials for building production-grade GenAI agents. From prototyp
+rockerBOO/awesome-neovim	21535	CC0-1.0	Shell	false	2026-10-31	Collections of awesome neovim plugins.
+nashsu/llm_wiki	21264	NOASSERTION	TypeScript	false	2026-10-21	LLM Wiki is a cross-platform desktop application that turns your documents into an organiz
+EthicalML/awesome-production-machine-learning	21062	MIT		false	2026-11-01	A curated list of awesome open source libraries to deploy, monitor, version and scale your
+birobirobiro/awesome-shadcn-ui	20740	MIT	TypeScript	false	2026-10-31	A curated list of awesome things related to shadcn/ui.
+eosphoros-ai/DB-GPT	20233	MIT	Python	false	2026-10-31	open-source agentic AI data assistant for the next generation of AI + Data products.
+teng-lin/notebooklm-py	20052	MIT	Python	false	2026-10-31	Unofficial Python API and agentic skill for Google Gemini Notebook. Full programmatic acce
+rocketride-org/rocketride-server	19504	MIT	Python	false	2026-11-01	High-performance AI pipeline engine with a C++ core and 50+ Python-extensible nodes. Build
+keon/awesome-nlp	19119	CC0-1.0		false	2026-10-12	:book: A curated list of resources dedicated to Natural Language Processing (NLP)
+avante-corp/avante.nvim	18183	Apache-2.0	Lua	false	2026-11-01	Use your Neovim like using Cursor AI IDE!
+BradyFU/Awesome-Multimodal-Large-Language-Models	18070	none		false	2026-10-29	:sparkles::sparkles:Latest Advances on Multimodal Large Language Models
+camel-ai/camel	18006	Apache-2.0	Python	false	2026-10-27	🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. 
+QwenLM/Qwen-Agent	17239	Apache-2.0	Python	false	2026-03-04	Agent framework and applications built upon Qwen>=3.0, featuring Function Calling, MCP, Co
+xx025/carrot	17214	none		false	2026-09-05	AI 工具导航大全，帮你快速筛选免费、实用、高效的网站资源
+Arindam200/awesome-ai-apps	16655	MIT	Python	false	2026-10-30	A collection of projects showcasing RAG, agents, workflows, and other AI use cases
+raga-ai-hub/RagaAI-Catalyst	16184	Apache-2.0	Python	false	2026-02-11	Python SDK for Agent AI Observability, Monitoring and Evaluation Framework. Includes featu
+yusufkaraaslan/Skill_Seekers	15263	MIT	Python	false	2026-09-30	Convert documentation websites, GitHub repositories, and PDFs into Claude AI skills with a
+llmware-ai/llmware	14818	Apache-2.0	Python	false	2026-10-01	Unified framework for building enterprise RAG pipelines with small, specialized models
+netease-youdao/QAnything	14210	AGPL-3.0	Python	false	2026-09-23	Question and Answer based on Anything.
+Orchestra-Research/AI-Research-SKILLs	14172	MIT	TeX	false	2026-10-11	Comprehensive open-source library of AI research and engineering skills for any AI model. 
+StarTrail-org/LEANN	13743	MIT	Python	false	2026-10-30	[MLsys2026 Best Paper]: https://arxiv.org/abs/2506.08276. RAG on Everything with LEANN. En
+ShishirPatil/gorilla	13062	Apache-2.0	Python	false	2026-10-17	Gorilla: Training and Evaluating LLMs for Function Calls (Tool Calls)
+neuml/txtai	13057	Apache-2.0	Python	false	2026-11-01	💡 All-in-one AI framework for semantic search, LLM orchestration and language model workfl
+blackboardsh/electrobun	12994	MIT	Zig	false	2026-10-30	Build ultra fast, tiny, and cross-platform desktop apps with TypeScript, Zig, Rust, Go, or
+steven2358/awesome-generative-ai	12793	CC0-1.0		false	2026-10-30	A curated list of modern Generative Artificial Intelligence projects and services
+EvanLi/Github-Ranking	12776	MIT	Python	false	2026-11-01	:star:Github Ranking:star: Github stars and forks ranking list. Github Top100 stars list o
+FlagOpen/FlagEmbedding	12292	MIT	Python	false	2026-10-27	Retrieval and Retrieval-augmented LLMs
+tensorzero/tensorzero	11710	Apache-2.0	Rust	false	2026-06-11	TensorZero is an open-source LLMOps platform that unifies an LLM gateway, observability, e
+jnv/lists	11620	CC0-1.0		false	2026-10-31	The definitive list of lists (of lists) curated on GitHub and elsewhere
+TencentCloud/Octop	11418	MIT	Python	false	2026-11-01	A smarter, self-hosted AI assistant — multi-user, multi-agent.
+The-Pocket/PocketFlow	11295	MIT	Python	false	2026-07-26	Pocket Flow: 100-line LLM framework. Let Agents build Agents!
+VoltAgent/voltagent	10908	MIT	TypeScript	false	2026-10-15	AI Agent Engineering Platform built on an Open Source TypeScript AI Agent Framework
+KalyanKS-NLP/llm-engineer-toolkit	10896	Apache-2.0		false	2026-10-25	A curated list of  120+ LLM libraries category wise. 
+awesome-opencode/awesome-opencode	10821	CC0-1.0	JavaScript	false	2026-11-01	A curated list of awesome plugins, themes, agents, projects, and resources for https://ope

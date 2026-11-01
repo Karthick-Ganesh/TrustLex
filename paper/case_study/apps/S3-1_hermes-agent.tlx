@@ -1,0 +1,48 @@
+# about: Hermes Agent: a personal coding/assistant agent with memory, skills and project context files
+# repo: NousResearch/hermes-agent (MIT, 259,446 stars)
+# commit: d3e586881eacb132595edcbe4c170be8381e40c5
+# prompt code: agent/system_prompt.py:1-9 (three tiers), :738-813 (build_system_prompt_parts);
+#              agent/prompt_builder.py:84-110 (_scan_context_content: keyword threat scan),
+#              :1720-1750 (build_context_files_prompt: AGENTS.md / .cursorrules / CLAUDE.md / SOUL.md)
+# stratum: S3 (rank 5)
+#
+# Sources
+#   identity, guidance, platform hints                 developer-written                    -> var
+#   SOUL.md in the user's own HERMES_HOME             the user's identity file
+#                                                      (operator configuration)              -> var
+#   project context file (.hermes.md, AGENTS.md,
+#   CLAUDE.md, .cursorrules of the working directory)  arrives with a cloned repository:
+#                                                      third-party text                      -> input from rag
+#   memory, USER.md                                    written by the agent's memory tool
+#                                                      during earlier sessions               -> input from tool
+#   skills index                                       names and descriptions of installed
+#                                                      skills, including downloaded ones     -> input from rag
+#   task                                               the user's message                    -> input (user)
+#
+# The project context file is checked with a keyword threat scanner and replaced
+# by a [BLOCKED] note when a pattern matches: a run-time filter, not a change of
+# channel. Translated as sanitize(...): matching text is removed, anything the
+# patterns miss enters the system prompt.
+# Not expressible: only one project context type loads (first found wins), and
+# every tier part is optional; translated with each source present.
+
+var identity = "<DEFAULT_AGENT_IDENTITY and guidance blocks>"
+var soul = "<SOUL.md from HERMES_HOME: the user's own identity file>"
+
+input project_context from rag
+input memory from tool
+input skills_index from rag
+input task
+
+system {
+    insert(identity)
+    "# Project Context\n\nThe following project context files have been loaded and should be followed:"
+    insert(sanitize(project_context))
+    insert(soul)
+    insert(skills_index)
+    insert(memory)
+}
+
+instruction {
+    insert(task)
+}

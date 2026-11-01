@@ -1,0 +1,49 @@
+# about: Project NOMAD: offline knowledge server; chat answers questions over a local knowledge base
+# repo: Crosstalk-Solutions/project-nomad (Apache-2.0, 41,585 stars)
+# commit: 54ee30a44902e5c252b477f8685c26ec3064ab72
+# prompt code: admin/app/services/rag_pipeline_service.ts:64-95 (system blocks, query, history),
+#              :202-214 (planPrompt with renderRagBlock); admin/app/utils/context_budget.ts:176, :238
+#              (the RAG block is a role 'system' message), :279; admin/app/utils/rag_prompt.ts:60-76
+#              (buildContextBlock); admin/constants/ollama.ts:220 (RAG_PLACEMENT = 'tail'),
+#              :317-331 (SYSTEM_PROMPTS.default, rag_context)
+# stratum: S2 (rank 31)
+#
+# Sources
+#   SYSTEM_PROMPTS.default, rag_context wrapper     developer-written             -> var / literals
+#   NOMAD.md                                        persistent instructions written by
+#                                                   the owner of this personal server  -> var (operator configuration)
+#   chunks                                          retrieved from the knowledge base:
+#                                                   Kiwix/Wikipedia archives and
+#                                                   user-uploaded PDFs                 -> input from rag
+#   history, query                                  the chat                           -> input (user)
+#
+# With the default placement 'tail', the RAG block is a separate system message
+# placed after the history and before the current question.
+# Not expressible: the token budget planner may drop history turns or chunks
+# (conditionals and a loop over chunks); the chunks are modelled as one input.
+
+var nomad_md = "<NOMAD.md: the owner's persistent instructions>"
+var formatting = "Format all responses using markdown for better readability. ..."
+
+input history
+input chunks from rag
+input query
+
+system {
+    insert(nomad_md)
+    insert(formatting)
+}
+
+instruction {
+    insert(history)
+}
+
+system {
+    "Information has been retrieved from the NOMAD knowledge base for the user's question. It cleared a relevance filter before reaching you, so it is likely on topic — but it was selected by automated search, so it may still not contain the specific detail asked for."
+    "[Knowledge Base Context]"
+    insert(chunks)
+}
+
+instruction {
+    insert(query)
+}
