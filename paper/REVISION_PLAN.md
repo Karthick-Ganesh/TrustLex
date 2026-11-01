@@ -48,10 +48,10 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
   - limitations (remove the "fix-it sanitizes in place" item);
   - README.
 
-**Open choices for A (to decide before coding).**
-1. **Name and syntax:** `declassify(x, "reason")`, recommended, is the standard term in the security-types literature. Alternatives: `trust(x, "reason")`, `unsafe_insert(x)`.
-2. **Justification required?** Recommended: yes, a non-empty string literal.
-3. **Default severity of `declassify`:** recommended: a warning by default, an error with `--no-declassify`.
+**Choices for A.**
+1. **Name and syntax: DECIDED.** `declassify(x, "reason")`.
+2. **Justification required: DECIDED.** Yes, a non-empty string literal. The compiler quotes the reason in the warning it prints for every declassification.
+3. **Default severity of `declassify` (open):** recommended: a warning by default, an error with `--no-declassify`.
 4. **New live condition S** ("sanitized text in system", the layout today's compiler accepts): recommended if API quota allows, as empirical support for rejecting it. Cost: about +33% API calls. The gpt-oss runs are the slow ones (daily token limit).
 
 ---
