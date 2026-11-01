@@ -8,7 +8,7 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 
 ## Agreed
 
-### A. Sanitized free text in the `system` block 🔴 · 🛠 — AGREED, not started
+### A. Sanitized free text in the `system` block 🔴 · 🛠 — DONE (6081423): code, tests, corpus, paper
 
 **Problem.** `system` accepts anything at SANITIZED or below, and `sanitize()` lowers any input to SANITIZED. So `insert(sanitize(user_msg))` inside `system` compiles as safe. The sanitizer removes structure (role tokens, control and invisible characters) but not plain-English instructions, so attacker text still reaches the most trusted channel.
 - The TL-S010 fix-it recommends exactly this layout (`insert(sanitize(user_msg))`, kept in `system`).
@@ -54,7 +54,7 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 3. **Severity: DECIDED.** A warning by default, quoting the reason; `--no-declassify` turns it into an error. Plain sanitized text in `system`, without `declassify`, is always an error (TL-S013).
 4. **New live condition S (deferred; the live-test part will be discussed later):** ("sanitized text in system", the layout today's compiler accepts): recommended if API quota allows, as empirical support for rejecting it. Cost: about +33% API calls. The gpt-oss runs are the slow ones (daily token limit).
 
-### E3. TrustLex (C) barely beats the industry layout (B) 🔴 · 🛠 — AGREED, not started
+### E3. TrustLex (C) barely beats the industry layout (B) 🔴 · 🛠 — Part 1 DONE (86f59ab, db0015b); live runs in progress; Part 2 framing pending final numbers
 
 **Problem.** Only 2 of 12 B-vs-C comparisons are significant: allam indirect, p = 0.029 and 0.013. C is worse than B in 2 cells: allam direct with our attacks, 42.2 → 48.4, and gpt-oss indirect Tensor Trust, 25.0 → 31.2 (n=32).
 
@@ -83,7 +83,7 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 
 **Expected outcome.** C clearly beats B on indirect attacks, and beats or matches B-tagged on models that respect markers. If not, the paper's main claim still rests on the compile-time metrics (real-app leaks and typed-input share), and C is reported as "matches best practice".
 
-### E1. Evaluated only on our own corpus (circular F1) 🔴 · 🧱 — AGREED, not started
+### E1. Evaluated only on our own corpus (circular F1) 🔴 · 🧱 — DONE except the 4 independent translations and the replay (c73b881, aa1834c)
 
 **Problem.** F1 = 1.00 comes from 48 programs we wrote around TrustLex's own rules. The property-based tests show the theory is sound, but not that real prompts have these leaks, or that TrustLex can express real apps.
 
