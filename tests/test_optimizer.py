@@ -268,7 +268,7 @@ def test_optimizer_properties(compiled, level):
 @pytest.mark.filterwarnings("ignore::codegen.UnsafeSanitizerWarning")  # deliberate toy sanitizer
 def test_values_pass_through_byte_for_byte():
     src = 'input u\nsystem { """\n    Rules.\n    """ insert(sanitize(u)) }\ninstruction { "  Q:   " insert(u) }'
-    _, compiled = compile_source(src, "t.tlx", delimit_untrusted=False)
+    _, compiled = compile_source(src, "t.tlx", delimit_untrusted=False, data_notice=False)
     optimized, _ = optimize(compiled, 2)
     value = "  a \n\n\n b  \t"
     rendered = optimized.render({"u": value}, lambda v, n: f"[{v}]", unsafe_sanitizer_override=True)

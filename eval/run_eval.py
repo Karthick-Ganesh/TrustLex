@@ -34,7 +34,7 @@ from common import (  # noqa: E402
 from corpus_loader import load_corpus  # noqa: E402
 from naive import naive_render, system_text  # noqa: E402
 
-from codegen import BindError, SanitizerConfig, clean, compile_source, default_sanitizer  # noqa: E402
+from codegen import DATA_NOTICE, BindError, SanitizerConfig, clean, compile_source, default_sanitizer  # noqa: E402
 
 
 def _values(inputs: list[str], text: str) -> dict[str, str]:
@@ -99,7 +99,8 @@ def evaluate(out: Path, seed: str = DEFAULT_SEED) -> dict:
                 leak_rows.append(_leak_row(program, attack, "trustlex", "blocked-compile", None, payload, token))
                 continue
             try:
-                rendered = compiled.render(values)
+                # Drop the compiler's own notice: its tag names are trusted text, not a break-out.
+                rendered = [(r, t) for r, t in compiled.render(values) if not t.startswith(DATA_NOTICE)]
             except BindError as exc:
                 leak_rows.append(_leak_row(program, attack, "trustlex", f"blocked-bind {exc.code}", None, payload, token))
                 continue

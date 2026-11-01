@@ -68,7 +68,7 @@ def test_compile_inputs_from_json_file(capsys, tmp_path):
     values = tmp_path / "values.json"
     values.write_text(json.dumps({"user_msg": "hi", "doc": "d"}))
     code, out, _ = run(capsys, SAFE, "--target", "openai", "--model", "m", "--inputs", str(values))
-    assert code == 0 and [m["role"] for m in json.loads(out)["messages"]] == ["system", "user"]
+    assert code == 0 and [m["role"] for m in json.loads(out)["messages"]] == ["system", "system", "user"]  # rules, notice
 
 
 def test_missing_input_value(capsys):

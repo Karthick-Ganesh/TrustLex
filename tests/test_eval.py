@@ -53,7 +53,7 @@ def safe_programs():
 @pytest.mark.parametrize("path", safe_programs(), ids=lambda p: p.stem)
 def test_naive_render_matches_trustlex_on_benign_values(path):
     source = path.read_text(encoding="utf-8")
-    checked, compiled = compile_source(source, path.name)
+    checked, compiled = compile_source(source, path.name, data_notice=False)  # compare the text only
     assert compiled is not None, checked.diagnostics.render()
     values = benign_values(compiled)
     trustlex = [(role, _DELIMITERS.sub("", text)) for role, text in compiled.render(values)]

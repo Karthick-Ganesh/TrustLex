@@ -48,6 +48,7 @@
     }
   ],
   "options": {
+    "data_notice": true,
     "delimit_untrusted": true,
     "optimization": 1,
     "policy": "strict"
@@ -56,6 +57,6 @@
     "max_length": 4000,
     "name": "trustlex-default/1"
   },
-  "sha256": "66cfc203f0321ac2f380be0a238ca5d9017988a3683fcc48bf95ca6184b79f61",
+  "sha256": "7939d4bbdad0a84f08e04e832e1d663a15d6793e26016eab89f702b0d9c70ff9",
   "source": "safe.tlx"
 }
