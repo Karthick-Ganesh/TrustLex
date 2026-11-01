@@ -221,23 +221,31 @@ def trustlex_verdicts(scenario: str, conditions=None) -> dict:
 
 
 def plan_trials(attacks, benign, conditions, repeats, model, seed, scenario: str = "direct") -> list[Trial]:
+    """Every trial, in the order they are sent: item by item, each item under
+    every condition, attacks and benign inputs alternating. A run stopped
+    early (e.g. by a daily quota) therefore leaves every condition with the
+    same items, which the paired comparisons need; `--limit` then selects
+    exactly the completed items, and the cache supplies their replies."""
+    sequence = []
+    for i in range(max(len(attacks), len(benign))):
+        sequence += [("attack", attacks[i])] if i < len(attacks) else []
+        sequence += [("benign", benign[i])] if i < len(benign) else []
     trials = []
-    for condition in conditions:
-        for repeat in range(repeats):
-            for kind, items in (("attack", attacks), ("benign", benign)):
-                for item in items:
-                    parts = ("asr", condition, kind, item["id"], repeat)
-                    if scenario != "direct":  # the direct scenario keeps its original canaries (and cache)
-                        parts = ("asr", scenario, *parts[1:])
-                    token = canary(*parts, seed=seed)
-                    text = with_canary(item, token) if kind == "attack" else item["text"]
-                    trial = Trial(condition, kind, item, repeat, token)
-                    try:
-                        values = trial_values(scenario, condition, kind, text)
-                        trial.system, trial.messages = build_prompt(condition, values, model, scenario)
-                    except BindError as exc:
-                        trial.blocked = exc.code
-                    trials.append(trial)
+    for repeat in range(repeats):
+        for kind, item in sequence:
+            for condition in conditions:
+                parts = ("asr", condition, kind, item["id"], repeat)
+                if scenario != "direct":  # the direct scenario keeps its original canaries (and cache)
+                    parts = ("asr", scenario, *parts[1:])
+                token = canary(*parts, seed=seed)
+                text = with_canary(item, token) if kind == "attack" else item["text"]
+                trial = Trial(condition, kind, item, repeat, token)
+                try:
+                    values = trial_values(scenario, condition, kind, text)
+                    trial.system, trial.messages = build_prompt(condition, values, model, scenario)
+                except BindError as exc:
+                    trial.blocked = exc.code
+                trials.append(trial)
     return trials
 
 
