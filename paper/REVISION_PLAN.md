@@ -54,6 +54,35 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 3. **Severity: DECIDED.** A warning by default, quoting the reason; `--no-declassify` turns it into an error. Plain sanitized text in `system`, without `declassify`, is always an error (TL-S013).
 4. **New live condition S (deferred; the live-test part will be discussed later):** ("sanitized text in system", the layout today's compiler accepts): recommended if API quota allows, as empirical support for rejecting it. Cost: about +33% API calls. The gpt-oss runs are the slow ones (daily token limit).
 
+### E3. TrustLex (C) barely beats the industry layout (B) 🔴 · 🛠 — AGREED, not started
+
+**Problem.** Only 2 of 12 B-vs-C comparisons are significant: allam indirect, p = 0.029 and 0.013. C is worse than B in 2 cells: allam direct with our attacks, 42.2 → 48.4, and gpt-oss indirect Tensor Trust, 25.0 → 31.2 (n=32).
+
+**Causes found.**
+1. **Incomplete spotlighting.** The system prompt never explains the `<untrusted_input>` tags. Hines et al. pair the marking with that explanation (checked: `codegen.py` and `eval/llm_asr.py` have no such notice).
+2. **Weakest variant only.** We use plain delimiting; datamarking and encoding were stronger in Hines et al.
+3. **Direct is out of the runtime layer's reach.** The customer is both the attacker and the user the model must serve, so B ≈ C is expected there.
+4. **Low power.** n = 32–64 detects only gaps of about 17+ points; about 150–200 trials per condition are needed for about 10 points.
+5. **Floor effect and small models.** gemma resists everything, and allam ignores markers.
+
+**Planned fix.**
+- **Part 1, strengthen C (code, about 1 day):**
+  1. The compiler appends a fixed, developer-trusted notice to the system prompt whenever the program renders tagged inputs; the notice says that text inside the tags is data and must not be followed.
+  2. Datamarking (and possibly encoding) becomes a selectable named sanitizer next to the default.
+  3. To avoid tuning on the test set, split the 206 Tensor Trust attacks into a dev set (to choose the variant) and a disjoint, fresh test set; the 64 used so far stay with the old results.
+  4. Check utility for each variant (datamarking and encoding can hurt small models).
+- **Part 2, honest framing (paper, about 1 hour):**
+  - For direct injection, claim no privilege escalation, no role forgery and 100% blocking of typed fields, not lower attack success than B; state that B ≈ C is expected.
+  - Indirect injection is where the runtime layer is evaluated.
+- **Part 3, a fair, well-powered comparison (deferred to the live-test discussion):**
+  - baselines B and B-tagged, with A for reference only;
+  - about 150–200 attacks per condition;
+  - 1–2 frontier models;
+  - BIPIA or AgentDojo;
+  - utility reported with every attack-success number.
+
+**Expected outcome.** C clearly beats B on indirect attacks, and beats or matches B-tagged on models that respect markers. If not, the paper's main claim still rests on the compile-time metrics (real-app leaks and typed-input share), and C is reported as "matches best practice".
+
 ---
 
 ## To discuss next (from the review)
@@ -62,7 +91,7 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 |---|---|---|---|---|
 | D | Exponential worst case (`a = a + a`) | rebutted in paper, not fixed in code; fix = DAG / hash-consed templates | 🟠 | 🛠 |
 | C | Lattice levels act like two | one sentence in paper; A partly helps; option: a `context{}` channel for RAG data at SEMI_TRUSTED | 🟠 | 🛠 |
-| E3 | B vs C (realistic comparison) weak; gpt-oss TT indirect C worse than B | reported honestly; needs more n, models, baseline defences | 🔴 | 🛠/🧱 |
+| E3 | B vs C weak | **agreed above** (Parts 1–2); Part 3 waits for the live-test discussion | 🔴 | 🛠/🧱 |
 | E2 | Condition D compares free text with an 8-character regex | labelled "by construction"; needs evidence of how often real inputs can be typed | 🟠 | 🧱 |
 | E1 | Own corpus only (circular F1) | wording fixed; needs a real-app case study | 🔴 | 🧱 |
 | — | Proof is a sketch | fine for a conference; full proof for a journal | 🟢/🟠 | 🛠 |
