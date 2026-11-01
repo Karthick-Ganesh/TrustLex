@@ -23,7 +23,7 @@ if str(ROOT) not in sys.path:
 
 from codegen import _ROLE_OF, ITEM_SEPARATOR  # noqa: E402
 from parser_ast import (  # noqa: E402
-    Assign, Block, Concat, InputDecl, Sanitize, StringLit, TextItem, TextSegment, VarDecl, VarRef, parse,
+    Assign, Block, Concat, Declassify, InputDecl, Sanitize, StringLit, TextItem, TextSegment, VarDecl, VarRef, parse,
 )
 
 
@@ -34,7 +34,7 @@ def _eval(expr, env: dict[str, str]) -> str:
         return env.get(expr.name, "")
     if isinstance(expr, Concat):
         return _eval(expr.left, env) + _eval(expr.right, env)
-    if isinstance(expr, Sanitize):
+    if isinstance(expr, (Sanitize, Declassify)):
         return _eval(expr.expr, env)  # the naive app has no sanitizer
     raise TypeError(f"unexpected expression {type(expr).__name__}")
 

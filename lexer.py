@@ -236,6 +236,7 @@ class TrustLexer:
         "input": "INPUT",
         "insert": "INSERT",
         "sanitize": "SANITIZE",
+        "declassify": "DECLASSIFY",
         "from": "FROM",
     }
 

@@ -1,6 +1,6 @@
-# about: user message sanitized before entering system
+# about: user message declassified before entering system
 # expect: ok
-# category: sanitized-single
+# category: declassified-single
 input user_msg
-system { "Customer message:" insert(sanitize(user_msg)) }
+system { "Customer message:" insert(declassify(user_msg, "the handler must quote the customer's message verbatim")) }
 instruction { "Reply to the customer." }

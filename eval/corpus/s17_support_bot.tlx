@@ -1,4 +1,4 @@
-# about: customer-support bot with sanitized account notes
+# about: customer-support bot with declassified account notes
 # expect: ok
 # category: realistic
 # Customer support bot
@@ -15,7 +15,7 @@ system {
     "{persona}"
     insert(policy)
     "Account summary:"
-    insert(sanitize(account_note))
+    insert(declassify(account_note, "account notes come from our CRM and are written by staff"))
 }
 
 instruction { insert(user_msg) }

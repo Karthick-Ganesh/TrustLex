@@ -59,9 +59,9 @@ def generate_program(statements: int) -> str:
         elif kind == 4:
             lines.append(f's{i - 2} = "Reset {i}: " + s{i - 2}')
         elif kind == 5:
-            lines.append(f'system {{ "Section {i}." insert(t{i - 4}) insert(s{i - 3}) "{{c{i - 2}}}" }}')
+            lines.append(f'system {{ "Section {i}." insert(t{i - 4}) "Reply in {{lang}}." }}')
         elif kind == 6:
-            lines.append(f"instruction {{ insert(in{i - 6}) insert(doc) }}")
+            lines.append(f'instruction {{ insert(s{i - 4}) "{{c{i - 3}}}" insert(in{i - 6}) insert(doc) }}')
         else:
             lines.append(f'var u{i} = "{{t{i - 6}}} / {{c{i - 4}}}"')
         i += 1

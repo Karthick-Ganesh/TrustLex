@@ -1,7 +1,7 @@
-# about: tool output sanitized before entering system
+# about: tool output declassified before entering system
 # expect: ok
-# category: sanitized-single
+# category: declassified-single
 input weather from tool
 input question
-system { "Current weather:" insert(sanitize(weather)) }
+system { "Current weather:" insert(declassify(weather, "the weather service is ours and returns short forecasts")) }
 instruction { insert(question) }

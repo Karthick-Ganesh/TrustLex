@@ -1,8 +1,8 @@
-# about: sanitized value travels through three variables
+# about: declassified value travels through three variables
 # expect: ok
-# category: sanitized-multi-hop
+# category: declassified-multi-hop
 input msg
-var a = sanitize(msg)
+var a = declassify(msg, "the note is shown to the agent as context")
 var b = a
 var c = "Note: {b}"
 system { insert(c) }

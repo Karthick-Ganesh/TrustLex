@@ -1,4 +1,4 @@
-# about: Same assistant, but one 'quick fix' line pastes raw customer text into the context
+# about: Same assistant, but one 'quick fix' line pastes raw customer and CRM text into the policy in the system prompt
 # expect: TL-S010 TL-S011
 
 # ---------- External data (every source has a trust level) ----------
@@ -34,11 +34,11 @@ var account        = "Account history: " + safe_crm + " | Order status: " + safe
 
 var policy = "Policy for tier {tier}: refunds up to {max_refund} USD may be approved without escalation."
 policy = policy + " Always reply in {reply_language}."
+# quick fix: also keep the original wording so the model sees the exact complaint
+policy = policy + " Original complaint: " + customer_msg + " Raw CRM: " + crm_notes
 
 var context = knowledge + " " + account
 context = context + " Use only the facts above."
-# quick fix: also keep the original wording so the model sees the exact complaint
-context = context + " Original complaint: " + customer_msg + " Raw CRM: " + crm_notes
 
 system {
     """
@@ -57,16 +57,11 @@ system {
     "items per answer."
 }
 
-system {
+instruction {
     "Context for this conversation:"
     insert(context)
-    insert(customer_block)
-}
-
-instruction {
     "Answer the customer's question using the context above."
-    "Customer wrote:"
-    insert(customer_msg)
+    insert(customer_block)
 }
 
 instruction {

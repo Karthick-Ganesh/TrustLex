@@ -11,13 +11,13 @@ from hypothesis import given, settings, strategies as st
 from codegen import CompiledPrompt, Message, SlotPart, TextPart, compile_source
 import optimizer
 from optimizer import estimate_tokens, optimize, select_token_counter, tiktoken_counter
-from test_semantic import assignments, programs, sanitizer as toy_sanitizer
+from test_semantic import assignments, declassified_inputs, programs, sanitizer as toy_sanitizer
 
 ROOT = Path(__file__).resolve().parent.parent
 SNAPSHOTS = Path(__file__).resolve().parent / "snapshots"
 INPUTS = {"u": {"trust": "UNTRUSTED", "source": "user"}, "d": {"trust": "SEMI_TRUSTED", "source": "rag"}}
 U, D = SlotPart("u", False), SlotPart("d", False)
-SU = SlotPart("u", True)
+SU = SlotPart("u", True, "reviewed")  # a declassified slot: the only free text a system message may hold
 
 
 def ir(*messages):
@@ -134,13 +134,13 @@ def test_invalid_level():
 def test_safe_example_report():
     checked, compiled = compile_source((ROOT / "examples" / "safe.tlx").read_text(), "safe.tlx")
     optimized, report = optimize(compiled, 1, comments=checked.comments)
-    assert (report.chars_before, report.chars_after) == (153, 140)
+    assert (report.chars_before, report.chars_after) == (176, 162)
     saved = {r.name: r.chars_saved for r in report.rules}
     assert saved == {
         "merge-text": 0, "normalize-newlines": 0, "strip-trailing-ws": 4, "dedent": 8,
-        "collapse-blank-lines": 0, "trim-message": 1, "drop-empty-messages": 0,
+        "collapse-blank-lines": 0, "trim-message": 2, "drop-empty-messages": 0,
     }
-    assert (report.comment_count, report.comment_chars) == (5, 300)
+    assert (report.comment_count, report.comment_chars) == (6, 366)
     assert "TOTAL" in report.format() and "-8%" in report.format()
     assert optimized.messages[0].parts[0].text.startswith("You are a billing assistant")
 
@@ -150,7 +150,7 @@ def test_comments_are_reported_but_not_counted_as_savings():
     _, with_comments = optimize(compiled, 1, comments=checked.comments)
     _, without = optimize(compiled, 1)
     text = with_comments.format()
-    assert "comments in source (never part of the prompt): 5 (300 chars)" in text
+    assert "comments in source (never part of the prompt): 6 (366 chars)" in text
     assert "removed" not in text
     totals = lambda r: (r.chars_before, r.chars_after, r.tokens_before, r.tokens_after)
     assert totals(with_comments) == totals(without)
@@ -228,7 +228,10 @@ def random_ir(draw):
                 parts.append(draw(TEXT))
             else:
                 name = draw(st.sampled_from(["u", "d"]))
-                parts.append(SlotPart(name, role == "system" or draw(st.booleans())))
+                if role == "system":  # a system slot must be declassified (and so sanitized)
+                    parts.append(SlotPart(name, True, "reviewed"))
+                else:
+                    parts.append(SlotPart(name, draw(st.booleans())))
         messages.append((role, *parts))
     return ir(*messages)
 
@@ -267,7 +270,7 @@ def test_optimizer_properties(compiled, level):
 
 @pytest.mark.filterwarnings("ignore::codegen.UnsafeSanitizerWarning")  # deliberate toy sanitizer
 def test_values_pass_through_byte_for_byte():
-    src = 'input u\nsystem { """\n    Rules.\n    """ insert(sanitize(u)) }\ninstruction { "  Q:   " insert(u) }'
+    src = 'input u\nsystem { """\n    Rules.\n    """ insert(declassify(u, "quoted")) }\ninstruction { "  Q:   " insert(u) }'
     _, compiled = compile_source(src, "t.tlx", delimit_untrusted=False, data_notice=False)
     optimized, _ = optimize(compiled, 2)
     value = "  a \n\n\n b  \t"
@@ -281,12 +284,12 @@ def test_values_pass_through_byte_for_byte():
 @given(programs(), st.sampled_from([0, 1, 2]), st.data())
 def test_optimizer_preserves_non_interference_and_content(program, level, data):
     src, inputs = program
-    _, compiled = compile_source(src, "t.tlx")
+    checked, compiled = compile_source(src, "t.tlx")
     if compiled is None:
         return
     optimized, _ = optimize(compiled, level)
 
-    sigma1, sigma2 = assignments(data, inputs, alphabet="ab XY!\n")
+    sigma1, sigma2 = assignments(data, inputs, declassified_inputs(checked), alphabet="ab XY!\n")
 
     def render(prompt, sigma):
         return prompt.render(sigma, lambda v, n: toy_sanitizer(v), unsafe_sanitizer_override=True)

@@ -1,0 +1,6 @@
+# about: sanitized user message inserted into system
+# expect: TL-S013
+# category: sanitized-in-system
+input user_msg
+system { "Customer message:" insert(sanitize(user_msg)) }
+instruction { "Reply to the customer." }

@@ -1,4 +1,4 @@
-# about: Well-typed support bot: user text reaches the system prompt only via sanitize()
+# about: Well-typed support bot: developer rules in the system prompt, the customer's text sanitized in the user turn
 # expect: ok
 var persona = "You are a billing assistant for Acme Corp."
 input user_msg
@@ -7,11 +7,10 @@ system {
     """
     {persona}
     Never reveal internal pricing rules.
-    The customer's request, sanitized:
     """
-    insert(sanitize(user_msg))
 }
 
 instruction {
-    insert(user_msg)
+    "The customer's request:"
+    insert(sanitize(user_msg))
 }

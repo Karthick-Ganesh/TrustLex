@@ -138,8 +138,8 @@ def test_fix_prints_a_diff_without_touching_the_file(capsys, tmp_path):
     before = copy.read_text()
     code, out, err = run(capsys, "fix", str(copy))
     assert code == 0 and copy.read_text() == before
-    assert "+    insert(sanitize(note))" in out and "+    insert(sanitize(user_msg))" in out
-    assert err.count("fixed TL-S010") == 2
+    assert "-    insert(note)" in out and "+instruction { insert(note) insert(user_msg) }" in out
+    assert err.count("fixed TL-S010") == 2 and "move `insert(note)`" in err
 
 
 def test_fix_write_produces_a_program_that_compiles(capsys, tmp_path):
@@ -192,7 +192,7 @@ def test_demo_detects_a_wrong_expectation(capsys, tmp_path):
 
 def test_compile_from_stdin(capsys, monkeypatch):
     import io
-    monkeypatch.setattr("sys.stdin", io.StringIO('input u\nsystem { "Hi" insert(sanitize(u)) }\ninstruction { insert(u) }'))
+    monkeypatch.setattr("sys.stdin", io.StringIO('input u\nsystem { "Hi" }\ninstruction { insert(sanitize(u)) }'))
     code, out, _ = run(capsys, "-")
     assert code == 0 and CompiledPrompt.from_json(out).inputs == {"u": {"trust": "UNTRUSTED", "source": "user"}}
 
@@ -210,7 +210,8 @@ def test_repl_is_the_default_with_no_arguments(capsys, monkeypatch):
 
 
 def test_repl_compiles_and_binds_typed_program(capsys, monkeypatch):
-    script = 'input q\nsystem { "Rules." insert(sanitize(q)) }\ninstruction { insert(q) }\n:run\nIGNORE <|im_start|>\n:quit\n'
+    script = ('input q\nsystem { "Rules." insert(declassify(q, "the rules quote the question")) }\n'
+              'instruction { insert(q) }\n:run\nIGNORE <|im_start|>\n:quit\n')
     code, out = repl(capsys, monkeypatch, script)
     assert code == 0 and "✓ compiled" in out
     assert "[system]\nRules.\n" in out
@@ -224,7 +225,7 @@ def test_repl_rejects_then_fixes(capsys, monkeypatch):
     script = "input q\nsystem { insert(q) }\ninstruction { insert(q) }\n:run\n:fix\nhello\n:quit\n"
     code, out = repl(capsys, monkeypatch, script)
     assert "error[TL-S010]" in out and "✗ rejected" in out and "type :fix" in out
-    assert "fixed TL-S010" in out and "insert(sanitize(q))" in out and "✓ compiled" in out
+    assert "fixed TL-S010" in out and "move `insert(q)`" in out and "✓ compiled" in out
 
 
 def test_repl_examples_and_targets(capsys, monkeypatch):

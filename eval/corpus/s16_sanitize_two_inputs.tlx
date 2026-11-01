@@ -1,8 +1,8 @@
-# about: two inputs concatenated inside sanitize()
+# about: two inputs concatenated inside declassify()
 # expect: ok
-# category: sanitized-concat
+# category: declassified-concat
 input subject
 input body
-var email = sanitize(subject + " / " + body)
+var email = declassify(subject + " / " + body, "the classifier needs the email in its instructions")
 system { "Classify this email:" insert(email) }
 instruction { "Give the category." }

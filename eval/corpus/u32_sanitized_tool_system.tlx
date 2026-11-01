@@ -1,0 +1,7 @@
+# about: sanitized tool output inserted into system
+# expect: TL-S013
+# category: sanitized-in-system
+input weather from tool
+input question
+system { "Current weather:" insert(sanitize(weather)) }
+instruction { insert(question) }

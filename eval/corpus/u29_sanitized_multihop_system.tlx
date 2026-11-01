@@ -1,0 +1,9 @@
+# about: sanitized value reaches system through three variables
+# expect: TL-S013
+# category: sanitized-in-system
+input msg
+var a = sanitize(msg)
+var b = a
+var c = "Note: {b}"
+system { insert(c) }
+instruction { "Reply." }

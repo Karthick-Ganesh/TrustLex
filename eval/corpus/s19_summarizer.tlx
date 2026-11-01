@@ -1,4 +1,4 @@
-# about: document summarizer with a sanitized title in system
+# about: document summarizer with a declassified title in system
 # expect: ok
 # category: realistic
 input title
@@ -9,6 +9,6 @@ system {
     You summarise documents in {style}.
     """
     "Document title:"
-    insert(sanitize(title))
+    insert(declassify(title, "titles are short and shown to the model as metadata"))
 }
 instruction { insert(document) }

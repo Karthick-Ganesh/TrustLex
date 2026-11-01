@@ -64,8 +64,48 @@ def test_interpolated_input_in_system_is_rejected():
     assert errors('input u\nsystem { "Hi {u}" }') == [("TL-S010", 2)]
 
 
-def test_sanitized_input_in_system_is_accepted():
-    assert run("input u\nsystem { insert(sanitize(u)) }").ok
+def test_sanitized_input_in_system_is_rejected():
+    # sanitize() strips structure, not instructions: free text stays out of system.
+    assert errors("input u\nsystem { insert(sanitize(u)) }") == [("TL-S013", 2)]
+    assert run("input u\ninstruction { insert(sanitize(u)) }").ok
+
+
+def test_declassified_input_in_system_is_accepted_with_a_warning():
+    checked = run('input u\nsystem { insert(declassify(u, "greet the customer by name")) }')
+    assert checked.ok
+    [warning] = checked.diagnostics
+    assert warning.code == "TL-W004" and warning.label == 'reason: "greet the customer by name"'
+
+
+def test_no_declassify_policy_turns_declassification_into_an_error():
+    from semantic import SecurityPolicy
+    src = 'input u\nsystem { insert(declassify(u, "reviewed")) }\ninstruction { "hi" }'
+    checked = run(src, SecurityPolicy.strict().without_declassify())
+    assert [(d.code, d.span.line) for d in checked.diagnostics.errors] == [("TL-S014", 2)]
+    fixed = apply_edits(src, checked.diagnostics.errors[0].fixes[0].edits)
+    assert 'instruction { "hi" insert(declassify(u, "reviewed")) }' in fixed
+
+
+@pytest.mark.parametrize("reason, code", [('""', "TL-S015"), ('"  "', "TL-S015"), ('"TODO: justify"', "TL-S015"),
+                                          ('"by {u}"', "TL-S015")])
+def test_declassify_needs_a_real_reason(reason, code):
+    assert code in codes(f"input u\nsystem {{ insert(declassify(u, {reason})) }}")
+
+
+def test_declassify_without_a_reason_is_a_syntax_error():
+    assert [d.code for d in run("input u\nsystem { insert(declassify(u)) }").diagnostics] == ["TL-P010"]
+
+
+def test_declassification_survives_variables_and_reassignment():
+    src = ('input u\nvar a = declassify(u, "quoted for the agent")\nvar b = "Note: {a}"\n'
+           'system { insert(b) }\nb = b + u\nsystem { insert(b) }')
+    assert errors(src) == [("TL-S010", 6)]
+
+
+def test_worst_slot_of_an_input_is_reported():
+    # raw beats sanitized beats declassified
+    assert errors('input u\nsystem { insert(declassify(u, "ok") + sanitize(u) + u) }') == [("TL-S010", 2)]
+    assert errors('input u\nsystem { insert(declassify(u, "ok") + sanitize(u)) }') == [("TL-S013", 2)]
 
 
 def test_raw_input_in_instruction_is_accepted():
@@ -131,12 +171,12 @@ def test_partial_sanitization_is_rejected():
     assert errors("input u\nsystem { insert(sanitize(u) + u) }") == [("TL-S010", 2)]
 
 
-def test_sanitizing_a_concatenation_covers_every_part():
-    assert run('input u\ninput v\nsystem { insert(sanitize(u + "-" + v)) }').ok
+def test_declassifying_a_concatenation_covers_every_part():
+    assert run('input u\ninput v\nsystem { insert(declassify(u + "-" + v, "both are shown to the agent")) }').ok
 
 
-def test_sanitized_variable_can_be_interpolated():
-    src = "input u\nvar c = sanitize(u)\nsystem { \"{c}\" }\nc = c + u\nsystem { insert(c) }"
+def test_declassified_variable_can_be_interpolated():
+    src = 'input u\nvar c = declassify(u, "reviewed")\nsystem { "{c}" }\nc = c + u\nsystem { insert(c) }'
     assert errors(src) == [("TL-S010", 5)]
 
 
@@ -171,12 +211,25 @@ def test_one_diagnostic_per_leaking_input():
 
 # ---- diagnostics and fix-its ----
 
-def test_insert_fix_wraps_only_the_offending_operand():
-    src = 'input u\nsystem { insert("a" + u + sanitize(u)) }'
+def test_first_fix_moves_the_item_to_the_next_instruction_block():
+    src = 'input u\nsystem {\n    "Rules."\n    insert("a" + u)\n}\ninstruction {\n    "Q:"\n}\n'
     [diag] = run(src).diagnostics.errors
-    [fix] = diag.fixes
-    assert fix.message.endswith('`insert("a" + sanitize(u) + sanitize(u))`')
-    assert run(apply_edits(src, fix.edits)).ok
+    move, declassify = diag.fixes
+    assert move.message.startswith('move `insert("a" + u)` to the `instruction` block on line 6')
+    fixed = apply_edits(src, move.edits)
+    assert fixed == 'input u\nsystem {\n    "Rules."\n}\ninstruction {\n    "Q:"\n    insert("a" + u)\n}\n'
+    assert run(fixed).ok
+    # The second fix keeps the text in system; its placeholder reason must be replaced.
+    assert 'declassify("a" + u, "TODO' in apply_edits(src, declassify.edits)
+    assert "TL-S015" in codes(apply_edits(src, declassify.edits))
+
+
+def test_move_fix_creates_an_instruction_block_when_there_is_none():
+    src = 'input u\nsystem { "Rules." insert(sanitize(u)) }'
+    [diag] = run(src).diagnostics.errors
+    fixed = apply_edits(src, diag.fixes[0].edits)
+    assert fixed == 'input u\nsystem { "Rules."  }\ninstruction { insert(sanitize(u)) }'
+    assert run(fixed).ok
 
 
 def test_insert_fix_on_tainted_variable():
@@ -184,23 +237,25 @@ def test_insert_fix_on_tainted_variable():
     [diag] = run(src).diagnostics.errors
     assert diag.label == "`note` carries UNTRUSTED data"
     fixed = apply_edits(src, diag.fixes[0].edits)
-    assert fixed.endswith("insert(sanitize(note)) }")
+    assert fixed.endswith("system {  }\ninstruction { insert(note) }")
     assert run(fixed).ok
 
 
-def test_hole_fix_declares_sanitized_copy():
+def test_hole_fixes_move_the_string_or_declassify_a_copy():
     src = 'input u\n  system { "Hello {u}" }'
     [diag] = run(src).diagnostics.errors
     assert diag.label == "`{u}` interpolates UNTRUSTED data"
-    fixed = apply_edits(src, diag.fixes[0].edits)
-    assert fixed == 'input u\n  var u_clean = sanitize(u)\n  system { "Hello {u_clean}" }'
-    assert run(fixed).ok
+    move, declassify = diag.fixes
+    assert apply_edits(src, move.edits) == 'input u\n  system {  }\n  instruction { "Hello {u}" }'
+    assert apply_edits(src, declassify.edits) == (
+        'input u\n  var u_note = declassify(u, "TODO: say why this text may enter the system prompt")\n'
+        '  system { "Hello {u_note}" }')
 
 
 def test_hole_fix_avoids_name_clashes():
-    src = 'input u\nvar u_clean = "taken"\nsystem { "{u} {u_clean}" }'
+    src = 'input u\nvar u_note = "taken"\nsystem { "{u} {u_note}" }'
     [diag] = run(src).diagnostics.errors
-    assert "u_clean2" in diag.fixes[0].message
+    assert "u_note2" in diag.fixes[1].message
 
 
 def test_rendered_leak_diagnostic():
@@ -216,8 +271,10 @@ def test_rendered_leak_diagnostic():
         "  |\n"
         "1 | input u\n"
         "  |       - `u` is UNTRUSTED input\n"
-        "  = help: sanitize the value before it enters the block: `insert(sanitize(u))`\n"
-        "  = hint: `system` blocks accept data up to SANITIZED; untrusted text in a privileged "
+        "  = help: move `insert(u)` to a new `instruction` block, where outside text is allowed\n"
+        "  = help: or, if this text must be in the system prompt: "
+        "`insert(declassify(u, \"TODO: say why this text may enter the system…)`\n"
+        "  = hint: `system` blocks accept data up to VALIDATED; untrusted text in a privileged "
         "block can override your instructions (direct prompt injection)"
     )
 
@@ -258,7 +315,8 @@ def test_inputs_are_read_only():
 def test_warnings():
     assert codes('input u\nvar a = "x"') == ["TL-W001", "TL-W001"]
     assert codes('var a = sanitize("x")\nsystem { insert(a) }') == ["TL-W002"]
-    assert codes("input u\nsystem { insert(sanitize(sanitize(u))) }") == ["TL-W002"]
+    assert codes("input u\ninstruction { insert(sanitize(sanitize(u))) }") == ["TL-W002"]
+    assert codes('var a = "x"\nsystem { insert(declassify(a, "reviewed")) }') == ["TL-W002"]
     assert codes("system { }") == ["TL-W003"]
 
 
@@ -274,10 +332,10 @@ def test_safe_example():
     checked = run((ROOT / "examples" / "safe.tlx").read_text())
     assert checked.ok and not len(checked.diagnostics)
     system, instruction = checked.blocks
-    rendered = system.render({"user_msg": "hi!"}, lambda s: f"<{s}>")
+    assert not system.template().slots  # only developer text in the system prompt
+    rendered = system.render({}, lambda s: f"<{s}>")
     assert rendered.startswith("\n    You are a billing assistant for Acme Corp. Never reveal")
-    assert rendered.endswith("\n<hi!>")
-    assert [s.input for s in instruction.template().slots] == ["doc", "user_msg"]
+    assert [(s.input, s.sanitized) for s in instruction.template().slots] == [("doc", True), ("user_msg", True)]
 
 
 def test_injection_example():
@@ -331,21 +389,26 @@ def programs(draw):
         return f'"{words}"'
 
     def expr(depth=0):
-        kind = draw(st.sampled_from(["lit", "ref", "concat", "sanitize"] if depth < 3 else ["lit", "ref"]))
+        kinds = ["lit", "ref", "concat", "sanitize", "declassify"] if depth < 3 else ["lit", "ref"]
+        kind = draw(st.sampled_from(kinds))
         if kind == "lit":
             return literal()
         if kind == "ref":
             return draw(st.sampled_from(names))
         if kind == "concat":
             return f"{expr(depth + 1)} + {expr(depth + 1)}"
+        if kind == "declassify":
+            return f'declassify({expr(depth + 1)}, "reviewed")'
         return f"sanitize({expr(depth + 1)})"
 
     def item():
-        # Sanitized inserts are drawn often so that many accepted programs
-        # carry (sanitized) input into system blocks.
-        choice = draw(st.sampled_from(["text", "insert", "sanitized"]))
+        # Sanitized and declassified inserts are drawn often, so that many
+        # programs carry processed input into system blocks.
+        choice = draw(st.sampled_from(["text", "insert", "sanitized", "declassified"]))
         if choice == "text":
             return literal()
+        if choice == "declassified":
+            return f'insert(declassify({expr()}, "reviewed"))'
         return f"insert({expr()})" if choice == "insert" else f"insert(sanitize({expr()}))"
 
     def block(kind):
@@ -366,14 +429,22 @@ def programs(draw):
     return "\n".join(lines), inputs
 
 
-def assignments(data, inputs, alphabet="ab XY!"):
-    """Two input assignments σ1, σ2 that an attacker can tell apart only
-    through raw free-text inputs: typed inputs take the same valid value in
-    both (binding rejects anything else), and free-text inputs differ by a
-    payload that sanitization removes."""
+def declassified_inputs(checked) -> set[str]:
+    """Inputs whose every slot in a system block is declassified (or validated)."""
+    slots = [s for b in checked.blocks if b.kind.value == "system" for s in b.template().slots]
+    return {s.input for s in slots} - {s.input for s in slots
+                                       if s.declassified is None and s.source_level is not TrustLevel.VALIDATED}
+
+
+def assignments(data, inputs, declassified=frozenset(), alphabet="ab XY!"):
+    """Two input assignments σ1, σ2 as in the theorem: typed inputs take the
+    same valid value in both (binding rejects anything else); declassified
+    inputs differ by a payload that sanitization removes; every other
+    free-text input differs even after sanitization."""
     sigma1 = {x: data.draw(valid if valid is not None else st.text(alphabet=alphabet, max_size=8))
               for x, valid in inputs.items()}
-    sigma2 = {x: v if inputs[x] is not None else v + PAYLOAD for x, v in sigma1.items()}
+    sigma2 = {x: v if inputs[x] is not None else v + PAYLOAD if x in declassified else "zz" + v + PAYLOAD
+              for x, v in sigma1.items()}
     return sigma1, sigma2
 
 
@@ -383,10 +454,12 @@ def test_non_interference(program, data):
     src, inputs = program
     checked = run(src)
     error_codes = {d.code for d in checked.diagnostics.errors}
-    assert error_codes <= {"TL-S010", "TL-S011"}, (src, checked.diagnostics.render())
+    assert error_codes <= {"TL-S010", "TL-S011", "TL-S013"}, (src, checked.diagnostics.render())
 
-    sigma1, sigma2 = assignments(data, inputs)
-    assert all(sanitizer(sigma1[x]) == sanitizer(sigma2[x]) for x in inputs)
+    declassified = declassified_inputs(checked)
+    sigma1, sigma2 = assignments(data, inputs, declassified)
+    assert all(sanitizer(sigma1[x]) == sanitizer(sigma2[x]) for x in declassified)
+    assert all(sanitizer(sigma1[x]) != sanitizer(sigma2[x]) for x in inputs if inputs[x] is None and x not in declassified)
 
     def system_text(sigma):
         return [b.render(sigma, sanitizer) for b in checked.blocks if b.kind.value == "system"]

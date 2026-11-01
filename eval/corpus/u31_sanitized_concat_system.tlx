@@ -1,0 +1,6 @@
+# about: sanitized input concatenated with literals in system
+# expect: TL-S013
+# category: sanitized-in-system
+input query
+system { insert("Search query: " + sanitize(query) + ". Use the catalogue.") }
+instruction { "Explain the results." }

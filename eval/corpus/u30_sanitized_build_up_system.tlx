@@ -1,0 +1,9 @@
+# about: note built from sanitized parts reaches system
+# expect: TL-S013
+# category: sanitized-in-system
+input complaint
+var note = "Customer note: "
+note = note + sanitize(complaint)
+note = note + " (priority)"
+system { "You are a complaints handler." insert(note) }
+instruction { "Draft a reply." }

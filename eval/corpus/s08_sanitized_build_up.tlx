@@ -1,9 +1,9 @@
-# about: note built up over several reassignments from sanitized parts
+# about: note built up over several reassignments from declassified parts
 # expect: ok
-# category: sanitized-multi-hop
+# category: declassified-multi-hop
 input complaint
 var note = "Customer note: "
-note = note + sanitize(complaint)
+note = note + declassify(complaint, "the complaint summary frames the whole conversation")
 note = note + " (priority)"
 system { "You are a complaints handler." insert(note) }
 instruction { "Draft a reply." }

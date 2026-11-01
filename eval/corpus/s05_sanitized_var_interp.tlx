@@ -1,7 +1,7 @@
-# about: sanitized copy interpolated into system
+# about: declassified copy interpolated into system
 # expect: ok
-# category: sanitized-single
+# category: declassified-single
 input name
-var safe_name = sanitize(name)
+var safe_name = declassify(name, "greet the customer by name")
 system { "You are talking to {safe_name}." }
 instruction { "Say hello." }

@@ -17,7 +17,7 @@ from codegen import (
 )
 from codegen import _ROLE_TOKENS, _canonical
 from semantic import analyze
-from test_semantic import assignments, programs, sanitizer as toy_sanitizer
+from test_semantic import assignments, declassified_inputs, programs, sanitizer as toy_sanitizer
 
 ROOT = Path(__file__).resolve().parent.parent
 SNAPSHOTS = Path(__file__).resolve().parent / "snapshots"
@@ -26,7 +26,7 @@ SIMPLE = """\
 var persona = "You are a support bot."
 input user_msg
 input doc from rag
-system { "{persona}" insert(sanitize(user_msg)) }
+system { "{persona}" insert(declassify(user_msg, "the agent quotes the request")) }
 instruction { "Context:" insert(doc) "Question:" insert(user_msg) }
 """
 VALUES = {"user_msg": "Where is my refund?", "doc": "Refunds take 5 days."}
@@ -53,7 +53,8 @@ def test_ir_structure():
     }
     system, user = compiled.messages
     assert (system.role, system.block, system.line) == ("system", "system", 4)
-    assert system.parts == (TextPart("You are a support bot.\n"), SlotPart("user_msg", True))
+    assert system.parts == (TextPart("You are a support bot.\n"),
+                            SlotPart("user_msg", True, "the agent quotes the request"))
     assert user.role == "user"
     assert user.parts == (
         TextPart("Context:\n"), SlotPart("doc", False), TextPart("\nQuestion:\n"), SlotPart("user_msg", False),
@@ -521,11 +522,11 @@ def test_codegen_preserves_non_interference(program, data):
     src, inputs = program
     checked, compiled = compile_source(src, "t.tlx")
     if compiled is None:
-        assert {d.code for d in checked.diagnostics.errors} <= {"TL-S010", "TL-S011"}
+        assert {d.code for d in checked.diagnostics.errors} <= {"TL-S010", "TL-S011", "TL-S013"}
         return
     assert CompiledPrompt.from_json(compiled.to_json()).digest() == compiled.digest()
 
-    sigma1, sigma2 = assignments(data, inputs)
+    sigma1, sigma2 = assignments(data, inputs, declassified_inputs(checked))
 
     def system_texts(sigma):
         return [text for role, text in compiled.render(sigma, lambda v, n: toy_sanitizer(v), unsafe_sanitizer_override=True) if role == "system"]

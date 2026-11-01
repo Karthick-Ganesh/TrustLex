@@ -14,7 +14,8 @@ data rather than through string templating.
 
 Security is enforced again at both stages (defence in depth):
   * generate() re-checks its own output: every slot in a system message must
-    be sanitized, so a checker bug cannot silently emit a leaking prompt;
+    be validated or declassified (and then sanitized), so a checker bug cannot
+    silently emit a leaking prompt;
   * the IR carries a SHA-256 integrity checksum of its canonical form, which
     detects accidental corruption. With a key ($TRUSTLEX_IR_KEY or key=) it
     also carries an HMAC-SHA256 seal, which detects tampering;
@@ -279,9 +280,13 @@ class TextPart:
 class SlotPart:
     input: str
     sanitize: bool
+    declassify: str | None = None  # the developer's reason, for a declassified slot
 
     def to_dict(self) -> dict:
-        return {"slot": self.input, "sanitize": self.sanitize}
+        data = {"slot": self.input, "sanitize": self.sanitize}
+        if self.declassify is not None:
+            data["declassify"] = self.declassify
+        return data
 
 
 @dataclass(frozen=True)
@@ -392,7 +397,8 @@ class CompiledPrompt:
                 inputs=data["inputs"],
                 messages=[
                     Message(m["role"], m["block"], m["line"], tuple(
-                        TextPart(p["text"]) if "text" in p else SlotPart(p["slot"], bool(p["sanitize"]))
+                        TextPart(p["text"]) if "text" in p
+                        else SlotPart(p["slot"], bool(p["sanitize"]), p.get("declassify"))
                         for p in m["parts"]
                     ))
                     for m in data["messages"]
@@ -430,10 +436,11 @@ class CompiledPrompt:
 
     def verify(self):
         """Every slot must name a declared input, and every slot in a system
-        message must be sanitized, unless its input is VALIDATED (it has a
-        type that excludes free text, re-checked here and enforced at bind
-        time). Under the relaxed policy (recorded in the IR) a SEMI_TRUSTED
-        slot may also be unsanitized; UNTRUSTED never.
+        message must be VALIDATED (its input has a type that excludes free
+        text, re-checked here and enforced at bind time) or declassified, with
+        a reason, and sanitized. Under the relaxed policy (recorded in the IR) a
+        SEMI_TRUSTED slot is admitted too; UNTRUSTED never. A sanitized slot
+        alone is not enough: sanitizing removes structure, not instructions.
 
         Without an HMAC key, anyone can edit the IR and recompute its checksum.
         verify() therefore never takes a stored label on faith: each input's
@@ -450,14 +457,26 @@ class CompiledPrompt:
                 if isinstance(p, SlotPart):
                     if p.input not in self.inputs:
                         raise BindError("TL-G005", f"slot `{p.input}` does not name a declared input")
+                    if p.declassify is not None and (not isinstance(p.declassify, str) or not p.declassify.strip()
+                                                     or not p.sanitize):
+                        raise BindError("TL-G005", f"malformed IR: declassified slot `{p.input}` needs a reason "
+                                                   "and must be sanitized")
                     trust = self.inputs[p.input]["trust"]
-                    exempt = trust == "VALIDATED" or (self.policy == "relaxed" and trust == "SEMI_TRUSTED")
-                    if m.role == "system" and not p.sanitize and not exempt:
+                    exempt = (trust == "VALIDATED" or p.declassify is not None
+                              or (self.policy == "relaxed" and trust == "SEMI_TRUSTED"))
+                    if m.role == "system" and not exempt:
                         raise BindError(
                             "TL-G005",
-                            f"IR violates the security invariant: unsanitized input `{p.input}` "
-                            f"in the system message from line {m.line}",
+                            f"IR violates the security invariant: input `{p.input}` in the system message from "
+                            f"line {m.line} is neither validated nor declassified",
                         )
+
+    @property
+    def declassifications(self) -> list[tuple[str, str, int]]:
+        """(input, reason, line) of every declassified slot in a system message:
+        the audit list of outside text that may enter the privileged prompt."""
+        return [(p.input, p.declassify, m.line) for m in self.messages if m.role == "system"
+                for p in m.parts if isinstance(p, SlotPart) and p.declassify is not None]
 
     def _verify_inputs(self):
         if not isinstance(self.inputs, dict):
@@ -652,7 +671,7 @@ def generate(checked: CheckedProgram, sanitizer: SanitizerConfig | None = None,
                 parts.append(TextPart(piece.text))
             else:
                 assert isinstance(piece, Slot)
-                parts.append(SlotPart(piece.input, piece.sanitized))
+                parts.append(SlotPart(piece.input, piece.sanitized, piece.declassified))
         if parts:
             messages.append(Message(_ROLE_OF[cb.kind], cb.kind.value, cb.block.span.line, tuple(parts)))
 

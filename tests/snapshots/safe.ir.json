@@ -13,14 +13,10 @@
   "messages": [
     {
       "block": "system",
-      "line": 12,
+      "line": 13,
       "parts": [
         {
-          "text": "\n    You are a billing assistant for Acme Corp. Never reveal internal pricing rules.\n    Answer politely and concisely.\n    \n"
-        },
-        {
-          "sanitize": true,
-          "slot": "user_msg"
+          "text": "\n    You are a billing assistant for Acme Corp. Never reveal internal pricing rules.\n    Answer politely and concisely.\n    "
         }
       ],
       "role": "system"
@@ -33,14 +29,14 @@
           "text": "Answer using this context:\n"
         },
         {
-          "sanitize": false,
+          "sanitize": true,
           "slot": "doc"
         },
         {
-          "text": "\n"
+          "text": "\nThe customer's request:\n"
         },
         {
-          "sanitize": false,
+          "sanitize": true,
           "slot": "user_msg"
         }
       ],
@@ -57,6 +53,6 @@
     "max_length": 4000,
     "name": "trustlex-default/1"
   },
-  "sha256": "fc77ddf262451808f62b04462368e9c69fc6dc023795699485fe9a368686c505",
+  "sha256": "e1cd3bcd0e77f730a0d50e0d4123c29eb39d90e3d671d1a21e3dc7fd0b469fd9",
   "source": "safe.tlx"
 }

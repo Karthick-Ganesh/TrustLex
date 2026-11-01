@@ -2,8 +2,11 @@
 TrustLex - Module 3: Semantic and Security Analysis.
 
 Checks name resolution and enforces the TrustLex security rule: no data from
-an `input` may reach a `system` block unless it passed through sanitize() or
-the input is validated (refinement-typed with enum / pattern / int).
+an `input` may reach a `system` block unless the input is validated
+(refinement-typed with enum / pattern / int) or the developer explicitly
+declassifies it with declassify(e, "reason"). sanitize() alone is not enough:
+it removes structure (role markers, control characters), not natural-language
+instructions, so sanitized free text belongs in an `instruction` block.
 
 Trust lattice (a chain, ordered by taint):
 
@@ -15,9 +18,12 @@ Trust lattice (a chain, ordered by taint):
     input x [from user]        UNTRUSTED
     a + b, "...{a}..."         join (⊔): the less trusted operand
     sanitize(e)                every external part of e is lowered to SANITIZED
+    declassify(e, "reason")    sanitize(e), marked as an audited exception
 
 Each block kind has a clearance; content may enter a block only if its label
-is ⊑ the clearance (strict policy: system = SANITIZED, instruction = UNTRUSTED).
+is ⊑ the clearance (system = VALIDATED, instruction = UNTRUSTED), or it was
+declassified: a warning (TL-W004) that quotes the reason, or an error
+(TL-S014) when the policy forbids declassification.
 
 Flow-sensitive taint by symbolic evaluation
 -------------------------------------------
@@ -31,17 +37,20 @@ each variable's value at the block's position. A template's label is the join
 of its slots' levels (Text is TRUSTED). The checked block templates are handed
 to code generation, which never re-evaluates the program.
 
-Soundness: non-interference up to sanitization and validation
---------------------------------------------------------------
-Let P be a program with no TL-S010/TL-S011/TL-S012 errors under the strict
-policy, and let san be the runtime sanitizer. Let σ1, σ2 assign runtime
-strings to P's inputs that bind, i.e. σi(y) ∈ L(τ) for every validated input
-y : τ (bind() enforces this, TL-G006). If san(σ1(x)) = san(σ2(x)) for every
-free-text input x, and σ1(y) = σ2(y) for every validated input y, then every
+Soundness: non-interference up to validation and declassification
+------------------------------------------------------------------
+Let P be a program with no errors under the strict policy, and let san be the
+runtime sanitizer. Let σ1, σ2 assign runtime strings to P's inputs that bind,
+i.e. σi(y) ∈ L(τ) for every validated input y : τ (bind() enforces this,
+TL-G006). If σ1(y) = σ2(y) for every validated input y, and
+san(σ1(x)) = san(σ2(x)) for every input x that P declassifies, then every
 system block of P renders to the same text under σ1 and σ2.
 
-Raw input can therefore influence privileged content only through sanitize()
-or by choosing a value of a validated type. Validated values range over a
+In particular, if P contains no declassify(), its system blocks do not depend
+on any free-text input at all. Raw or sanitized input can influence privileged
+content only by choosing a value of a validated type, or through a
+declassification the developer wrote, justified and was warned about.
+Validated values range over a
 fixed language L(τ): a developer-chosen finite set (enum), decimal integers
 (int), or a pattern that TL-S012 has checked can only match at most 64
 printable, whitespace-free characters (no `.`, negated classes or unbounded
@@ -54,17 +63,17 @@ Proof outline.
       cases are literals and inputs; Concat, interpolation and sanitize are
       homomorphic over rendering; assignment is a strong update, which is
       exact because P has no control flow.
-  (2) Clean templates. If label(t) ⊑ SANITIZED then every slot of t is
-      sanitized or validated (a raw free-text slot has level SEMI_TRUSTED
-      or UNTRUSTED). So render(t, σ) depends on σ only through san ∘ σ on
-      free-text inputs and σ itself on validated ones.
-  (3) The block check requires label(t) ⊑ SANITIZED for the template t of
-      every system block item. By (1) that template is the item's runtime
-      content, and by (2) the content is equal under σ1 and σ2.        ∎
+  (2) Clean templates. The block check admits a slot into a system block
+      only if its level is ⊑ VALIDATED (a validated input) or it is
+      declassified (and therefore sanitized). So render(t, σ) depends on σ
+      only through σ on validated inputs and san ∘ σ on declassified ones.
+  (3) By (1) the template t of every system block item is the item's
+      runtime content, and by (2) the content is equal under σ1 and σ2.  ∎
 
 Because the evaluation is exact, the check is also complete for this
-language: a program is rejected only if some raw input slot reaches a system
-block, i.e. there exist σ1, σ2 as above that render it differently. Both
+language: a program is rejected only if a slot of a free-text input that was
+not declassified reaches a system block, i.e. there exist σ1, σ2 as above that
+render it differently. Both
 directions are exercised by the property-based test in tests/test_semantic.py,
 whose random programs include validated inputs; a second property checks that
 every string an accepted pattern matches is short and whitespace-free.
@@ -83,7 +92,7 @@ from diagnostics import (
 )
 from lexer import TrustLevel
 from parser_ast import (
-    Assign, Block, BlockKind, Concat, Expr, InputDecl, InputType, InsertItem, Node, ParseResult,
+    Assign, Block, BlockKind, Concat, Declassify, Expr, InputDecl, InputType, InsertItem, Node, ParseResult,
     Program, Sanitize, StringLit, TextItem, TextSegment, VarDecl, VarRef, parse,
 )
 
@@ -247,14 +256,16 @@ def input_type_problem(t: InputType) -> str | None:
 
 @dataclass(frozen=True)
 class SecurityPolicy:
-    """Clearance of each block kind, and how leaks of retrieved/tool data
-    (SEMI_TRUSTED) into a block are reported."""
+    """Clearance of each block kind, how leaks of retrieved/tool data
+    (SEMI_TRUSTED) into a block are reported, and whether declassify() may
+    bring data into a block above its clearance."""
 
     clearances: dict = field(default_factory=lambda: {
-        BlockKind.SYSTEM: TrustLevel.SANITIZED,
+        BlockKind.SYSTEM: TrustLevel.VALIDATED,
         BlockKind.INSTRUCTION: TrustLevel.UNTRUSTED,
     })
     semi_trusted_severity: Severity = Severity.ERROR
+    allow_declassify: bool = True
 
     @classmethod
     def strict(cls) -> SecurityPolicy:
@@ -265,6 +276,10 @@ class SecurityPolicy:
         """Retrieved and tool data in a system block is only a warning.
         The soundness lemma then covers UNTRUSTED inputs only."""
         return cls(semi_trusted_severity=Severity.WARNING)
+
+    def without_declassify(self) -> SecurityPolicy:
+        """The same policy, with every declassification an error (TL-S014)."""
+        return replace(self, allow_declassify=False)
 
     def clearance(self, kind: BlockKind) -> TrustLevel:
         return self.clearances[kind]
@@ -299,6 +314,7 @@ class Slot:
     source_level: TrustLevel
     sanitized: bool = False
     path: tuple[FlowStep, ...] = ()
+    declassified: str | None = None  # the developer's reason, if declassify() was applied
 
     @property
     def level(self) -> TrustLevel:
@@ -337,6 +353,11 @@ class Template:
     def sanitized(self) -> Template:
         return self._map_slots(lambda s: replace(s, sanitized=True))
 
+    def declassified(self, reason: str, step: FlowStep) -> Template:
+        """Sanitized and marked as declassified; validated slots need neither."""
+        return self._map_slots(lambda s: s if s.level.leq(TrustLevel.VALIDATED) else replace(
+            s, sanitized=True, declassified=reason, path=s.path + (step,)))
+
     def with_step(self, step: FlowStep) -> Template:
         return self._map_slots(lambda s: replace(s, path=s.path + (step,)))
 
@@ -344,7 +365,7 @@ class Template:
         """Contributing inputs, in order, e.g. ['user_msg', 'doc (sanitized)']."""
         seen = []
         for s in self.slots:
-            name = s.input + (" (sanitized)" if s.sanitized else "")
+            name = s.input + (" (declassified)" if s.declassified is not None else " (sanitized)" if s.sanitized else "")
             if name not in seen:
                 seen.append(name)
         return seen
@@ -470,8 +491,10 @@ class SecurityChecker:
         self._declared_later: dict[str, SourceSpan] = {}
         self._all_names: set[str] = set()
         self._invalid_types: set[str] = set()  # inputs whose type got TL-S012
+        self._statements: list = []
 
     def check(self, program: Program) -> CheckedProgram:
+        self._statements = program.statements
         for stmt in program.statements:
             if isinstance(stmt, (InputDecl, VarDecl)):
                 self._declared_later.setdefault(stmt.name, stmt.name_span)
@@ -592,11 +615,32 @@ class SecurityChecker:
                     hint=f"remove the call: {_short(expr.expr.span.text, 40)}",
                 )
             template = inner.sanitized()
+        elif isinstance(expr, Declassify):
+            template = self._declassify(expr)
         else:
             raise TypeError(f"unexpected expression {type(expr).__name__}")
         self.templates[expr] = template
         self.labels[expr] = template.label
         return template
+
+    def _declassify(self, expr: Declassify) -> Template:
+        inner = self._eval(expr.expr)
+        reason = "".join(p.text for p in expr.reason.parts if isinstance(p, TextSegment)).strip()
+        if expr.reason.holes:
+            self.diagnostics.error("TL-S015", "the reason of declassify() must be plain text", expr.reason.span,
+                                   label="no {interpolation} here",
+                                   hint="the reason is for reviewers; write it out, without input values")
+        elif not reason or reason.upper().startswith("TODO"):
+            self.diagnostics.error("TL-S015", "declassify() needs a real reason", expr.reason.span,
+                                   hint='say why this text may enter the system prompt, '
+                                        'e.g. declassify(name, "greet the customer by name")')
+        if inner.label.leq(TrustLevel.VALIDATED):
+            what = "trusted data" if inner.label is TrustLevel.TRUSTED else "validated data"
+            self.diagnostics.warning(
+                "TL-W002", f"declassify() applied to {what} has no effect", expr.span,
+                hint=f"remove the call: {_short(expr.expr.span.text, 40)}",
+            )
+        return inner.declassified(reason, FlowStep(f'declassified here: "{_short(reason, 48)}"', expr.span))
 
     def _read(self, ref: VarRef) -> Template:
         sym = self.symbols.get(ref.name)
@@ -643,46 +687,70 @@ class SecurityChecker:
                         template = template + Template.of_text(part.text)
                     else:
                         hole = self._eval(part)
-                        self._enforce(block, clearance, hole, part)
+                        self._enforce(block, clearance, hole, part, item)
                         template = template + hole
                 self.templates[item.text] = template
             else:
                 template = self._eval(item.expr)
-                self._enforce(block, clearance, template, item)
+                self._enforce(block, clearance, template, item, item)
             items.append(CheckedItem(item, template))
             self.labels[item] = template.label
             event = f"{block.kind.value} ← {_short(item.span.text)}"
-            self.trace.append(TraceEntry(item.span, event, template.label, template.sources(), template.label.leq(clearance)))
+            allowed = all(s.level.leq(clearance) or s.declassified is not None for s in template.slots)
+            self.trace.append(TraceEntry(item.span, event, template.label, template.sources(), allowed))
 
         if block.kind is BlockKind.SYSTEM and not block.items:
             self.diagnostics.warning("TL-W003", "empty system block", block.keyword_span)
         return CheckedBlock(block, items)
 
-    def _enforce(self, block: Block, clearance: TrustLevel, template: Template, site: Node):
-        """Report every input whose raw data in `template` exceeds the
-        block's clearance. `site` is an InsertItem or an interpolated VarRef."""
+    def _enforce(self, block: Block, clearance: TrustLevel, template: Template, site: Node, item: Node):
+        """Report every input whose data in `template` exceeds the block's
+        clearance. `site` is an InsertItem or an interpolated VarRef inside
+        the TextItem `item`."""
+        def badness(slot: Slot) -> int:  # report the worst way an input gets in: raw, sanitized, declassified
+            return 0 if slot.declassified is not None else 1 if slot.sanitized else 2
+
         leaks: dict[str, Slot] = {}
         for slot in template.slots:
             if not slot.level.leq(clearance) and slot.input not in self._invalid_types:
-                leaks.setdefault(slot.input, slot)
+                if slot.input not in leaks or badness(slot) > badness(leaks[slot.input]):
+                    leaks[slot.input] = slot
 
         for name, slot in leaks.items():
             level = slot.source_level
-            code, severity = ("TL-S010", Severity.ERROR) if level is TrustLevel.UNTRUSTED else ("TL-S011", self.policy.semi_trusted_severity)
             kind = block.kind.value
-
-            if isinstance(site, VarRef):
-                span = site.span
-                label = f"`{{{site.name}}}` interpolates {level} data"
-                fix = self._hole_fix(block, site)
+            semi = level is TrustLevel.SEMI_TRUSTED
+            fixes = []
+            if slot.declassified is not None:
+                code = "TL-W004" if self.policy.allow_declassify else "TL-S014"
+                severity = Severity.WARNING if self.policy.allow_declassify else Severity.ERROR
+                message = f"declassified {level} data from input `{name}` enters a `{kind}` block"
+                label = f'reason: "{_short(slot.declassified, 60)}"'
+                hint = ("declassification is forbidden by the policy (--no-declassify)" if not self.policy.allow_declassify
+                        else "sanitize() removes structure, not instructions: review this exception, or keep the text "
+                             "in an `instruction` block")
+                if not self.policy.allow_declassify:
+                    fixes = [self._move_fix(block, item)]
+            elif slot.sanitized:
+                code = "TL-S013"
+                severity = self.policy.semi_trusted_severity if semi else Severity.ERROR
+                message = f"sanitized {level} data from input `{name}` reaches a `{kind}` block"
+                label = "sanitize() removes role markers and control characters, not instructions"
+                hint = (f"`{kind}` blocks accept only developer text and validated inputs; move the text to an "
+                        "`instruction` block, give the input a refinement type, or declassify it with a reason")
+                fixes = [self._move_fix(block, item), self._declassify_fix(site, item, name)]
             else:
-                span = site.expr.span
-                expr = site.expr
-                if isinstance(expr, VarRef):
-                    label = "raw input inserted here" if expr.name == name else f"`{expr.name}` carries {level} data"
+                code = "TL-S011" if semi else "TL-S010"
+                severity = self.policy.semi_trusted_severity if semi else Severity.ERROR
+                message = f"{level} data from input `{name}` reaches a `{kind}` block"
+                if isinstance(site, VarRef):
+                    label = f"`{{{site.name}}}` interpolates {level} data"
+                elif isinstance(site.expr, VarRef):
+                    label = "raw input inserted here" if site.expr.name == name else f"`{site.expr.name}` carries {level} data"
                 else:
                     label = f"this expression carries {level} data"
-                fix = self._insert_fix(site, name, clearance)
+                hint = f"`{kind}` blocks accept data up to {clearance}; {_LEAK_HINT[level]}"
+                fixes = [self._move_fix(block, item), self._declassify_fix(site, item, name)]
 
             path = list(slot.path)
             notes = []
@@ -691,53 +759,81 @@ class SecurityChecker:
                 path = path[:1] + path[-(_MAX_PATH - 1):]
 
             self.diagnostics.report(
-                severity, code, f"{level} data from input `{name}` reaches a `{kind}` block", span,
+                severity, code, message, site.span if isinstance(site, VarRef) else site.expr.span,
                 label=label,
                 related=[Related(step.span, step.description) for step in path],
                 notes=notes,
-                fixes=[fix] if fix else [],
-                hint=f"`{kind}` blocks accept data up to {clearance}; {_LEAK_HINT[level]}",
+                fixes=[f for f in fixes if f is not None],
+                hint=hint,
             )
 
     # ---- fix-its ----
 
-    def _offenders(self, expr: Expr, name: str, clearance: TrustLevel) -> list[Expr]:
-        """Smallest sub-expressions that carry raw `name` data and can be
-        wrapped in sanitize()."""
-        if isinstance(expr, Concat):
-            return self._offenders(expr.left, name, clearance) + self._offenders(expr.right, name, clearance)
-        if isinstance(expr, Sanitize):
-            return []
-        template = self.templates.get(expr, Template())
-        leaking = any(s.input == name and not s.level.leq(clearance) for s in template.slots)
-        return [expr] if leaking else []
+    def _move_fix(self, block: Block, item: Node) -> Fix:
+        """Move `item` out of `block` into the next `instruction` block, or
+        into a new one right after `block`. The fix is re-checked when it is
+        applied, so a move that changes what a variable holds is caught."""
+        text = self.source.text
+        item_text = item.span.text
+        # Delete the whole line (with any trailing comment) when the item is alone on it.
+        line_start = text.rfind("\n", 0, item.span.offset) + 1
+        line_end = text.find("\n", item.span.end_offset)
+        line_end = len(text) if line_end < 0 else line_end
+        after = text[item.span.end_offset:line_end].strip()
+        if not text[line_start:item.span.offset].strip() and (not after or after.startswith("#")):
+            removal = Edit(self.source.span(line_start, min(line_end + 1, len(text))), "")
+        else:
+            removal = Edit(item.span, "")
 
-    def _insert_fix(self, item: InsertItem, name: str, clearance: TrustLevel) -> Fix | None:
-        offenders = self._offenders(item.expr, name, clearance)
-        if not offenders:
+        later = [s for s in self._statements if isinstance(s, Block) and s.kind is BlockKind.INSTRUCTION
+                 and s.span.offset > block.span.offset]
+        if later:
+            target = later[0]
+            if target.items:
+                # Append after the last item, so that successive moves keep their order.
+                last = target.items[-1].span
+                indent = text[text.rfind("\n", 0, last.offset) + 1:last.offset]
+                # Keep a one-line block on one line; otherwise give the item a line of its own.
+                gap = "\n" + indent if not indent.strip() else " "
+                insertion = Edit(self.source.span(last.end_offset, last.end_offset), gap + item_text)
+            else:
+                brace = text.index("{", target.keyword_span.end_offset) + 1
+                insertion = Edit(self.source.span(brace, brace), " " + item_text + " ")
+            where = f"the `instruction` block on line {target.span.line}"
+        else:
+            at = block.span.end_offset
+            indent = " " * (block.span.col - 1)
+            insertion = Edit(self.source.span(at, at), f"\n{indent}instruction {{ {item_text} }}")
+            where = "a new `instruction` block"
+        return Fix(f"move `{_short(item_text, 40)}` to {where}, where outside text is allowed",
+                   (removal, insertion))
+
+    def _declassify_fix(self, site: Node, item: Node, name: str) -> Fix | None:
+        """Declassify the value in place. Never the first fix: it keeps the text
+        in the system prompt, and its placeholder reason must be replaced
+        (TL-S015) before the program compiles."""
+        reason = '"TODO: say why this text may enter the system prompt"'
+        if isinstance(site, VarRef):
+            note = f"{site.name}_note"
+            n = 2
+            while note in self._all_names:
+                note, n = f"{site.name}_note{n}", n + 1
+            block_start = self._enclosing_block(item).span
+            indent = " " * (block_start.col - 1)
+            decl = f"var {note} = declassify({site.name}, {reason})"
+            at_block = self.source.span(block_start.offset, block_start.offset)
+            return Fix(f"or, if this text must be in the system prompt, declare `{decl}` and write `{{{note}}}`",
+                       (Edit(at_block, decl + "\n" + indent), Edit(site.span, "{" + note + "}")))
+        expr = site.expr
+        inner = expr.expr if isinstance(expr, Sanitize) else expr
+        if isinstance(expr, Declassify):
             return None
-        edits = tuple(Edit(e.span, f"sanitize({e.span.text})") for e in offenders)
-        # Preview the whole insert(...) item with the edits applied.
-        base = item.span.offset
-        preview = item.span.text
-        for edit in sorted(edits, key=lambda e: e.span.offset, reverse=True):
-            start, end = edit.span.offset - base, edit.span.end_offset - base
-            preview = preview[:start] + edit.text + preview[end:]
-        return Fix(f"sanitize the value before it enters the block: `{preview}`", edits)
+        replacement = f"declassify({inner.span.text}, {reason})"
+        return Fix(f"or, if this text must be in the system prompt: `insert({_short(replacement, 60)})`",
+                   (Edit(expr.span, replacement),))
 
-    def _hole_fix(self, block: Block, hole: VarRef) -> Fix:
-        clean = f"{hole.name}_clean"
-        n = 2
-        while clean in self._all_names:
-            clean = f"{hole.name}_clean{n}"
-            n += 1
-        indent = " " * (block.span.col - 1)
-        decl = f"var {clean} = sanitize({hole.name})"
-        at_block = self.source.span(block.span.offset, block.span.offset)
-        return Fix(
-            f"interpolation cannot be sanitized in place; declare `{decl}` before the block and write `{{{clean}}}`",
-            (Edit(at_block, decl + "\n" + indent), Edit(hole.span, "{" + clean + "}")),
-        )
+    def _enclosing_block(self, item: Node) -> Block:
+        return next(s for s in self._statements if isinstance(s, Block) and item in s.items)
 
     # ---- trace ----
 

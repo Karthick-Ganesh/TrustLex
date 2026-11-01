@@ -1,5 +1,6 @@
 # TrustLex example: a well-typed prompt program.
-# Untrusted data reaches the system block only through sanitize().
+# The system block holds only developer text; outside data goes to the
+# instruction block, where bind() sanitizes and spotlights it.
 
 var persona = "You are a billing assistant for Acme Corp."
 input user_msg                    # UNTRUSTED: typed by the end user
@@ -14,11 +15,11 @@ system {
     {rules}
     Answer politely and concisely.
     """
-    insert(sanitize(user_msg))
 }
 
 instruction {
     "Answer using this context:"
-    insert(doc)
-    insert(user_msg)
+    insert(sanitize(doc))
+    "The customer's request:"
+    insert(sanitize(user_msg))
 }

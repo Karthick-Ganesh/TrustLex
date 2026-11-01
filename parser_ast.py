@@ -19,7 +19,8 @@ Grammar (semicolons are optional; a lone `;` is an empty statement):
     items      : items item | <empty>
     item       : STRING | INSERT LPAREN expr RPAREN | SEMI
     expr       : expr PLUS term | term
-    term       : STRING | IDENT | SANITIZE LPAREN expr RPAREN | LPAREN expr RPAREN
+    term       : STRING | IDENT | SANITIZE LPAREN expr RPAREN
+               | DECLASSIFY LPAREN expr COMMA STRING RPAREN | LPAREN expr RPAREN
 
 Additional error productions recognise common mistakes (a bare variable in a
 block, a stray string, `insert` outside a block, ...) and report them with a
@@ -116,6 +117,15 @@ class Concat(Expr):
 @node
 class Sanitize(Expr):
     expr: Expr
+
+
+@node
+class Declassify(Expr):
+    """declassify(e, "reason"): sanitize e and let it enter a system block,
+    as an explicit, justified and reported exception to the trust rule."""
+
+    expr: Expr
+    reason: StringLit
 
 
 @node
@@ -322,13 +332,14 @@ _TOKEN_NAMES = {
     "EQUALS": "`=`", "PLUS": "`+`", "SEMI": "`;`", "COLON": "`:`", "COMMA": "`,`", "NUMBER": "number",
 }
 _TOKEN_ORDER = [
-    "PLUS", "RPAREN", "COMMA", "IDENT", "STRING", "NUMBER", "SANITIZE", "LPAREN", "EQUALS", "FROM", "COLON",
+    "PLUS", "RPAREN", "COMMA", "IDENT", "STRING", "NUMBER", "SANITIZE", "DECLASSIFY", "LPAREN", "EQUALS", "FROM",
+    "COLON",
     "INSERT", "RBRACE",
     "VAR", "INPUT", "SYSTEM", "INSTRUCTION", "SEMI", "LBRACE", "$end",
 ]
 # Tokens accepted in a context only by error productions; never suggest them.
 _STMT_ERROR_ONLY = {"INSERT", "STRING"}
-_ITEM_ERROR_ONLY = {"IDENT", "SYSTEM", "INSTRUCTION", "SANITIZE"}
+_ITEM_ERROR_ONLY = {"IDENT", "SYSTEM", "INSTRUCTION", "SANITIZE", "DECLASSIFY"}
 _STMT_KEYWORDS = {"VAR", "INPUT", "SYSTEM", "INSTRUCTION"}
 _TYPE_HINT = 'valid input types: enum("a", "b"), pattern("[A-Z0-9]{8}"), int, int(min, max)'
 
@@ -610,6 +621,18 @@ class TrustParser:
         "term : SANITIZE LPAREN expr RPAREN"
         p[0] = Sanitize(p[3], span=self._cover(p, 1, 4))
 
+    def p_term_declassify(self, p):
+        "term : DECLASSIFY LPAREN expr COMMA STRING RPAREN"
+        p[0] = Declassify(p[3], self._string(p.slice[5]), span=self._cover(p, 1, 6))
+
+    def p_term_declassify_no_reason(self, p):
+        "term : DECLASSIFY LPAREN expr RPAREN"
+        self._report(
+            "TL-P010", "declassify(...) needs a reason", self._cover(p, 1, 4),
+            hint='say why this text may enter the system prompt: declassify(x, "greet the customer by name")',
+        )
+        p[0] = Declassify(p[3], StringLit([], span=self._span(p, 4)), span=self._cover(p, 1, 4))
+
     def p_term_group(self, p):
         "term : LPAREN expr RPAREN"
         p[0] = p[2]
@@ -628,6 +651,13 @@ class TrustParser:
         self._report(
             "TL-P003", "bare sanitize(...) inside a block", self._cover(p, 1, 4),
             hint="embed the sanitized value explicitly: insert(sanitize(...))",
+        )
+
+    def p_item_bare_declassify(self, p):
+        "item : DECLASSIFY LPAREN expr COMMA STRING RPAREN"
+        self._report(
+            "TL-P003", "bare declassify(...) inside a block", self._cover(p, 1, 6),
+            hint="embed the value explicitly: insert(declassify(...))",
         )
 
     def p_stmt_top_level_insert(self, p):

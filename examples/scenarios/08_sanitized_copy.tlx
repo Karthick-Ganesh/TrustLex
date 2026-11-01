@@ -1,5 +1,5 @@
-# about: A sanitized copy of the input can be interpolated into the system prompt
-# expect: ok
+# about: A sanitized copy is still free text: sanitize() strips structure, not instructions, so it may not enter the system prompt
+# expect: TL-S013
 input user_msg
 var clean_msg = sanitize(user_msg)
 

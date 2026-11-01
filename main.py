@@ -22,6 +22,7 @@ Compile options:
     --model M, --max-tokens N      payload settings; payload targets need a model
                                    (--model, or set TRUSTLEX_DEFAULT_MODEL)
     --relaxed                      retrieved/tool data in system blocks is a warning
+    --no-declassify                every declassify() into a system block is an error
     --no-delimit                   do not wrap raw untrusted values in <untrusted_input> tags
     --openai-developer-role        send OpenAI system messages as "developer"
     --stages                       print every stage's output and timing to stderr
@@ -175,7 +176,8 @@ def print_stages(stages: list[Stage], color: bool, setup_ms: float = 0.0):
 # --------------------------------------------------------------------------
 
 def _policy(args) -> SecurityPolicy:
-    return SecurityPolicy.relaxed() if getattr(args, "relaxed", False) else SecurityPolicy.strict()
+    policy = SecurityPolicy.relaxed() if getattr(args, "relaxed", False) else SecurityPolicy.strict()
+    return policy.without_declassify() if getattr(args, "no_declassify", False) else policy
 
 
 def _values(args) -> dict[str, str]:
@@ -514,6 +516,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     def common(p):
         p.add_argument("--relaxed", action="store_true", help="retrieved/tool data in system blocks is a warning")
+        p.add_argument("--no-declassify", action="store_true",
+                       help="every declassify() into a system block is an error")
         p.add_argument("--no-color", action="store_true", help="disable colored output")
 
     p = sub.add_parser("compile", help="compile a program to IR or an API payload")

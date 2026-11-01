@@ -1,6 +1,6 @@
-# about: sanitize() wraps a concatenation containing input
+# about: declassify() wraps a concatenation containing input
 # expect: ok
-# category: sanitized-concat
+# category: declassified-concat
 input subject
-system { insert(sanitize("Re: " + subject)) }
+system { insert(declassify("Re: " + subject, "the subject line sets the topic of the reply")) }
 instruction { "Draft a reply." }

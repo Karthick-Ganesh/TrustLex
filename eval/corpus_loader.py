@@ -23,11 +23,11 @@ CORPUS = Path(__file__).resolve().parent / "corpus"
 
 UNSAFE_CATEGORIES = (
     "direct-insert", "interp-normal", "interp-triple", "multi-hop", "concat",
-    "partial-sanitize", "rag-tool-system", "reassign-after-sanitize",
+    "partial-sanitize", "rag-tool-system", "reassign-after-sanitize", "sanitized-in-system",
 )
 SAFE_CATEGORIES = (
-    "instruction-only", "sanitized-single", "sanitized-multi-hop", "lookalike-literal",
-    "sanitized-concat", "realistic",
+    "instruction-only", "declassified-single", "declassified-multi-hop", "lookalike-literal",
+    "declassified-concat", "realistic",
 )
 
 

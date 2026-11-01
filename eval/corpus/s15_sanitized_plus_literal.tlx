@@ -1,6 +1,6 @@
-# about: sanitized input concatenated with literals
+# about: declassified input concatenated with literals
 # expect: ok
-# category: sanitized-concat
+# category: declassified-concat
 input query
-system { insert("Search query: " + sanitize(query) + ". Use the catalogue.") }
+system { insert("Search query: " + declassify(query, "the search query selects the catalogue section") + ". Use the catalogue.") }
 instruction { "Explain the results." }

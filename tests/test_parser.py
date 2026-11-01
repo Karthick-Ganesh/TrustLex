@@ -184,7 +184,7 @@ def test_error_codes(src, expected):
 def test_expected_tokens_hint():
     [diag] = parse("var x = )", "t.tlx").diagnostics
     assert diag.message == "unexpected `)`"
-    assert diag.hint == "expected one of: identifier, string, `sanitize`, `(`"
+    assert diag.hint == "expected one of: identifier, string, `sanitize`, `declassify`, `(`"
 
 
 def test_expected_tokens_are_context_exact():

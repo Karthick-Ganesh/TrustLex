@@ -55,16 +55,11 @@ system {
     "items per answer."
 }
 
-system {
+instruction {
     "Context for this conversation:"
     insert(context)
-    insert(customer_block)
-}
-
-instruction {
     "Answer the customer's question using the context above."
-    "Customer wrote:"
-    insert(customer_msg)
+    insert(customer_block)
 }
 
 instruction {
