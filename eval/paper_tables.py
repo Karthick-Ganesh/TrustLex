@@ -99,7 +99,7 @@ def write_indirect(index: dict):
     tex = (SHARED / "tab_indirect.tex").read_text(encoding="utf-8")
     head, rest = tex.split("\\midrule\n", 1)
     tail = rest[rest.index("\\bottomrule"):]
-    (SHARED / "tab_indirect.tex").write_text(head + "\\midrule\n" + "\n".join(lines) + "\n" + tail, encoding="utf-8")
+    (SHARED / "tab_indirect.tex").write_bytes((head + "\\midrule\n" + "\n".join(lines) + "\n" + tail).encode("utf-8"))
 
 
 def write_direct(index: dict):
@@ -123,8 +123,8 @@ def write_direct(index: dict):
     tex = (SHARED / "tab_direct.tex").read_text(encoding="utf-8")
     head, rest = tex.split("\\midrule\n", 1)
     tail = rest[rest.index("\\bottomrule"):]
-    (SHARED / "tab_direct.tex").write_text(head + "\\midrule\n" + "\n\\midrule\n".join(lines) + "\n" + tail,
-                                           encoding="utf-8")
+    (SHARED / "tab_direct.tex").write_bytes(
+        (head + "\\midrule\n" + "\n\\midrule\n".join(lines) + "\n" + tail).encode("utf-8"))
 
 
 def write_replay():
@@ -152,7 +152,7 @@ def write_replay():
     tex = (SHARED / "tab_replay.tex").read_text(encoding="utf-8")
     head, rest = tex.split("\\midrule\n", 1)
     tail = rest[rest.index("\\bottomrule"):]
-    (SHARED / "tab_replay.tex").write_text(head + "\\midrule\n" + "\n".join(lines) + "\n" + tail, encoding="utf-8")
+    (SHARED / "tab_replay.tex").write_bytes((head + "\\midrule\n" + "\n".join(lines) + "\n" + tail).encode("utf-8"))
 
 
 def main():
