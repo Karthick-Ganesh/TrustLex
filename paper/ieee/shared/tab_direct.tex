@@ -1,6 +1,6 @@
 % Direct injection and typed inputs. Shared by both papers.
 \begin{table}[t]
-\caption{Direct injection: attack success (\%) when the customer's message is the attack; in D the attacker also fills two typed fields, which block the request. Red: not final.}
+\caption{Direct injection: attack success (\%) when the customer's message is the attack; in D the attacker also fills two typed fields, which block the request. TT: Tensor Trust's rule; ours: corrected judge. Red: not final.}
 \label{tab:direct}
 \centering\footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -8,14 +8,11 @@
 \toprule
 Model & Attacks ($n$) & A & B & Bt & S & C & D \\
 \midrule
-\multirow{2}{*}{gemma-4-26b} & TT (165) & \pending{3.6} & \pending{1.2} & \pending{1.2} & \pending{2.4} & \pending{2.4} & \textbf{0} \\
- & Ours (32) & \pending{3.1} & \pending{0.0} & \pending{0.0} & \pending{3.1} & \pending{0.0} & \textbf{0} \\
+\multirow{2}{*}{gemma-4-26b} & TT (165) & 2.4 & 0.0 & 0.0 & 1.2 & \textbf{0.0} & \textbf{0} \\
+ & Ours (32) & 0.0 & 0.0 & 0.0 & 0.0 & \textbf{0.0} & \textbf{0} \\
 \midrule
-\multirow{2}{*}{llama-3.1-8b} & TT (165) & \pending{35.2} & \pending{34.5} & \pending{20.0} & \pending{26.1} & \pending{18.2} & \textbf{0} \\
+\multirow{2}{*}{llama-3.1-8b} & TT (165) & 23.6 & 30.9 & 19.4 & 20.0 & \textbf{4.8} & \textbf{0} \\
  & Ours (32) & 9.4 & 6.2 & 3.1 & 6.2 & \textbf{0.0} & \textbf{0} \\
-\midrule
-\multirow{2}{*}{mistral-7b} & TT (165) & \pending{--} & \pending{--} & \pending{--} & \pending{--} & \pending{--} & \pending{--} \\
- & Ours (32) & \pending{--} & \pending{--} & \pending{--} & \pending{--} & \pending{--} & \pending{--} \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -1,6 +1,6 @@
 % Main live result: indirect injection. Shared by both papers.
 \begin{table*}[t]
-\caption{Indirect injection: attack success (\%) by layout, with the attack in a retrieved article (Tensor Trust, 165 attacks) or an e-mail (LLMail-Inject, 200). Layouts as in Section~\ref{sec:layouts}; $p$: exact McNemar, B vs.\ C; Util.: benign-task success, B / C. Red: not final (Groq rows partial).}
+\caption{Indirect injection: attack success (\%) by layout, with the attack in a retrieved article (Tensor Trust, 165 attacks) or an e-mail (LLMail-Inject, 200). Layouts as in Section~\ref{sec:layouts}; $p$: exact McNemar, B vs.\ C; Util.: benign-task success, B / C. Success by each set's own rule (Section~\ref{sec:judge}). Red: partial runs.}
 \label{tab:indirect}
 \centering\footnotesize
 \setlength{\tabcolsep}{3.2pt}
@@ -10,13 +10,13 @@
 \cmidrule(lr){2-8}\cmidrule(lr){9-15}
 Model & A & B & Bt & S & C & $p$ & Util. & A & B & Bt & S & C & $p$ & Util. \\
 \midrule
-allam-2-7b       & \pending{69.5} & \pending{64.2} & \pending{67.4} & \pending{57.9} & \pending{\textbf{52.6}} & \pending{--} & \pending{100/100} & -- & -- & -- & -- & -- & -- & -- \\
-qwen3.8-27b      & \pending{30.6} & \pending{16.3} & \pending{12.2} & \pending{10.2} & \pending{\textbf{0.0}} & \pending{--} & \pending{100/100} & -- & -- & -- & -- & -- & -- & -- \\
-gpt-oss-20b      & \pending{53.8} & \pending{26.9} & \pending{15.4} & \pending{11.5} & \pending{\textbf{7.7}} & \pending{--} & \pending{100/100} & -- & -- & -- & -- & -- & -- & -- \\
-gpt-oss-120b     & \pending{41.9} & \pending{9.7} & \pending{3.2} & \pending{29.0} & \pending{\textbf{0.0}} & \pending{--} & \pending{100/100} & -- & -- & -- & -- & -- & -- & -- \\
-gemma-4-26b      & \pending{4.8} & \pending{3.0} & \pending{2.4} & \pending{9.7} & \pending{\textbf{0.0}} & \pending{.063} & \pending{88/78} & \pending{23.5} & \pending{34.0} & \pending{28.0} & \pending{14.0} & \pending{\textbf{12.5}} & \pending{$<$.001} & \pending{100/100} \\
-llama-3.1-8b     & \pending{36.4} & \pending{36.4} & \pending{30.9} & \pending{32.7} & \pending{\textbf{1.8}} & \pending{$<$.001} & \pending{100/100} & \pending{57.5} & \pending{57.5} & \pending{58.5} & \pending{65.5} & \pending{\textbf{49.5}} & \pending{.072} & \pending{100/100} \\
-mistral-7b       & \pending{63.6} & \pending{72.1} & \pending{69.1} & \pending{55.2} & \pending{\textbf{53.3}} & \pending{$<$.001} & \pending{100/98} & \pending{--} & \pending{--} & \pending{--} & \pending{--} & \pending{--} & \pending{--} & \pending{--} \\
+allam-2-7b       & \pending{44.9} & \pending{44.9} & \pending{42.1} & \pending{39.3} & \pending{\textbf{15.9}} & \pending{$<$.001} & \pending{100/100} & -- & -- & -- & -- & -- & -- & -- \\
+qwen3.8-27b      & \pending{29.1} & \pending{18.2} & \pending{14.5} & \pending{12.7} & \pending{\textbf{0.0}} & \pending{.002} & \pending{100/100} & -- & -- & -- & -- & -- & -- & -- \\
+gpt-oss-20b      & \pending{46.7} & \pending{20.0} & \pending{10.0} & \pending{10.0} & \pending{\textbf{6.7}} & \pending{.125} & \pending{100/100} & -- & -- & -- & -- & -- & -- & -- \\
+gpt-oss-120b     & \pending{28.6} & \pending{11.4} & \pending{5.7} & \pending{22.9} & \pending{\textbf{0.0}} & \pending{.125} & \pending{100/100} & -- & -- & -- & -- & -- & -- & -- \\
+gemma-4-26b      & 4.8 & 3.0 & 2.4 & 9.7 & \textbf{0.0} & .062 & 88/78 & 4.0 & 23.0 & 15.5 & 0.0 & \textbf{0.0} & $<$.001 & 100/100 \\
+llama-3.1-8b     & 34.5 & 34.5 & 29.7 & 30.9 & \textbf{1.8} & $<$.001 & 100/100 & 2.0 & 32.0 & 33.5 & 1.5 & \textbf{4.0} & $<$.001 & 100/100 \\
+mistral-7b       & 37.6 & 43.6 & 42.4 & 36.4 & \textbf{24.8} & $<$.001 & 100/98 & -- & -- & -- & -- & -- & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table*}
