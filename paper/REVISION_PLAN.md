@@ -83,7 +83,7 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 
 **Expected outcome.** C clearly beats B on indirect attacks, and beats or matches B-tagged on models that respect markers. If not, the paper's main claim still rests on the compile-time metrics (real-app leaks and typed-input share), and C is reported as "matches best practice".
 
-### E1. Evaluated only on our own corpus (circular F1) 🔴 · 🧱 — DONE except the 4 independent translations and the replay (c73b881, aa1834c)
+### E1. Evaluated only on our own corpus (circular F1) 🔴 · 🧱 — DONE (c73b881, aa1834c); independent translations: 2 of 4 planned (agreement in case_study/README.md); replay done
 
 **Problem.** F1 = 1.00 comes from 48 programs we wrote around TrustLex's own rules. The property-based tests show the theory is sound, but not that real prompts have these leaks, or that TrustLex can express real apps.
 

@@ -2,7 +2,9 @@
 
 Twelve open-source LLM applications, chosen by the pre-registered protocol in [SELECTION.md](SELECTION.md) (committed before any candidate was opened). [candidates.csv](candidates.csv) lists all 361 search results with the decision and reason for each. `apps/` holds the TrustLex translation of each app, with the repository commit, the exact files and line ranges of its prompt construction, the source of every input, and what TrustLex cannot express.
 
-**Status:** draft translations by Claude are complete. The independent translations by the authors (4 apps, see [TRANSLATION_GUIDE.md](TRANSLATION_GUIDE.md)) and the agreement measurement are pending. Proofs of concept are pending.
+**Status:** draft translations by Claude are complete. An author translated 2 apps independently (`independent/`; 4 were planned, see the deviation in [SELECTION.md](SELECTION.md)). Proofs of concept: layout replay in `replay.py`.
+
+**Translation agreement** (`python paper/case_study/compare.py`): over career-ops and graphify, placement 3/3 (every outside text in the same block with the same treatment), leak verdict 2/2, exact error codes 1/2, trust tags 0/6. The tags differ systematically: the author tagged text by who chose it (the person running the tool, `user`), Claude by who wrote it (a job ad or a repository's files, `rag`). Under the default policy this changes only the code (TL-S010 vs TL-S011), not the verdict.
 
 ## Results
 

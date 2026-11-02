@@ -60,6 +60,8 @@ For each stratum, the GitHub repository search below is run once, sorted by star
 
 Claude (the AI assistant) drafts each translation. At least one author independently translates a sample of at least 4 of the 12 apps from the original source code, without seeing the draft, and agreement between the two translations is reported. Disagreements are resolved by discussion and recorded.
 
+> **Deviation, 2026-11-02, reported in the paper:** only 2 of the 4 planned independent translations (career-ops, graphify) were done, for lack of time; agreement is reported over these two. The author saw the comparison for career-ops before translating graphify, and received the same file and line pointers to the prompt code that the translation guide lists. After translation, Claude escaped literal braces in the graphify prompt text (a syntax error, TL-L005); nothing else was changed.
+
 ## Ethics
 
 Only public code is read. Proofs of concept run only on local copies, with the authors' own API keys, never against deployed services. Confirmed leaks in maintained projects are reported to the maintainers by the authors (Karthick Ganesh drafts and sends the reports).
