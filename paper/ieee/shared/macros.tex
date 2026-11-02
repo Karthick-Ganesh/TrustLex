@@ -1,0 +1,34 @@
+% Shared by the conference paper (trustlex.tex) and the journal version
+% (trustlex_journal.tex).
+\newcommand{\TL}{\textsc{TrustLex}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\lab}[1]{\textsf{\small #1}}
+% A number that is not final yet (live runs still in progress, or not yet
+% re-judged). Every \pending{} is replaced by the final value before submission:
+%   grep -n "pending{" trustlex.tex trustlex_journal.tex shared/*.tex
+\newcommand{\pending}[1]{\textcolor{red}{#1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
+\lstdefinelanguage{trustlex}{
+  morekeywords={var,input,from,system,instruction,insert,sanitize,declassify,pattern,enum,int},
+  morecomment=[l]{\#},
+  morestring=[b]",
+}
+\lstset{
+  language=trustlex,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape\color{gray},
+  stringstyle=\color{teal!70!black},
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framesep=2pt,
+  xleftmargin=3pt,
+  xrightmargin=3pt,
+  aboveskip=4pt,
+  belowskip=4pt,
+}

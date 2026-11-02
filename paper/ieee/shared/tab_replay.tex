@@ -1,0 +1,25 @@
+% Layout replay of the leaking real applications. Shared by both papers.
+\begin{table}[t]
+\caption{Proof of concept by layout replay: attack success (\%) of 30 Tensor Trust attacks planted in the outside text that each application places in its system prompt, with the application's original layout (orig.) and with the layout \TL{}'s fix-it produces (fixed). allam used the default sanitizer, the others the datamarking variant. Pooled $p$: exact McNemar over all paired trials. Red values are not final.}
+\label{tab:replay}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+ & \multicolumn{2}{c}{allam-2-7b} & \multicolumn{2}{c}{llama-3.1-8b} & \multicolumn{2}{c}{gemma-4-26b} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Application & orig. & fixed & orig. & fixed & orig. & fixed \\
+\midrule
+career-ops    & \pending{86.7} & \pending{73.3} & \pending{62.1} & \pending{41.4} & \pending{13.3} & \pending{0.0} \\
+DeepTutor     & \pending{80.0} & \pending{50.0} & \pending{26.7} & \pending{26.7} & \pending{16.7} & \pending{6.7} \\
+project-nomad & \pending{53.3} & \pending{50.0} & \pending{40.0} & \pending{26.7} & \pending{13.3} & \pending{0.0} \\
+hermes-agent  & \pending{90.0} & \pending{73.3} & \pending{46.7} & \pending{20.0} & \pending{10.0} & \pending{0.0} \\
+open-design   & \pending{76.7} & \pending{73.3} & \pending{48.3} & \pending{34.5} & \pending{16.7} & \pending{0.0} \\
+agent-browser & \pending{73.3} & \pending{76.7} & \pending{34.5} & \pending{24.1} & \pending{10.0} & \pending{3.3} \\
+openhuman     & \pending{63.3} & \pending{83.3} & \pending{26.7} & \pending{6.7} & \pending{6.7} & \pending{0.0} \\
+\midrule
+Pooled        & \pending{74.8} & \pending{68.6} & \pending{40.6} & \pending{25.6} & \pending{12.4} & \pending{1.4} \\
+$p$           & \multicolumn{2}{c}{\pending{0.092}} & \multicolumn{2}{c}{\pending{$<$0.001}} & \multicolumn{2}{c}{\pending{$<$0.001}} \\
+\bottomrule
+\end{tabular}
+\end{table}
