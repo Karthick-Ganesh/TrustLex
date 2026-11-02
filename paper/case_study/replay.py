@@ -30,7 +30,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 sys.path[:0] = [str(ROOT), str(ROOT / "eval")]
 
-from codegen import compile_source  # noqa: E402
+from codegen import SanitizerConfig, compile_source  # noqa: E402
 from common import canary, load_attacks, mcnemar, wilson, with_canary  # noqa: E402
 from llm_asr import _from_payload, _load_dotenv, _split, obeyed  # noqa: E402
 from main import apply_fixes  # noqa: E402
@@ -90,17 +90,17 @@ APPS = {
 }
 
 
-def layouts(app: dict):
+def layouts(app: dict, sanitizer: str):
     source = (HERE / "apps" / app["file"]).read_text(encoding="utf-8")
     fixed_source, applied, final = apply_fixes(source, app["file"], SecurityPolicy.strict())
     if not final.ok:
         raise SystemExit(f"{app['file']}: the fix-its do not produce an accepted program")
-    _, compiled = compile_source(fixed_source, app["file"])
+    _, compiled = compile_source(fixed_source, app["file"], sanitizer=SanitizerConfig(name=sanitizer))
     return source, compiled, applied
 
 
-def plan(app_name: str, app: dict, attacks: list[dict], model: str):
-    source, compiled, applied = layouts(app)
+def plan(app_name: str, app: dict, attacks: list[dict], model: str, sanitizer: str):
+    source, compiled, applied = layouts(app, sanitizer)
     trials = []
     for item in attacks:
         for layout in ("original", "fixed"):
@@ -123,6 +123,8 @@ def main(argv=None) -> int:
     p.add_argument("--base-url")
     p.add_argument("--key-env")
     p.add_argument("--limit", type=int, default=30)
+    p.add_argument("--sanitizer", default="trustlex-default/1",
+                   help="sanitizer of the fixed layout (trustlex-default/1 or trustlex-datamark/1)")
     p.add_argument("--rpm", type=float, default=5)
     p.add_argument("--max-tokens", type=int, default=512)
     p.add_argument("--out", type=Path, default=ROOT / "eval" / "results" / "v2" / "replay")
@@ -134,7 +136,7 @@ def main(argv=None) -> int:
     attacks = load_attacks(TT_TEST)[:args.limit]
     trials = []
     for name, app in APPS.items():
-        app_trials, applied = plan(name, app, attacks, args.model)
+        app_trials, applied = plan(name, app, attacks, args.model, args.sanitizer)
         print(f"{name}: fixed by {'; '.join(applied)}")
         trials += app_trials
     if args.dry_run:
@@ -160,7 +162,7 @@ def main(argv=None) -> int:
         if i % 20 == 0:
             print(f"  {i}/{len(trials)}", flush=True)
 
-    summary = {"model": args.model, "attacks": len(attacks), "apps": {}}
+    summary = {"model": args.model, "sanitizer": args.sanitizer, "attacks": len(attacks), "apps": {}}
     for name in APPS:
         by = {layout: {r["item"]: r["success"] for r in rows if r["app"] == name and r["layout"] == layout
                        and r["error"] == ""} for layout in ("original", "fixed")}
@@ -176,7 +178,8 @@ def main(argv=None) -> int:
                                  "mcnemar_p": round(mcnemar(b, c), 4)}
         s = summary["apps"][name]
         print(f"{name:14} n={s['n']:3}  original {s['original_asr']:.1%}  fixed {s['fixed_asr']:.1%}  p={s['mcnemar_p']}")
-    stem = f"replay_{args.provider}_{args.model.replace('/', '_')}"
+    variant = "" if args.sanitizer == "trustlex-default/1" else "_" + args.sanitizer.split("/")[0].removeprefix("trustlex-")
+    stem = f"replay{variant}_{args.provider}_{args.model.replace('/', '_')}"
     (args.out / f"{stem}.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     (args.out / f"{stem}.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows), encoding="utf-8")
     print("wrote", args.out / f"{stem}.json")
