@@ -146,16 +146,14 @@ def write_replay():
             ("openhuman", "openhuman")]
     lines = []
     for app, shown in apps:
-        vals = []
-        for m in files:
-            vals += [rate(res[m][(app, "original")]), rate(res[m][(app, "fixed")])]
+        vals = [f"{rate(res[m][(app, 'original')])}\\,$\\to$\\,{rate(res[m][(app, 'fixed')])}" for m in files]
         lines.append(f"{shown:13} & " + " & ".join(vals) + r" \\")
     pooled, ps = [], []
     for m in files:
         o = {(a, i): s for (a, lay), it in res[m].items() if lay == "original" for i, s in it.items()}
         f = {(a, i): s for (a, lay), it in res[m].items() if lay == "fixed" for i, s in it.items()}
-        pooled += [rate(o), rate(f)]
-        ps.append(f"\\multicolumn{{2}}{{c}}{{{fmt_p(paired_p(o, f))}}}")
+        pooled.append(f"{rate(o)}\\,$\\to$\\,{rate(f)}")
+        ps.append(fmt_p(paired_p(o, f)))
     lines.append("\\midrule")
     lines.append("Pooled        & " + " & ".join(pooled) + r" \\")
     lines.append("$p$           & " + " & ".join(ps) + r" \\")
