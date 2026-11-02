@@ -70,10 +70,18 @@ def rate(items: dict) -> str:
 
 
 def official(path: Path | None):
+    """(condition -> {item: success}, still running?) under the attack set's own rule.
+    A run that a daily quota stopped is final, not pending: it is marked in the table."""
     if path is None or not path.exists():
         return None
-    res = run_results(path)
-    return res["by"], bool(res["meta"].get("partial"))
+    return run_results(path)["by"], False
+
+
+def partial_attacks(path: Path | None) -> int | None:
+    if path is None or not path.exists():
+        return None
+    meta = json.loads(path.with_suffix(".json").read_text(encoding="utf-8"))["metadata"]
+    return meta["attacks"] if meta.get("partial") else None
 
 
 def indirect_cells(path, scored) -> list[str]:
@@ -95,7 +103,9 @@ def write_indirect(index: dict):
         lm = index.get(("email", "llmail_test", model))
         row = indirect_cells(tt, official(tt))
         row += indirect_cells(lm, official(lm)) if lm else ["--"] * 7
-        lines.append(f"{name:16} & " + " & ".join(row) + r" \\")
+        n = partial_attacks(tt)
+        shown = f"{name}$^\\dagger$ ({n})" if n else name
+        lines.append(f"{shown:16} & " + " & ".join(row) + r" \\")
     tex = (SHARED / "tab_indirect.tex").read_text(encoding="utf-8")
     head, rest = tex.split("\\midrule\n", 1)
     tail = rest[rest.index("\\bottomrule"):]
