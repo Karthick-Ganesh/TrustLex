@@ -4,10 +4,10 @@ Uses the variant chosen by orchestrate_v2.py (eval/results/v2/decision.json)
 and its retry logic. Two workers run in parallel:
 
   local   llama3.1:8b served by Ollama on this machine (no quota):
-          LLMail indirect, Tensor Trust indirect, layout replay, our attacks
+          LLMail (e-mail scenario), Tensor Trust indirect, layout replay, our attacks
           indirect, then the direct scenario with both attack sets
   gemma   waits until orchestrate_v2.py has finished its gemma jobs, then
-          LLMail indirect and the layout replay
+          LLMail (e-mail scenario) and the layout replay
 
     python eval/run_local_v2.py      (run it in the background)
 """
@@ -54,12 +54,12 @@ def gemma_after_first_wave(winner: str):
     path = EVAL / "results" / f"v2_orch_{slug(GEMMA['model'])}.log"
     while "all jobs complete" not in path.read_text(encoding="utf-8"):
         time.sleep(120)
-    jobs(GEMMA, winner, [("indirect", LLMAIL), "replay"])
+    jobs(GEMMA, winner, [("email", LLMAIL), "replay"])
 
 
 def main():
     winner = json.loads((V2 / "decision.json").read_text(encoding="utf-8"))["winner"]
-    local_plan = [("indirect", LLMAIL), ("indirect", TT_TEST), "replay", ("indirect", OURS),
+    local_plan = [("email", LLMAIL), ("indirect", TT_TEST), "replay", ("indirect", OURS),
                   ("direct", TT_TEST), ("direct", OURS)]
     threads = [threading.Thread(target=jobs, args=(LOCAL, winner, local_plan)),
                threading.Thread(target=gemma_after_first_wave, args=(winner,))]
