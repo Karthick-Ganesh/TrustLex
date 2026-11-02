@@ -97,10 +97,51 @@ def full_replies(csv_path: Path) -> dict:
     return out
 
 
-def successes() -> list[dict]:
-    """Every attack row the canary judge scored as a success, in every finished run,
-    with its complete reply (`reply`) and the reply as stored in the CSV (`stored`)."""
+REPLAY = EVAL / "results" / "v2" / "replay"
+
+
+def replay_successes() -> list[dict]:
+    """Successes of the case-study layout replay (paper/case_study/replay.py), with
+    full replies from its cache (its JSONL keeps 400 characters). The condition is
+    `app:layout`."""
+    sys.path.insert(0, str(EVAL.parent / "paper" / "case_study"))
+    import replay  # noqa: PLC0415 - only needed here
+
+    cache = {}
+    if (REPLAY / "cache.jsonl").exists():
+        for line in (REPLAY / "cache.jsonl").open(encoding="utf-8"):
+            try:
+                entry = json.loads(line)
+            except ValueError:
+                continue
+            cache[entry["key"]] = entry["response"]
     rows = []
+    for path in sorted(REPLAY.glob("replay_*.jsonl")):
+        meta = json.loads(path.with_suffix(".json").read_text(encoding="utf-8"))
+        provider = "gemini" if "_gemini_" in path.stem else "openai_compat"
+        attacks = load_attacks(ATTACK_SETS["tensor_trust_test"])[:meta["attacks"]]
+        full = {}
+        for name, app in replay.APPS.items():
+            trials, _ = replay.plan(name, app, attacks, meta["model"], meta.get("sanitizer", "trustlex-default/1"))
+            for t in trials:
+                reply = cache.get(cache_key(provider, meta["model"], t["system"], t["messages"], 0.0))
+                if reply is not None:
+                    full[(t["app"], t["layout"], t["item"])] = reply
+        for line in path.open(encoding="utf-8"):
+            r = json.loads(line)
+            if r.get("success") == 1:
+                rows.append({"run": path.stem, "condition": f"{r['app']}:{r['layout']}", "item": r["item"],
+                             "repeat": "0", "canary": r["canary"], "stored": r["reply"], "kind": "attack",
+                             "success": "1", "error": r["error"],
+                             "reply": full.get((r["app"], r["layout"], r["item"]), r["reply"])})
+    return rows
+
+
+def successes() -> list[dict]:
+    """Every attack row the canary judge scored as a success, in every finished run
+    and in the layout replay, with its complete reply (`reply`) and the reply as
+    stored in the result file (`stored`)."""
+    rows = replay_successes()
     for path in sorted(RESULTS.glob("*.csv")):
         full = None
         for r in csv.DictReader(path.open(encoding="utf-8")):
@@ -144,7 +185,8 @@ def run_judge(args):
     def stale(r):
         entry = done.get(row_key(r))
         return (entry is None or entry["label"] == "UNCLEAR"
-                or (len(r["stored"]) >= STORED and not entry.get("full_reply")))
+                or (len(r["stored"]) >= (400 if r["run"].startswith("replay") else STORED)
+                    and not entry.get("full_reply")))
     todo = [r for r in successes() if stale(r)]
     random.Random("trustlex-rejudge-1").shuffle(todo)  # blind to condition: no order by run or layout
     # Each worker has its own client (and cache file) and an equal share of the rate.
