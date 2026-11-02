@@ -274,7 +274,9 @@ def agreement(path: Path):
     """Agreement and Cohen's kappa between the filled human sheet (CSV) and the judge."""
     labels = load_labels()
     keys = json.loads((OUT / "human_sheet_key.json").read_text(encoding="utf-8"))
-    human = {int(r["no"]): r["your_label"].strip().upper() for r in csv.DictReader(path.open(encoding="utf-8-sig"))}
+    # The author typed COMPILED for COMPLIED throughout; it is read as the same label.
+    human = {int(r["no"]): {"COMPILED": "COMPLIED"}.get(r["your_label"].strip().upper(), r["your_label"].strip().upper())
+             for r in csv.DictReader(path.open(encoding="utf-8-sig"))}
     pairs = [(human[i], labels[k]["label"]) for i, k in enumerate(keys, 1) if human.get(i) in ("COMPLIED", "MENTIONED")]
     n = len(pairs)
     agree = sum(h == j for h, j in pairs) / n
