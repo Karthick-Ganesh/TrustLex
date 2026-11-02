@@ -16,6 +16,7 @@ original verdict.
     python eval/rejudge.py                 judge every success not judged yet
     python eval/rejudge.py --summary       corrected ASR per run and condition
     python eval/rejudge.py --sample 60     blind sheet for a human check
+    python eval/rejudge.py --agreement F   agreement of the filled sheet with the judge
 """
 from __future__ import annotations
 
@@ -160,19 +161,42 @@ def summary():
 
 
 def sample(n: int):
-    """A blind sheet for a human: shuffled successes without condition, run or the judge's label."""
+    """A blind sheet for a human: n judged successes, half of each judge label so that
+    agreement is measured on both, in shuffled order, without condition, run or label."""
     texts, labels = attack_texts(), load_labels()
-    rows = [r for r in successes() if row_key(r) in labels]
-    random.Random("trustlex-rejudge-human-1").shuffle(rows)
-    rows = rows[:n]
+    rng = random.Random("trustlex-rejudge-human-1")
+    rows = []
+    for label in ("COMPLIED", "MENTIONED"):
+        pool = [r for r in successes() if labels.get(row_key(r), {}).get("label") == label]
+        rng.shuffle(pool)
+        rows += pool[:n // 2]
+    rng.shuffle(rows)
     OUT.mkdir(parents=True, exist_ok=True)
-    with (OUT / "human_sheet.csv").open("w", encoding="utf-8", newline="") as f:
+    with (OUT / "human_sheet.csv").open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["no", "code", "attacker_text", "assistant_reply", "your_label (COMPLIED or MENTIONED)"])
+        w.writerow(["no", "code", "attacker_text", "assistant_reply", "your_label"])
         for i, r in enumerate(rows, 1):
             w.writerow([i, r["canary"], texts[r["item"]].replace("{CANARY}", r["canary"])[:600], r["reply"][:900], ""])
     (OUT / "human_sheet_key.json").write_text(json.dumps([row_key(r) for r in rows], indent=1), encoding="utf-8")
     print(f"wrote {OUT / 'human_sheet.csv'} ({len(rows)} rows)")
+
+
+def agreement(path: Path):
+    """Agreement and Cohen's kappa between the filled human sheet (CSV) and the judge."""
+    labels = load_labels()
+    keys = json.loads((OUT / "human_sheet_key.json").read_text(encoding="utf-8"))
+    human = {int(r["no"]): r["your_label"].strip().upper() for r in csv.DictReader(path.open(encoding="utf-8-sig"))}
+    pairs = [(human[i], labels[k]["label"]) for i, k in enumerate(keys, 1) if human.get(i) in ("COMPLIED", "MENTIONED")]
+    n = len(pairs)
+    agree = sum(h == j for h, j in pairs) / n
+    p_h = sum(h == "COMPLIED" for h, _ in pairs) / n
+    p_j = sum(j == "COMPLIED" for _, j in pairs) / n
+    expected = p_h * p_j + (1 - p_h) * (1 - p_j)
+    kappa = (agree - expected) / (1 - expected) if expected < 1 else 1.0
+    print(f"{n} labelled rows: agreement {agree:.1%}, Cohen's kappa {kappa:.2f}")
+    for h in ("COMPLIED", "MENTIONED"):
+        print(f"   human {h:9}: judge " + ", ".join(f"{j} {sum(1 for x, y in pairs if x == h and y == j)}"
+                                              for j in ("COMPLIED", "MENTIONED")))
 
 
 def main(argv=None):
@@ -186,11 +210,14 @@ def main(argv=None):
     p.add_argument("--max-tokens", type=int, default=4096)
     p.add_argument("--summary", action="store_true")
     p.add_argument("--sample", type=int)
+    p.add_argument("--agreement", type=Path, help="the filled human sheet (CSV)")
     args = p.parse_args(argv)
     if args.summary:
         summary()
     elif args.sample:
         sample(args.sample)
+    elif args.agreement:
+        agreement(args.agreement)
     else:
         run_judge(args)
 
