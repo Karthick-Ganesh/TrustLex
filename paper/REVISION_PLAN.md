@@ -137,13 +137,13 @@ Legend: criticality 🔴 high (likely rejection reason) · 🟠 medium (major-re
 
 | # | Point | Status | Crit. | Feas. |
 |---|---|---|---|---|
-| D | Exponential worst case (`a = a + a`) | rebutted in paper, not fixed in code; fix = DAG / hash-consed templates | 🟠 | 🛠 |
-| C | Lattice levels act like two | one sentence in paper; A partly helps; option: a `context{}` channel for RAG data at SEMI_TRUSTED | 🟠 | 🛠 |
+| D | Exponential worst case (`a = a + a`) | **DONE:** size cap, TL-S016 (10,000 slots / 4M chars); checking bounded, 0.30 s at the cap | 🟠 | ⚡ |
+| C | Lattice levels act like two | **DONE:** table of what each level admits, by policy (checked against the compiler); `context{}` channel not planned | 🟠 | ⚡ |
 | E3 | B vs C weak | **agreed above** (Parts 1–2); Part 3 waits for the live-test discussion | 🔴 | 🛠/🧱 |
-| E2 | Condition D compares free text with an 8-character regex | labelled "by construction"; needs evidence of how often real inputs can be typed | 🟠 | 🧱 |
+| E2 | Condition D compares free text with an 8-character regex | **DONE:** case study, 2 of 31 real inputs typeable; D's claim reworded (blocks attacks written into typed fields) | 🟠 | ⚡ |
 | E1 | Own corpus only (circular F1) | **agreed above** (real-app case study) | 🔴 | 🧱 |
 | — | Proof is a sketch | fine for a conference; full proof for a journal | 🟢/🟠 | 🛠 |
-| — | Semantic Kernel cited as a developer blog [15] | text mention only | 🟢 | ⚡ |
+| — | Semantic Kernel cited as a developer blog [15] | **DONE:** cites the SDK repository, blog as a note | 🟢 | ⚡ |
 | — | Novelty: exact analysis is easy without control flow | add `if`/`match`/functions, or a practical contribution | 🔴 | 🧱 |
 | — | Only 3 small free-tier models | add 1–2 frontier models | 🟠 | 🛠 |
 | — | One public benchmark, not indirect | add BIPIA or AgentDojo | 🟠 | 🛠/🧱 |

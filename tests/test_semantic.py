@@ -605,3 +605,17 @@ def test_rejected_type_keeps_the_source_label():
 ])
 def test_example_value_matches_the_type(t, value):
     assert example_value(t) == value
+
+
+def _doubling(k: int, block: str = "instruction") -> str:
+    return 'input u\nvar a = "x{u}"\n' + "a = a + a\n" * k + f"{block} {{ insert(a) }}"
+
+
+def test_template_growth_is_capped():
+    assert "TL-S016" not in codes(_doubling(13))  # 8,192 insertions
+    assert codes(_doubling(14)).count("TL-S016") == 1  # 16,384: rejected, reported once
+    assert codes(_doubling(40)).count("TL-S016") == 1  # and checking stays bounded
+
+
+def test_capped_template_keeps_its_labels():
+    assert "TL-S010" in codes(_doubling(20, "system"))

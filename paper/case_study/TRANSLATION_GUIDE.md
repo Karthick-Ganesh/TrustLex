@@ -27,6 +27,8 @@ Each app below builds an LLM prompt in Python, TypeScript or Rust. You read the 
 | a retrieved document, a web page, an uploaded or cloned file, a job ad, an email, a file name, a skill/plugin description: anything written by a third party | `input x from rag` |
 | a tool or API result, **or text an LLM wrote** (a summary, a "memory", an extracted profile) | `input x from tool` |
 
+Tag text by who **wrote** it, not by who chose or supplied it. A user who pastes a job ad, uploads a PDF or points the tool at a folder did not write that text: it is `from rag`, even though the user picked it. (Added on 2026-11-02, after the two independent translations, which both tagged such text as `user`.)
+
 **2. Where does it go?** A `system`/`developer` message, or a `system=` / `systemInstruction` parameter → `system { }`. A `user` message, or a `tool` message → `instruction { }`. Keep the order of the messages: several `system { }` and `instruction { }` blocks are allowed.
 
 **3. Fixed choices.** If the app only ever accepts a value from a fixed set (a language code, a plan tier, an integer it computes), write a typed input: `input lang : enum("en", "fr")`, `input n : int`, `input id : pattern("[A-Z0-9]{8}")`.

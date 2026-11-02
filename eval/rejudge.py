@@ -96,11 +96,14 @@ def run_judge(args):
     _load_dotenv()
     OUT.mkdir(parents=True, exist_ok=True)
     texts, done = attack_texts(), load_labels()
-    todo = [r for r in successes() if row_key(r) not in done]
+    # UNCLEAR items (e.g. the judge thought until max_tokens) are judged again; the last label wins.
+    todo = [r for r in successes() if done.get(row_key(r), {}).get("label") in (None, "UNCLEAR")]
     random.Random("trustlex-rejudge-1").shuffle(todo)  # blind to condition: no order by run or layout
     # Each worker has its own client (and cache file) and an equal share of the rate.
     clients = [ReliableClient(make_provider(args.provider, args.model, base_url=args.base_url, key_env=args.key_env),
                               OUT / f"cache_{i}.jsonl", rpm=args.rpm / args.workers) for i in range(args.workers)]
+    for c in clients:  # the cache key has no max_tokens: an empty (cut-off) reply must be asked again
+        c.cache = {k: v for k, v in c.cache.items() if _LABEL.search(v or "")}
     print(f"{len(todo)} successes to judge ({len(done)} judged before) with {args.model}", flush=True)
     lock, count = threading.Lock(), [0]
 
@@ -180,7 +183,7 @@ def main(argv=None):
     p.add_argument("--key-env", default="GEMINI_API_KEY")
     p.add_argument("--rpm", type=float, default=12)
     p.add_argument("--workers", type=int, default=6)
-    p.add_argument("--max-tokens", type=int, default=1024)
+    p.add_argument("--max-tokens", type=int, default=4096)
     p.add_argument("--summary", action="store_true")
     p.add_argument("--sample", type=int)
     args = p.parse_args(argv)

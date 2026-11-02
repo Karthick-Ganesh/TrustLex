@@ -344,6 +344,20 @@ class Template:
         return [p for p in self.pieces if isinstance(p, Slot)]
 
     @property
+    def too_large(self) -> bool:
+        slots = sum(1 for p in self.pieces if isinstance(p, Slot))
+        return (slots > MAX_TEMPLATE_SLOTS
+                or sum(len(p.text) for p in self.pieces if isinstance(p, Text)) > MAX_TEMPLATE_TEXT)
+
+    def collapsed(self) -> Template:
+        """One slot per distinct way an input enters, and no text: the same labels,
+        in constant size."""
+        seen = {}
+        for s in self.slots:
+            seen.setdefault((s.input, s.source_level, s.sanitized, s.declassified), s)
+        return Template(tuple(seen.values()))
+
+    @property
     def label(self) -> TrustLevel:
         return functools.reduce(TrustLevel.join, (s.level for s in self.slots), TrustLevel.TRUSTED)
 
@@ -470,6 +484,14 @@ _LEAK_HINT = {
     TrustLevel.SEMI_TRUSTED: "retrieved or tool-produced text can carry instructions planted by a third party (indirect prompt injection)",
 }
 _MAX_PATH = 4
+# Largest template the checker builds: developer text of about four times the
+# largest context window (1M tokens), and at most 10,000 insertions of input
+# values. Repeated self-concatenation (a = a + a) doubles a template per
+# statement; past either limit the program is rejected (TL-S016) and the template
+# is collapsed to its distinct slots, so checking stays bounded and the trust
+# labels stay sound.
+MAX_TEMPLATE_TEXT = 4_000_000
+MAX_TEMPLATE_SLOTS = 10_000
 
 
 def _short(text: str, limit: int = 32) -> str:
@@ -492,6 +514,7 @@ class SecurityChecker:
         self._all_names: set[str] = set()
         self._invalid_types: set[str] = set()  # inputs whose type got TL-S012
         self._statements: list = []
+        self._too_large = False
 
     def check(self, program: Program) -> CheckedProgram:
         self._statements = program.statements
@@ -596,15 +619,29 @@ class SecurityChecker:
         finally:
             self._target = None
 
+    def _bounded(self, template: Template, expr: Expr) -> Template:
+        if not template.too_large:
+            return template
+        if not self._too_large:
+            self._too_large = True
+            self.diagnostics.error(
+                "TL-S016", f"this expression builds a prompt with over {MAX_TEMPLATE_SLOTS:,} inserted values or "
+                f"{MAX_TEMPLATE_TEXT:,} characters of text", expr.span,
+                hint="a value concatenated with itself doubles at every step; no model's context window holds it",
+            )
+        return template.collapsed()
+
     def _eval(self, expr: Expr) -> Template:
         if isinstance(expr, StringLit):
             template = Template()
             for part in expr.parts:
                 template = template + (Template.of_text(part.text) if isinstance(part, TextSegment) else self._eval(part))
+            template = self._bounded(template, expr)
         elif isinstance(expr, VarRef):
             template = self._read(expr)
         elif isinstance(expr, Concat):
             template = self._eval(expr.left) + self._eval(expr.right)
+            template = self._bounded(template, expr)
         elif isinstance(expr, Sanitize):
             inner = self._eval(expr.expr)
             if inner.label.leq(TrustLevel.SANITIZED):
