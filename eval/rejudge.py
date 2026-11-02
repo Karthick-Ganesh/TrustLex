@@ -25,6 +25,7 @@ import json
 import random
 import re
 import sys
+import threading
 from collections import defaultdict
 from pathlib import Path
 
@@ -97,22 +98,32 @@ def run_judge(args):
     texts, done = attack_texts(), load_labels()
     todo = [r for r in successes() if row_key(r) not in done]
     random.Random("trustlex-rejudge-1").shuffle(todo)  # blind to condition: no order by run or layout
-    provider = make_provider(args.provider, args.model, base_url=args.base_url, key_env=args.key_env)
-    client = ReliableClient(provider, OUT / "cache.jsonl", rpm=args.rpm)
+    # Each worker has its own client (and cache file) and an equal share of the rate.
+    clients = [ReliableClient(make_provider(args.provider, args.model, base_url=args.base_url, key_env=args.key_env),
+                              OUT / f"cache_{i}.jsonl", rpm=args.rpm / args.workers) for i in range(args.workers)]
     print(f"{len(todo)} successes to judge ({len(done)} judged before) with {args.model}", flush=True)
-    with (OUT / "labels.jsonl").open("a", encoding="utf-8") as f:
-        for n, r in enumerate(todo, 1):
+    lock, count = threading.Lock(), [0]
+
+    def work(i: int):
+        for r in todo[i::args.workers]:
             system, messages = judge_request(r, texts)
             try:
-                reply, _ = client.complete(system, messages, 0.0, args.max_tokens)
+                reply, _ = clients[i].complete(system, messages, 0.0, args.max_tokens)
             except Exception as exc:  # noqa: BLE001 - a failed item is retried on the next run
                 print(f"  {row_key(r)}: {exc}", flush=True)
                 continue
-            f.write(json.dumps({"key": row_key(r), "label": parse(reply), "judge": args.model,
-                                "raw": (reply or "")[-200:]}, ensure_ascii=False) + "\n")
-            f.flush()
-            if n % 50 == 0:
-                print(f"  {n}/{len(todo)}", flush=True)
+            with lock, (OUT / "labels.jsonl").open("a", encoding="utf-8") as f:
+                f.write(json.dumps({"key": row_key(r), "label": parse(reply), "judge": args.model,
+                                    "raw": (reply or "")[-200:]}, ensure_ascii=False) + "\n")
+                count[0] += 1
+                if count[0] % 50 == 0:
+                    print(f"  {count[0]}/{len(todo)}", flush=True)
+
+    threads = [threading.Thread(target=work, args=(i,)) for i in range(args.workers)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
     print("judging done", flush=True)
 
 
@@ -168,6 +179,7 @@ def main(argv=None):
     p.add_argument("--base-url")
     p.add_argument("--key-env", default="GEMINI_API_KEY")
     p.add_argument("--rpm", type=float, default=12)
+    p.add_argument("--workers", type=int, default=6)
     p.add_argument("--max-tokens", type=int, default=1024)
     p.add_argument("--summary", action="store_true")
     p.add_argument("--sample", type=int)
