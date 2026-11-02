@@ -1,6 +1,6 @@
 % Main live result: indirect injection. Shared by both papers.
 \begin{table*}[t]
-\caption{Indirect injection: attack success rate (\%) by prompt layout. The attacker controls a retrieved help-center article (Tensor Trust, 165 attacks) or the last of two e-mails (LLMail-Inject, 200 attacks); the user's request is harmless. A = outside text raw in the system prompt; B = raw in the user turn (industry standard); Bt = B inside XML tags (industry best practice); S = sanitized in the system prompt (the layout earlier \TL{} versions accepted, now \code{TL-S013}); C = \TL{} (sanitized, datamarked, spotlighted in the user turn, with the data notice). $p$: exact McNemar, B vs.\ C, paired by attack. Util.: benign-task success for B / C (40 questions). Red values are not final; the Groq rows are partial (daily token quota). Success counts replies judged to comply with the attacker (Section~\ref{sec:judge}).}
+\caption{Indirect injection: attack success (\%) by layout, with the attack in a retrieved article (Tensor Trust, 165 attacks) or an e-mail (LLMail-Inject, 200). Layouts as in Section~\ref{sec:layouts}; $p$: exact McNemar, B vs.\ C; Util.: benign-task success, B / C. Red: not final (Groq rows partial).}
 \label{tab:indirect}
 \centering\footnotesize
 \setlength{\tabcolsep}{3.2pt}

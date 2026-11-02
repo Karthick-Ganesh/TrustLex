@@ -30,7 +30,7 @@
 \begin{document}
 
 \title{TrustLex: Compile-Time Trust Typing for Injection-Safe Prompts in LLM-Integrated Applications%
-\thanks{The implementation, evaluation harness and all results are available at \url{https://github.com/Karthick-Ganesh/TrustLex}.}}
+\thanks{The implementation, evaluation harness and all results are available at \protect\url{https://github.com/Karthick-Ganesh/TrustLex}.}}
 
 \author{
 \IEEEauthorblockN{Amritha Varshini Pakanati}
@@ -75,7 +75,7 @@ prompt injection, large language models, information-flow control, security type
 % =====================================================================
 \section{Introduction}
 
-Most real-world use of LLMs is not a person chatting with a model but an \emph{LLM-integrated application}: a company calls a general-purpose model through an API and wraps it in its own logic---a customer-support bot, a retrieval-augmented generation (RAG) assistant, an email assistant, or an agent that calls tools and web APIs. The model is not custom; the \emph{application} is. What makes it specific is its \emph{system prompt}---persona, business rules, restrictions---combined at run time with outside text.
+Most real-world use of LLMs is an \emph{LLM-integrated application}: a company wraps a general-purpose model in its own logic---a support bot, a retrieval-augmented generation (RAG) assistant, an e-mail assistant or a tool-using agent---whose \emph{system prompt} (persona, business rules, restrictions) is combined at run time with outside text.
 
 The application builds its prompt by concatenating strings: developer instructions, the customer's message, a retrieved document, a tool result. The model receives one token sequence and cannot reliably tell who wrote which part. An attacker who controls any outside text can therefore write text that \emph{looks like} developer instructions: \emph{direct} injection through the customer message~\cite{perez2022ignore}, or \emph{indirect} injection planted in a document, web page or API response that the application later retrieves~\cite{greshake2023indirect}. OWASP ranks prompt injection as the top risk for LLM applications~\cite{owasp2025}.
 
@@ -90,7 +90,7 @@ This resembles SQL injection, where queries were built by concatenating user inp
 % =====================================================================
 \section{Literature Review}\label{sec:lit}
 
-We review the lines of work that address prompt injection or the techniques \TL{} builds on; Table~\ref{tab:related} compares them along the dimensions that matter for a developer, and Section~\ref{sec:compare} compares reported and measured results.
+We review the lines of work that address prompt injection or the techniques \TL{} builds on; Table~\ref{tab:related} compares them along the dimensions that matter for a developer, and Section~\ref{sec:eval} relates our measurements to published ones.
 
 \begin{table*}[t]
 \caption{Comparison with related approaches}
@@ -101,7 +101,7 @@ We review the lines of work that address prompt injection or the techniques \TL{
 \toprule
  & DSPy~\cite{khattab2024dspy}, LMQL~\cite{beurer2023lmql} & CaMeL~\cite{debenedetti2025camel} & TaintP2X~\cite{he2026taintp2x} & CSAS~\cite{samuel2011csas} & PromptShield~\cite{jacob2024promptshield}, NeMo~\cite{rebedea2023nemo} & \textbf{\TL{}} \\
 \midrule
-Domain & LM pipelines, constrained decoding & privileged/quarantined LLMs & taint in LLM app code & web templates (XSS) & run-time detection & \textbf{prompt DSL} \\
+Domain & LM pipelines, constrained decoding & privileged and quarantined LLMs & taint in LLM app code & web templates (XSS) & run-time detection & \textbf{prompt DSL} \\
 Reasons about trust & no & yes & yes & yes (type qualifiers) & implicitly & \textbf{yes, deterministic} \\
 Enforcement & -- & run time & static, general code & compile time (inserts sanitizers) & run time & \textbf{compile time} \\
 Flow analysis & -- & run-time data flow & approximate & flow-sensitive type inference & none & \textbf{exact, flow-sensitive} \\
@@ -124,7 +124,7 @@ Per-request cost & inference & extra LLM + interpreter & none & sanitizers & cla
 
 \textbf{Protecting API calls.} The compiler's output \emph{is} the API request body, so values enter it as JSON string data and a value such as \verb|"}]}, {"role": "system", ...| cannot forge a message; tool and API responses are \code{input r from tool} and cannot reach the system prompt; and the deployed artifact is checksummed and optionally HMAC-sealed, with the invariant re-checked by \code{bind()} before every call.
 
-\textbf{Out of scope.} Persuasion inside the user turn (untrusted text is allowed there, delimited); which tools an agent decides to call, which capability-based runtimes such as CaMeL~\cite{debenedetti2025camel} address; and attacks on model training or weights.
+\textbf{Out of scope.} Persuasion inside the user turn, an agent's choice of tools (addressed by CaMeL~\cite{debenedetti2025camel}), and attacks on training or weights.
 
 % =====================================================================
 \section{The TrustLex Language}
@@ -162,7 +162,7 @@ e &::= \mathit{str} \mid x \mid e + e \mid \code{sanitize(}e\code{)} \mid (e)\\
  &\mid\ \code{declassify(}e\code{,}\ \mathit{str}\code{)}
 \end{align*}}
 
-\textbf{Core typing rule.} \emph{Data from an \code{input} may enter a \code{system} block only if the input is validated, or if the developer declassifies it}---however it gets there: directly, by interpolation, or through any chain of variables and reassignments. \code{sanitize()} alone is not enough: it removes structure (role markers, control characters, delimiter break-outs) but not natural-language instructions, so sanitized free text in \code{system} is an error (\code{TL-S013}). Untrusted data may always enter \code{instruction} blocks, where the runtime sanitizes or delimits it; this is the recommended layout, evaluated below as condition~C. \code{declassify(e, "reason")} is the explicit, audited exception (e.g.\ to greet a customer by name): it sanitizes $e$, requires a non-empty reason (a placeholder such as \code{TODO} is rejected), and every declassification into \code{system} is reported as a warning quoting the reason (\code{TL-W004}), or as an error under \code{--no-declassify} (\code{TL-S014}).
+\textbf{Core typing rule.} \emph{Data from an \code{input} may enter a \code{system} block only if the input is validated or the developer declassifies it}---directly, by interpolation, or through any chain of variables and reassignments. \code{sanitize()} is not enough: it removes structure, not natural-language instructions, so sanitized free text in \code{system} is an error (\code{TL-S013}). Outside text may always enter \code{instruction} blocks. \code{declassify(e, "reason")} (e.g.\ to greet a customer by name) sanitizes $e$, requires a real reason (\code{TODO} is rejected), and is reported as a warning quoting the reason (\code{TL-W004}), or an error under \code{--no-declassify}.
 
 % =====================================================================
 \section{Security Type System}\label{sec:types}
@@ -176,15 +176,16 @@ Labels form the chain
 ordered by taint, with join $\sqcup$ the less trusted level. Literals are \lab{TRUSTED}; typed inputs \lab{VALIDATED}; user inputs \lab{UNTRUSTED}; \code{rag}/\code{tool} inputs \lab{SEMI\_TRUSTED}; $\mathit{label}(a+b) = \mathit{label}(a)\sqcup\mathit{label}(b)$, likewise for interpolation; \code{sanitize(e)} lowers every external part of $e$ to \lab{SANITIZED}. Content may enter a block only if its label is below the block's clearance---\lab{VALIDATED} for \code{system}, \lab{UNTRUSTED} (anything) for \code{instruction}---or it was declassified. Table~\ref{tab:levels} lists what each level admits; \lab{SEMI\_TRUSTED} and \lab{UNTRUSTED} differ under a relaxed policy that only warns about rag/tool data in \code{system}.
 
 \begin{table}[t]
-\caption{What each trust level admits into a block, by policy. Every level is admitted into \code{instruction}; ``decl.'' = only through \code{declassify()}, reported as \code{TL-W004}.}
+\caption{What each trust level admits into a \code{system} block, by policy. Every level is admitted into \code{instruction}. ``decl.'' = only through \code{declassify()}, reported as \code{TL-W004}; validated values are re-checked at bind time.}
 \label{tab:levels}
 \centering\footnotesize
-\begin{tabular}{@{}llll@{}}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llp{1.6cm}p{2.2cm}@{}}
 \toprule
-Level & Typical source & \code{system}, strict & \code{system}, relaxed \\
+Level & Source & strict & relaxed \\
 \midrule
 \lab{TRUSTED} & literals & yes & yes \\
-\lab{VALIDATED} & typed inputs & yes (re-checked at bind) & yes \\
+\lab{VALIDATED} & typed inputs & yes & yes \\
 \lab{SANITIZED} & \code{sanitize(x)} & decl.\ (else \code{S013}) & rag/tool: warning; user: \code{S013} \\
 \lab{SEMI\_TRUSTED} & \code{rag}, \code{tool} & no (\code{S011}) & warning \\
 \lab{UNTRUSTED} & \code{user} & no (\code{S010}) & no (\code{S010}) \\
@@ -193,10 +194,10 @@ Level & Typical source & \code{system}, strict & \code{system}, relaxed \\
 \end{table}
 
 \subsection{Typing rules}
-Fig.~\ref{fig:rules} gives the rules for labels. The environment $\Gamma$ maps names to labels and is threaded through statements ($\Gamma \vdash s \dashv \Gamma'$), which makes the analysis flow-sensitive; $\mathit{src}(\code{user}) = \lab{UNTRUSTED}$, $\mathit{src}(\code{rag}) = \mathit{src}(\code{tool}) = \lab{SEMI\_TRUSTED}$, and unknown sources map to \lab{UNTRUSTED}. Interpolation desugars to concatenation, and \code{var} is assignment to a fresh name. Because the lattice is a chain, meet distributes over join, so (\textsc{San}) agrees with lowering each external part of $e$ to \lab{SANITIZED}. A judgement $\Gamma\vdash e:\ell,D$ also carries the set $D$ of inputs whose slots in $e$ were declassified; (\textsc{Dec}) adds them, every other rule takes the union of its premises' sets (omitted from the figure), and (\textsc{Sys}) admits an item whose free-text slots all come from $D$.
+Fig.~\ref{fig:rules} gives the rules for labels. The environment $\Gamma$ maps names to labels and is threaded through statements ($\Gamma \vdash s \dashv \Gamma'$), which makes the analysis flow-sensitive; $\mathit{src}(\code{user}) = \lab{UNTRUSTED}$, $\mathit{src}(\code{rag}) = \mathit{src}(\code{tool}) = \lab{SEMI\_TRUSTED}$, and unknown sources map to \lab{UNTRUSTED}. Interpolation desugars to concatenation, and \code{var} is assignment to a fresh name. A judgement $\Gamma\vdash e:\ell,D$ also carries the set $D$ of inputs whose slots in $e$ were declassified; (\textsc{Dec}) adds them, every other rule takes the union of its premises' sets (omitted from the figure), and (\textsc{Sys}) admits an item whose free-text slots all come from $D$.
 
 \begin{figure}[t]
-\centering\small
+\centering\footnotesize
 \[
 \frac{}{\Gamma \vdash \texttt{"}s\texttt{"} : \lab{TRUSTED}}\ \textsc{(Lit)}
 \qquad
@@ -206,9 +207,6 @@ Fig.~\ref{fig:rules} gives the rules for labels. The environment $\Gamma$ maps n
 \frac{\Gamma \vdash e_1 : \ell_1 \qquad \Gamma \vdash e_2 : \ell_2}{\Gamma \vdash e_1 + e_2 : \ell_1 \sqcup \ell_2}\ \textsc{(Cat)}
 \]
 \[
-\frac{\Gamma \vdash e : \ell}{\Gamma \vdash \code{sanitize}(e) : \ell \sqcap \lab{SANITIZED}}\ \textsc{(San)}
-\]
-\[
 \frac{\Gamma \vdash e : \ell \qquad r \neq \varepsilon}{\Gamma \vdash \code{declassify}(e, r) : \ell \sqcap \lab{SANITIZED},\ \mathit{inputs}(e)}\ \textsc{(Dec)}
 \]
 \[
@@ -216,6 +214,9 @@ Fig.~\ref{fig:rules} gives the rules for labels. The environment $\Gamma$ maps n
 \]
 \[
 \frac{\mathit{safe}(\tau)}{\Gamma \vdash \code{input}\ x \code{:}\ \tau \dashv \Gamma[x \mapsto \lab{VALIDATED}]}\ \textsc{(InT)}
+\]
+\[
+\frac{\Gamma \vdash e : \ell}{\Gamma \vdash \code{sanitize}(e) : \ell \sqcap \lab{SANITIZED}}\ \textsc{(San)}
 \]
 \[
 \frac{\Gamma \vdash e : \ell}{\Gamma \vdash x = e \dashv \Gamma[x \mapsto \ell]}\ \textsc{(Asg)}
@@ -250,46 +251,9 @@ Let $P$ be a program with no errors under the strict policy, $\mathit{san}$ the 
 % =====================================================================
 \section{Compiler Implementation}
 
-\TL{} is about 4{,}300 lines of Python with PLY~3.11, plus a 2{,}000-line evaluation harness and 519 automated tests. Fig.~\ref{fig:pipeline} shows the phases.
+\TL{} is about 4{,}300 lines of Python with PLY~3.11, plus a 2{,}000-line evaluation harness and 519 automated tests. Its phases are a lexer, an LALR(1) parser, the security checker, IR generation, an optimizer and \code{bind()}, which alone runs per request.
 
-\begin{figure}[t]
-\centering
-\begin{tikzpicture}[
-  node distance=3mm and 2.5mm,
-  box/.style={draw, rounded corners=2pt, align=center, font=\scriptsize, minimum height=7mm, inner sep=2pt, text width=10.5mm},
-  arr/.style={-{Stealth[length=1.6mm]}, thick}]
-\node[box] (lex) {Lexer\\\tiny trust seeds};
-\node[box, right=of lex] (par) {Parser\\\tiny LALR(1) AST};
-\node[box, right=of par] (sem) {Security\\\tiny checker};
-\node[box, right=of sem] (gen) {IR gen.\\\tiny sealed IR};
-\node[box, right=of gen] (opt) {Optimizer\\\tiny slots kept};
-\node[box, below=6mm of opt] (bind) {bind()\\\tiny sanitize};
-\node[box, left=of bind, text width=19mm] (pay) {OpenAI /\\Anthropic payload};
-\node[box, below=6mm of par, text width=17mm, draw=red!70!black] (err) {error + taint\\path + fix-it};
-\draw[arr] (lex) -- (par);
-\draw[arr] (par) -- (sem);
-\draw[arr] (sem) -- (gen);
-\draw[arr] (gen) -- (opt);
-\draw[arr] (opt) -- (bind);
-\draw[arr] (bind) -- (pay);
-\draw[arr, red!70!black] (sem.south) -- (err.north east);
-\end{tikzpicture}
-\caption{Compiler pipeline. All phases above run at compile time; only \code{bind()} runs per request.}
-\label{fig:pipeline}
-\end{figure}
-
-\textbf{Front end.} A PLY tokenizer records exact spans, seeds each token's trust and splits strings into text and \code{\{hole\}} parts, so diagnostics point at the leaking hole. The LALR(1) parser has error productions for targeted hints and computes exact ``expected'' sets by simulating pending reductions. \textbf{Semantic analysis} resolves names with close-match hints, evaluates templates, checks patterns, reports taint paths as secondary locations, and offers fix-its that are applied one at a time and re-checked: first moving the item to an \code{instruction} block, then a declassification whose placeholder reason must be replaced:
-\begin{lstlisting}[language={},basicstyle=\ttfamily\scriptsize]
-error[TL-S010]: UNTRUSTED data from input `user_msg`
-                reaches a `system` block
- --> prompt.tlx:5:12
-5 |     insert(user_msg)
-  |            ^~~~~~~~ raw input inserted here
-  = help: move `insert(user_msg)` to the `instruction`
-          block on line 8, where outside text is allowed
-  = help: or, if this text must be in the system prompt:
-          insert(declassify(user_msg, "TODO: ..."))
-\end{lstlisting}
+\textbf{Front end.} A PLY tokenizer records exact spans, seeds each token's trust and splits strings into text and \code{\{hole\}} parts, so diagnostics point at the leaking hole. The LALR(1) parser has error productions for targeted hints and computes exact ``expected'' sets by simulating pending reductions. \textbf{Semantic analysis} resolves names with close-match hints, evaluates templates, checks patterns, reports taint paths as secondary locations, and offers fix-its that are applied one at a time and re-checked: first moving the item to an \code{instruction} block, then a declassification whose placeholder reason (\code{TODO: ...}) must be replaced before the program compiles.
 \textbf{IR and binding.} The IR keeps text and slots separate, is canonical JSON with a SHA-256 checksum and an optional HMAC-SHA256 seal, and is re-verified on generation. A rule-based optimizer rewrites developer text to a fixpoint, property-tested to keep the slot sequence (8--13\% shorter at \code{-O1}). Sanitizers are registered by name; the default normalizes Unicode, removes control, zero-width and bidi characters, defuses role markers and forged transcript turns, caps length, and \emph{spotlights}~\cite{hines2024spotlighting} the value in \code{<untrusted\_input>} delimiters it cannot close; the datamarking variant also replaces whitespace with a marker. Whenever marked data is present, \code{bind()} adds a fixed notice to the system prompt explaining the marking.
 
 % =====================================================================
@@ -297,32 +261,17 @@ error[TL-S010]: UNTRUSTED data from input `user_msg`
 
 Let $n$ be the program size, $S$ the largest template and $m$ the IR size. Lexing, parsing and name resolution are $O(n)$; the security analysis is $O(n\cdot S)$ over a constant-height lattice; IR generation and sealing are $O(m)$; the optimizer is $O(k\cdot m)$ with $k \le m$ rounds; binding is linear in $m$ plus the input length, and no analysis runs per request. Measured on a Ryzen laptop (Python 3.10, median of 5 runs), compile time grows from 1.8\,ms for 10 statements to 18.8\,ms for 100 and 1.60\,s for 5{,}000 (0.18--0.32\,ms per statement); the example compiles in about 1.6\,ms.
 
-\textbf{Worst case.} Because templates are copied, $k$ repetitions of \code{a = a + a} build $2^k$ parts, and checking time would double with each statement. \TL{} therefore caps a template at 10{,}000 inserted values and 4\,M characters of text, about four times the largest context window; past the cap the program is rejected (\code{TL-S016}) and the template is collapsed to its distinct slots, which keeps every trust label. Checking then stays bounded (0.30\,s at $k{=}14$, where the cap is reached; 0.68\,s at $k{=}40$). The blow-up is not reachable by an attacker, who supplies values only at bind time.
+\textbf{Worst case.} $k$ repetitions of \code{a = a + a} build $2^k$ parts, so \TL{} caps a template at 10{,}000 inserted values and 4\,M characters (about four times the largest context window), rejects larger ones (\code{TL-S016}) and collapses them to their distinct slots, keeping every label; checking stays bounded (0.68\,s at $k{=}40$). Attackers supply values only at bind time and cannot trigger the blow-up.
 
 % =====================================================================
 \section{Evaluation}\label{sec:eval}
 
 \subsection{Setup}
-\textbf{Corpus:} 54 hand-written programs (32 unsafe, 22 safe; six put sanitized text in \code{system}, ten declassify it with a reason), 32 attacks in 8 categories and 40 benign questions. \textbf{Baselines:} B1, a lexical linter; B2, a keyword blocklist on the naive rendering. \textbf{Models} (temperature 0): allam-2-7b, qwen3.8-27b, gpt-oss-20b and gpt-oss-120b~\cite{openai2025gptoss} (Groq free tier), gemma-4-26b (Google), and llama-3.1-8b~\cite{grattafiori2024llama3} and mistral-7b~\cite{jiang2023mistral} run locally with Ollama. \textbf{Attack sets:} (i)~the 206 Tensor Trust~\cite{toyer2024tensortrust} hijacking attacks that name ``Access Granted'' within 800 characters, the phrase replaced by our canary, split once into a 40-attack development set and a disjoint 165-attack test set; (ii)~LLMail-Inject~\cite{abdelnabi2025llmail}: of 37{,}303 submissions to Microsoft's adaptive e-mail-agent challenge, the 1{,}562 that triggered the agent's e-mail tool to send ``confirmation'', the word replaced by our canary, 200 sampled and run with the challenge's own system prompt. \textbf{Variant:} a rule fixed beforehand chose, on the development set (allam-2-7b, qwen3.8-27b), the datamarking variant of \TL{}'s layout (mean success 23.8\%, vs.\ 35.0\% with the notice alone and 48.8\% for B); only it ran on the test sets. \textbf{Judging.}\label{sec:judge} The pre-registered judge counted a reply as a success if the trial's canary appeared in a non-refusal sentence; it also counted replies that merely \emph{mention} the canary while doing the normal task (``a problem with your TLX-AB497D device?''). Every success in every layout was therefore re-judged by a blind second judge (gemma-4-26b, not shown the layout), validated on \pending{60} replies labelled by an author (agreement \pending{--}). \textbf{Statistics:} Wilson intervals~\cite{wilson1927}; exact McNemar tests~\cite{mcnemar1947} paired by attack.
+\input{shared/tab_indirect}
+\textbf{Corpus:} 54 hand-written programs (32 unsafe, 22 safe), 32 attacks in 8 categories and 40 benign questions; baselines B1 (lexical linter) and B2 (keyword blocklist on the naive rendering). \textbf{Models} (temperature 0): allam-2-7b, qwen3.8-27b, gpt-oss-20b and gpt-oss-120b~\cite{openai2025gptoss} (Groq free tier), gemma-4-26b (Google), and llama-3.1-8b~\cite{grattafiori2024llama3} and mistral-7b~\cite{jiang2023mistral} run locally with Ollama. \textbf{Attack sets:} (i)~the 206 Tensor Trust~\cite{toyer2024tensortrust} hijacking attacks that name ``Access Granted'' within 800 characters, the phrase replaced by our canary, split once into a 40-attack development set and a disjoint 165-attack test set; (ii)~LLMail-Inject~\cite{abdelnabi2025llmail}: of 37{,}303 submissions to Microsoft's adaptive e-mail-agent challenge, the 1{,}562 that triggered the agent's e-mail tool to send ``confirmation'', the word replaced by our canary, 200 sampled and run with the challenge's own system prompt. \textbf{Variant:} a rule fixed beforehand chose, on the development set (allam-2-7b, qwen3.8-27b), the datamarking variant of \TL{}'s layout (mean success 23.8\%, vs.\ 35.0\% with the notice alone and 48.8\% for B); only it ran on the test sets. \textbf{Judging.}\label{sec:judge} The pre-registered judge counted a reply as a success if the trial's canary appeared in a non-refusal sentence; it also counted replies that merely \emph{mention} the canary while doing the normal task (``a problem with your TLX-AB497D device?''). Every success in every layout was therefore re-judged by a blind second judge (gemma-4-26b, not shown the layout), validated on \pending{60} replies labelled by an author (agreement \pending{--}). \textbf{Statistics:} Wilson intervals~\cite{wilson1927}; exact McNemar tests~\cite{mcnemar1947} paired by attack.
 
 \subsection{Detection and structural leakage}
-Table~\ref{tab:detect} compares detection. \TL{}'s perfect score is expected for an exact analysis on our own corpus; the corpus shows where lightweight checks fail: B1 misses every leak through variables or reassignment and flags 12 of 22 safe programs, and B2 flags 13.
-
-\begin{table}[t]
-\caption{Detection on the labelled corpus (unsafe = positive)}
-\label{tab:detect}
-\centering
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}lrrrrccc@{}}
-\toprule
-Method & TP & FP & FN & TN & Prec. & Rec. & F1 \\
-\midrule
-\TL{} & 32 & 0 & 0 & 22 & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} \\
-B1 lexical & 14 & 12 & 18 & 10 & 0.54 & 0.44 & 0.48 \\
-B2 keyword & 32 & 13 & 0 & 9 & 0.71 & 1.00 & 0.83 \\
-\bottomrule
-\end{tabular}}
-\end{table}
+On the corpus \TL{} finds all 32 unsafe programs with no false positive (F1 1.00), as expected for an exact analysis on our own programs. The lightweight checks fail where it matters: B1 (precision 0.54, recall 0.44, F1 0.48) misses every leak through variables or reassignment and flags 12 of 22 safe programs; B2 (0.71, 1.00, 0.83) catches all leaks only because it sees the naive rendering, and flags 13.
 
 Across all 1{,}728 program--attack pairs, a \emph{structural leak}---a role token, a forged transcript turn or a delimiter break-out reaching the system message---occurs in 39.1\% of pairs under naive rendering and in 0\% under \TL{} (1{,}024 pairs blocked at compile time, 96 at bind time, 608 rendered with no surviving structure). Under \TL{} attack text reaches the system message only in the ten programs that declassify it, sanitized and reported.
 
@@ -357,38 +306,31 @@ chat-langchain & 6k & safe (summary returns in the user turn) \\
 Eight applications let outside text reach the system prompt (13 findings) and \TL{} reports nothing for the other four; the lexical linter finds 10 of the 13, with one false positive. The leaks are not raw customer messages but text developers did not treat as input---retrieved documents, a cloned repository's files, skill descriptions and, in four cases, \emph{text the application's own model wrote} (summaries, ``memory''), which carries planted instructions forward. Three applications escape outside text and still put it in the system channel (\code{TL-S013}); the safe ones build \TL{}'s layout by hand. Only 2 of the 31 inputs could be refinement-typed, and every application needed loops, optional sections or model outputs that \TL{} lacks. An author independently translated two applications (four were planned): the translations agree on every placement and on both verdicts but tag text differently (by who chose it vs.\ who wrote it), which changes only the error code under the default policy; we added that rule to our guide.
 
 \subsection{Live attack success}
-\textbf{Layouts.} Each scenario is one application written in every layout an industry developer might use: \textbf{A} outside text raw in the system prompt; \textbf{B} raw in the user turn, the industry standard; \textbf{Bt} B inside XML tags, the current best-practice advice; \textbf{S} sanitized in the system prompt, the layout earlier versions of \TL{} accepted and \code{TL-S013} now rejects; \textbf{C} the \TL{} program; and, in the direct scenario, \textbf{D}, C plus two typed fields (an order number and a topic) into which the attacker also writes the attack, so that a field that rejects it blocks the whole request. In the \emph{retrieval} scenario a customer asks a harmless question and the attacker controls a retrieved article (Tensor Trust attacks); in the \emph{e-mail} scenario the user asks for a summary and the attacker sent the last of two e-mails (LLMail-Inject attacks); in the \emph{direct} scenario the customer's message is the attack. Tables~\ref{tab:indirect}--\ref{tab:replay} give the results.
-
-\input{shared/tab_indirect}
 \input{shared/tab_direct}
-
-\textbf{Findings.} (1)~\emph{\TL{}'s layout has the lowest indirect-injection success on every model.} With Tensor Trust attacks it is significantly below the industry standard on \pending{llama-3.1-8b (36.4\% to 1.8\%) and mistral-7b (72.1\% to 53.3\%), both $p<0.001$}, and XML tags alone (Bt) recover little of that gain (\pending{30.9\%} and \pending{69.1\%}). (2)~\emph{Adaptive attacks remain hard for small models.} LLMail-Inject's attacks were written against defences of this kind; \TL{} still cuts their success on gemma-4-26b from \pending{34.0\%} to \pending{12.5\%} ($p\pending{<0.001}$), but on llama-3.1-8b only from \pending{57.5\%} to \pending{49.5\%} (not significant). (3)~\emph{Sanitized text in the system prompt is not safe.} S is never the best layout and is the worst on \pending{gemma-4-26b with Tensor Trust attacks (9.7\%) and llama-3.1-8b with LLMail (65.5\%)}, which supports rejecting it at compile time. (4)~\emph{Typed inputs block every attack before any API call} (D, 0\% on every model); D measures one thing---attack text cannot enter a refinement-typed field---and an attacker who leaves the fields valid meets the same defence as C. In the direct scenario C is no better than tagging (\pending{18.2\%} vs.\ \pending{20.0\%} on llama-3.1-8b): the customer's own message is addressed to the model anyway, so we claim only the structural guarantees there. (5)~\emph{Cost.} Datamarking lowers benign-task success on gemma-4-26b from \pending{87.5\%} to \pending{77.5\%} and on no other model by more than \pending{2.5} points.
-
 \input{shared/tab_replay}
+\textbf{Layouts.}\label{sec:layouts} Each scenario is one application in every layout a developer might use: \textbf{A} outside text raw in the system prompt; \textbf{B} raw in the user turn (industry standard); \textbf{Bt} B in XML tags (best practice); \textbf{S} sanitized in the system prompt (accepted by earlier \TL{} versions, now \code{TL-S013}); \textbf{C} the \TL{} program; and, for direct injection, \textbf{D}: C plus two typed fields that the attacker also fills, so a field that rejects the attack blocks the request. In the \emph{retrieval} scenario a customer asks a harmless question and the attacker controls a retrieved article (Tensor Trust attacks); in the \emph{e-mail} scenario the user asks for a summary and the attacker sent the last of two e-mails (LLMail-Inject attacks); in the \emph{direct} scenario the customer's message is the attack. Tables~\ref{tab:indirect}--\ref{tab:replay} give the results.
+
+
+\textbf{Findings.} (1)~\emph{\TL{}'s layout has the lowest indirect-injection success on every model.} With Tensor Trust attacks it is significantly below the industry standard on \pending{llama-3.1-8b (36.4\% to 1.8\%) and mistral-7b (72.1\% to 53.3\%), both $p<0.001$}, and XML tags alone (Bt) recover little of that gain (\pending{30.9\%} and \pending{69.1\%}). (2)~\emph{Adaptive attacks remain hard for small models.} LLMail-Inject's attacks were written against defences of this kind; \TL{} still cuts their success on gemma-4-26b from \pending{34.0\%} to \pending{12.5\%} ($p\pending{<0.001}$), but on llama-3.1-8b only from \pending{57.5\%} to \pending{49.5\%} (not significant). (3)~\emph{Sanitized text in the system prompt is not safe.} S is never the best layout and is the worst on \pending{gemma-4-26b with Tensor Trust attacks (9.7\%) and llama-3.1-8b with LLMail (65.5\%)}, which supports rejecting it at compile time. (4)~\emph{Typed inputs block every attack before any API call} (D, 0\% on every model); D measures one thing---attack text cannot enter a refinement-typed field---and an attacker who leaves the fields valid meets the same defence as C. In the direct scenario C is no better than tagging (\pending{18.2\%} vs.\ \pending{20.0\%} on llama-3.1-8b): the customer's own message is addressed to the model anyway, so we claim only the structural guarantees there. Published spotlighting gains on GPT-family models~\cite{hines2024spotlighting} exceed ours on small open models: prompt-level defences depend on the model. (5)~\emph{Cost.} Datamarking lowers benign-task success on gemma-4-26b from \pending{87.5\%} to \pending{77.5\%} and on no other model by more than \pending{2.5} points.
+
 
 \textbf{Proof of concept on the real applications.} For the seven leaking applications whose outside text is a single string, we replayed their prompt layout with 30 Tensor Trust attacks planted in that text, once as the application builds it and once as \TL{}'s first fix-it rewrites it (Table~\ref{tab:replay}). The fixed layout lowers pooled success on llama-3.1-8b from \pending{40.6\%} to \pending{25.6\%} and on gemma-4-26b from \pending{12.4\%} to \pending{1.4\%} (both $p\pending{<0.001}$); on allam-2-7b, which repeats codes found anywhere in its context, the change is not significant (\pending{74.8\%} to \pending{68.6\%}).
-
-\subsection{Comparison with existing work}\label{sec:compare}
-Published results come from other models and attacks, so they are context rather than a ranking. Hines et al.\ report spotlighting lowering attack success from over 50\% to under 2\% on GPT-family models~\cite{hines2024spotlighting}; on our open models the same idea gives reductions from near-complete (llama-3.1-8b) to modest (mistral-7b, allam-2-7b), and Microsoft's adaptive attacks keep succeeding on small models. CaMeL solves 77\% of AgentDojo tasks with provable security against 84\% undefended~\cite{debenedetti2025camel}, at the cost of an extra model and an interpreter per request; \TL{} costs about 2\,ms once, at build time. Unlike the keyword filter (which catches 56.2\% of the naive pairs in which an attack reaches the system prompt and flags 7.5\% of benign inputs), \TL{} decides from where text is placed, not what it says, so rephrasing an attack cannot evade its verdict. CaMeL and StruQ~\cite{chen2025struq} protect other layers and compose with \TL{}.
-
-\subsection{Guidance for developers}
-(1)~Type every input whose values can be enumerated or bounded. (2)~Keep customer messages and retrieved documents in the \code{instruction} channel, sanitized and datamarked. (3)~Declassify only short values and review the reasons the compiler reports; treat everything a model wrote as outside text. (4)~Use a model trained on the instruction hierarchy~\cite{wallace2024hierarchy}: persuasion within the user turn remains.
 
 % =====================================================================
 \section{Limitations and Threats to Validity}
 
-The guarantee covers the privileged channel: untrusted text is still allowed, delimited, in the user turn, where a model can be persuaded, and declassification remains possible, visibly. Validation is syntactic (\code{[A-Za-z]\{1,40\}} admits one word), and completeness relies on straight-line programs. Our corpus and 32 attacks are hand-written; the public attack sets mitigate this, but Tensor Trust attacks were written against the game's defences rather than our applications, and LLMail-Inject attacks against one e-mail agent. The models are small or mid-sized open-weight models; frontier models were out of our budget, and on the free tiers some runs are partial (\pending{$n$ in Table~\ref{tab:indirect}}). Canary-based success is a proxy: the pre-registered judge also counted replies that only mention the canary, and the corrected rates rest on a second, model-based judge validated on a sample; both sets of labels are published. Each layout is one hand-written application per scenario, and the case study's replay keeps the attack in the application's outside text, not in a full deployment. The case study models each application's main prompt path by hand, on open-source projects rather than proprietary deployments; two of four planned independent translations were done.
+The guarantee covers the privileged channel: untrusted text is still allowed, delimited, in the user turn, where a model can be persuaded, and declassification remains possible, visibly. Validation is syntactic (\code{[A-Za-z]\{1,40\}} admits one word), and completeness relies on straight-line programs. The public attack sets were written against other targets (a game, one e-mail agent). The models are small or mid-sized open-weight ones, and some free-tier runs are partial. Corrected success rates rest on a model-based second judge validated on a sample; both sets of labels are published. Each layout is one hand-written application, and the replay plants attacks in an application's outside text, not a full deployment. The case study models each application's main prompt path by hand, on open-source projects rather than proprietary deployments; two of four planned independent translations were done.
 
 % =====================================================================
 \section{Conclusion}
 
-Prompt injection in LLM-integrated applications is in part a construction problem: trusted instructions and untrusted data are concatenated into one string. \TL{} borrows the remedy that programming languages applied to SQL injection and cross-site scripting, making the trust of every piece of text part of the program's type and refusing to build an unsafe prompt, while acknowledging that, unlike a database engine, a model can still be persuaded by data it is shown. Its exact analysis yields non-interference for the privileged channel with no false positives, and its compiled output carries the guarantee to the API call. The experiments show the layers working together: refinement types block attacks independently of the model, channel separation keeps untrusted text out of the system prompt, and datamarked spotlighting gives the lowest indirect-injection success of every layout on seven models, though adaptive attacks still succeed against small ones. On twelve real applications, the compiler finds outside text in the system prompt of eight, most often text the application's own model wrote. Future work, motivated by the case study, includes control flow with sound joins and implicit-flow tracking, trust propagation through model calls in multi-step agent pipelines, integration with capability-based runtimes, and a language server for live diagnostics.
+Prompt injection in LLM-integrated applications is in part a construction problem: trusted instructions and untrusted data are concatenated into one string. \TL{} borrows the remedy applied to SQL injection and cross-site scripting: the trust of every piece of text is part of the program's type, and unsafe prompts are not built. Its exact analysis yields non-interference for the privileged channel with no false positives, and its compiled output carries the guarantee to the API call. The experiments show the layers working together: refinement types block attacks independently of the model, channel separation keeps untrusted text out of the system prompt, and datamarked spotlighting gives the lowest indirect-injection success of every layout on seven models, though adaptive attacks still succeed against small ones. On twelve real applications, the compiler finds outside text in the system prompt of eight, most often text the application's own model wrote. For developers this means: type every input that can be typed, keep all outside text---including anything a model wrote---in the user turn, declassify rarely and review the reasons, and pair the result with a model trained on the instruction hierarchy~\cite{wallace2024hierarchy}. Future work, motivated by the case study, includes control flow with sound joins and implicit-flow tracking, trust propagation through model calls in multi-step agent pipelines, integration with capability-based runtimes, and a language server for live diagnostics.
 
 \section*{Acknowledgment}
 
 The authors thank Dr.~Krishnaraj~N for his guidance throughout this work.
 
-\textbf{Use of AI tools.} In accordance with IEEE policy on AI-generated content, the authors disclose that Claude (Anthropic), used through the Claude Code assistant, served as an assistant in this work: for debugging and extending the compiler and its automated test suite, for building and running the evaluation harness and its statistical analysis, for screening candidate applications and drafting their \TL{} translations in the case study (under a selection protocol fixed beforehand, with an independent second translation of two applications by an author), and for drafting the manuscript text and its \LaTeX{} layout. The concept and design of \TL{}, the direction of the work and all final decisions are the authors'; the authors reviewed and tested all code, verified every reported number against the logged results, and take full responsibility for the content of this paper. The language models evaluated in this paper are subjects of the experiments, not authoring tools (Section~\ref{sec:eval}).
+\textbf{Use of AI tools.} In accordance with IEEE policy, the authors disclose that Claude (Anthropic), through the Claude Code assistant, assisted in debugging and extending the compiler and its tests, building and running the evaluation harness, screening candidate applications and drafting their translations (under a protocol fixed beforehand, with an independent translation of two applications by an author), and drafting the manuscript. The design of \TL{} and all decisions are the authors'; they reviewed and tested all code, verified every number against the logged results, and take full responsibility for the content. The evaluated models are experimental subjects, not authoring tools.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}

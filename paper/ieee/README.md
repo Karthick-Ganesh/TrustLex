@@ -31,3 +31,15 @@ Locally (with TeX Live or MiKTeX): `latexmk -pdf trustlex.tex`.
 - `../PAPER_CONTENT.md` is the longer version of the same content (extra
   tables, presentation notes for the review); this file is the condensed
   IEEE version.
+
+## Compile locally (Tectonic)
+
+Tectonic 0.17.0 is installed at `E:\TrustLex-local	ectonic` with its package cache on E:.
+From `paper/ieee`, in Git Bash:
+
+    export TECTONIC_CACHE_DIR='E:\TrustLex-local	ectonic-cache'
+    /e/TrustLex-local/tectonic/tectonic.exe -X compile trustlex.tex --outdir build
+    /e/TrustLex-local/tectonic/tectonic.exe -X compile trustlex_journal.tex --outdir build
+
+Last check: conference 7 pages, journal 14 pages, no overfull lines. Tectonic uses XeTeX;
+Overleaf's pdfLaTeX can break lines slightly differently, so recheck the page count there.
