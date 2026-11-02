@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -179,7 +180,7 @@ def main(argv=None) -> int:
         s = summary["apps"][name]
         print(f"{name:14} n={s['n']:3}  original {s['original_asr']:.1%}  fixed {s['fixed_asr']:.1%}  p={s['mcnemar_p']}")
     variant = "" if args.sanitizer == "trustlex-default/1" else "_" + args.sanitizer.split("/")[0].removeprefix("trustlex-")
-    stem = f"replay{variant}_{args.provider}_{args.model.replace('/', '_')}"
+    stem = f"replay{variant}_{args.provider}_{re.sub(r'[/:]', '_', args.model)}"
     (args.out / f"{stem}.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     (args.out / f"{stem}.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows), encoding="utf-8")
     print("wrote", args.out / f"{stem}.json")
