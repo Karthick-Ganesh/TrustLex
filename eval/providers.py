@@ -136,12 +136,35 @@ class OpenAICompatProvider(_HTTPProvider):
         key = _key(self.key_env)
         if key:
             headers["Authorization"] = f"Bearer {key}"
-        data = self._post(f"{self.base_url}/chat/completions", headers,
-                          self.request(system, messages, temperature, max_tokens))
+        body = self.request(system, messages, temperature, max_tokens)
+        response = self._client.post(f"{self.base_url}/chat/completions", headers=headers, json=body)
+        if response.status_code == 500 and "token repeat limit" in response.text:
+            # Ollama aborts a reply that loops on one token and returns an error instead of
+            # the text; at temperature 0 every retry loops the same way. The reply is the
+            # text the model wrote up to the abort, read from a streamed request.
+            return self._streamed_until_abort(headers, body)
+        if response.status_code in RETRY_STATUS:
+            raise RetryableError(response.status_code, _retry_after(response))
+        if response.status_code >= 400:
+            raise ProviderError(f"{self.name} returned HTTP {response.status_code}: {response.text[:300]}")
+        data = response.json()
         choices = data.get("choices") or []
         if not choices:
             return ""
         return (choices[0].get("message") or {}).get("content") or ""
+
+    def _streamed_until_abort(self, headers: dict, body: dict) -> str:
+        text = []
+        with self._client.stream("POST", f"{self.base_url}/chat/completions", headers=headers,
+                                 json={**body, "stream": True}) as response:
+            for line in response.iter_lines():
+                if not line.startswith("data: ") or line == "data: [DONE]":
+                    continue
+                chunk = json.loads(line[6:])
+                if "error" in chunk:
+                    break
+                text.append(((chunk.get("choices") or [{}])[0].get("delta") or {}).get("content") or "")
+        return "".join(text)
 
 
 class OpenRouterProvider(OpenAICompatProvider):
