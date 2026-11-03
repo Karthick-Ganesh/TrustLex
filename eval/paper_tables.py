@@ -163,11 +163,43 @@ def write_replay():
     (SHARED / "tab_replay.tex").write_bytes((head + "\\midrule\n" + "\n".join(lines) + "\n" + tail).encode("utf-8"))
 
 
+def write_ablation(index: dict):
+    """Ablation table (variant 3): B, hand-written spotlighting (Bsp) and C, for the
+    models whose runs include Bsp. Written only when at least one such run exists."""
+    rows = []
+    for model, name in MODELS:
+        cells, have = [], False
+        for scenario, attack_set in (("indirect", "tensor_trust_test"), ("email", "llmail_test")):
+            scored = official(index.get((scenario, attack_set, model)))
+            if scored is None or "Bsp" not in scored[0]:
+                cells += ["--"] * 4
+                continue
+            by = scored[0]
+            c = next(k for k in by if k.startswith("C"))
+            have = True
+            cells += [rate(by["B"]), rate(by["Bsp"]), f"\\textbf{{{rate(by[c])}}}", fmt_p(paired_p(by["Bsp"], by[c]))]
+        if have:
+            rows.append(f"{name:13} & " + " & ".join(cells) + r" \\")
+    if not rows:
+        return
+    tex = ("% Spotlighting ablation (conference variant 3). Written by eval/paper_tables.py.\n"
+           "\\begin{table}[t]\n\\caption{Spotlighting ablation: attack success (\\%) of the industry layout (B), "
+           "spotlighting written by hand with the same tags, datamarking and notice but no \\TL{} sanitizer (Bsp), "
+           "and \\TL{} (C). $p$: exact McNemar, Bsp vs.\\ C. Success by each set's own rule.}\n\\label{tab:ablation}\n"
+           "\\centering\\footnotesize\n\\setlength{\\tabcolsep}{3pt}\n\\begin{tabular}{@{}l rrrr rrrr@{}}\n\\toprule\n"
+           " & \\multicolumn{4}{c}{Tensor Trust} & \\multicolumn{4}{c}{LLMail-Inject} \\\\\n"
+           "\\cmidrule(lr){2-5}\\cmidrule(lr){6-9}\n"
+           "Model & B & Bsp & C & $p$ & B & Bsp & C & $p$ \\\\\n\\midrule\n"
+           + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\end{table}\n")
+    (SHARED / "tab_ablation.tex").write_bytes(tex.encode("utf-8"))
+
+
 def main():
     index = runs()
     write_indirect(index)
     write_direct(index)
     write_replay()
+    write_ablation(index)
     print("wrote", ", ".join(p.name for p in sorted(SHARED.glob("tab_*.tex"))))
 
 
