@@ -21,3 +21,7 @@ eval/results/
 .env
 eval/external/
 paper/ieee/build/
+
+# Conference paper variants: kept local until the authors decide to publish them
+paper/ieee/trustlex_v*.tex
+paper/ieee/shared/tab_ablation.tex
