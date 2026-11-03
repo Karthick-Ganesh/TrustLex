@@ -27,6 +27,9 @@ OPENROUTER = [
     {"model": "qwen/qwen3.8-27b", "route": "deepinfra", "quantization": "bf16", "max_tokens": 1024},
 ]
 RPM = 60
+# allam on Groq's free tier: 6,000 tokens/minute, 7,000 requests/day. A Tensor Trust trial is
+# about 650 tokens, an LLMail trial about 1,450, so these rates stay under the minute budget.
+ALLAM_RPM = {"indirect": 8, "email": 4}
 ALLAM_PASSES, ALLAM_WAIT_MINUTES = 400, 15
 
 
@@ -47,8 +50,8 @@ def openrouter_pass(m: dict, scenario: str, attacks, conditions: str) -> int | N
     return json.loads(path.read_text(encoding="utf-8"))["metadata"]["errors"] if path.exists() else None
 
 
-def openrouter_worker(m: dict, conditions: str):
-    for scenario, attacks in (("indirect", TT_TEST), ("email", LLMAIL)):
+def openrouter_worker(m: dict, conditions: str, jobs=(("indirect", TT_TEST), ("email", LLMAIL))):
+    for scenario, attacks in jobs:
         for n in range(1, 11):
             errors = openrouter_pass(m, scenario, attacks, conditions)
             log(m["model"], f"openrouter {scenario}/{attacks.stem}: pass {n} -> {errors}")
@@ -62,19 +65,23 @@ def allam_worker(conditions: str):
     m = next(x for x in MODELS if x["model"] == "allam-2-7b")
     for scenario, attacks in (("indirect", TT_TEST), ("email", LLMAIL)):
         for n in range(1, ALLAM_PASSES + 1):
-            errors = run_asr(m, scenario, attacks, conditions, V2 / "test")
+            errors = run_asr({**m, "rpm": ALLAM_RPM[scenario]}, scenario, attacks, conditions, V2 / "test")
             log(m["model"], f"{scenario}/{attacks.stem}: pass {n} -> {errors}")
             if errors == 0:
                 break
             time.sleep(ALLAM_WAIT_MINUTES * 60)
-    replay(m, "trustlex-datamark/1")
+    replay({**m, "rpm": ALLAM_RPM["indirect"]}, "trustlex-datamark/1")
     log(m["model"], "all jobs complete")
 
 
 def main():
     winner = json.loads((V2 / "decision.json").read_text(encoding="utf-8"))["winner"]
     conditions = f"A,B,Bt,{winner},S"
-    threads = [threading.Thread(target=openrouter_worker, args=(m, conditions)) for m in OPENROUTER]
+    # qwen's LLMail part may already run as its own process; pass --skip-qwen-email to leave it out
+    import sys
+    skip = "--skip-qwen-email" in sys.argv
+    threads = [threading.Thread(target=openrouter_worker, args=(m, conditions) if not (skip and "qwen" in m["model"])
+                                else (m, conditions, (("indirect", TT_TEST),))) for m in OPENROUTER]
     threads.append(threading.Thread(target=allam_worker, args=(conditions,)))
     for t in threads:
         t.start()

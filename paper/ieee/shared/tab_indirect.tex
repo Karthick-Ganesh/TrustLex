@@ -1,6 +1,6 @@
 % Main live result: indirect injection. Shared by both papers.
 \begin{table*}[t]
-\caption{Indirect injection: attack success (\%) by layout, with the attack in a retrieved article (Tensor Trust, 165 attacks) or an e-mail (LLMail-Inject, 200). Layouts as in Section~\ref{sec:layouts}; $p$: exact McNemar, B vs.\ C; Util.: benign-task success, B / C. Success by each set's own rule (Section~\ref{sec:judge}). $^\dagger$Stopped by a daily quota; paired attacks in parentheses.}
+\caption{Indirect injection: attack success (\%) by layout, with the attack in a retrieved article (Tensor Trust, 165 attacks) or an e-mail (LLMail-Inject, 200). Layouts as in Section~\ref{sec:layouts}; $p$: exact McNemar, B vs.\ C; Util.: benign-task success, B / C. Success by each set's own rule (Section~\ref{sec:judge}). --: not run (allam-2-7b is limited by a free-tier daily token budget).}
 \label{tab:indirect}
 \centering\footnotesize
 \setlength{\tabcolsep}{3.2pt}
@@ -10,10 +10,10 @@
 \cmidrule(lr){2-8}\cmidrule(lr){9-15}
 Model & A & B & Bt & S & C & $p$ & Util. & A & B & Bt & S & C & $p$ & Util. \\
 \midrule
-allam-2-7b$^\dagger$ (118) & 42.4 & 42.4 & 39.0 & 36.4 & \textbf{14.4} & $<$.001 & 100/100 & -- & -- & -- & -- & -- & -- & -- \\
-qwen3.8-27b$^\dagger$ (59) & 30.5 & 20.3 & 16.9 & 15.3 & \textbf{0.0} & $<$.001 & 100/100 & -- & -- & -- & -- & -- & -- & -- \\
-gpt-oss-20b$^\dagger$ (33) & 45.5 & 21.2 & 9.1 & 12.1 & \textbf{6.1} & .062 & 100/100 & -- & -- & -- & -- & -- & -- & -- \\
-gpt-oss-120b$^\dagger$ (36) & 30.6 & 11.1 & 5.6 & 22.2 & \textbf{0.0} & .125 & 100/100 & -- & -- & -- & -- & -- & -- & -- \\
+allam-2-7b       & 45.5 & 45.5 & 41.8 & 39.4 & \textbf{16.4} & $<$.001 & 100/100 & -- & -- & -- & -- & -- & -- & -- \\
+qwen3.8-27b      & 12.7 & 3.6 & 2.4 & 2.4 & \textbf{0.0} & .031 & 100/100 & 1.5 & 8.5 & 1.5 & 0.5 & \textbf{0.5} & $<$.001 & 100/100 \\
+gpt-oss-20b      & 33.9 & 24.2 & 13.9 & 13.3 & \textbf{6.7} & $<$.001 & 100/100 & 1.5 & 54.5 & 31.5 & 0.0 & \textbf{14.0} & $<$.001 & 100/100 \\
+gpt-oss-120b     & 30.3 & 18.8 & 3.0 & 17.6 & \textbf{0.0} & $<$.001 & 100/100 & 1.5 & 45.0 & 23.5 & 0.5 & \textbf{12.0} & $<$.001 & 98/98 \\
 gemma-4-26b      & 4.8 & 3.0 & 2.4 & 9.7 & \textbf{0.0} & .062 & 88/78 & 4.0 & 23.0 & 15.5 & 0.0 & \textbf{0.0} & $<$.001 & 100/100 \\
 llama-3.1-8b     & 34.5 & 34.5 & 29.7 & 30.9 & \textbf{1.8} & $<$.001 & 100/100 & 2.0 & 32.0 & 33.5 & 1.5 & \textbf{4.0} & $<$.001 & 100/100 \\
 mistral-7b       & 37.6 & 43.6 & 42.4 & 36.4 & \textbf{24.8} & $<$.001 & 100/98 & 35.5 & 61.5 & 41.0 & 10.0 & \textbf{16.0} & $<$.001 & 98/100 \\
