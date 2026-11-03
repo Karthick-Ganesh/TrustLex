@@ -1,13 +1,13 @@
 % Layout replay of the leaking real applications. Shared by both papers.
 % Written by eval/paper_tables.py; each cell is original -> fixed.
 \begin{table}[t]
-\caption{Layout replay: success (\%) of 30 Tensor Trust attacks planted in each leaking application's outside text, shown as the application's original layout $\to$ the layout \TL{}'s fix-it produces. Success by Tensor Trust's rule; $p$: pooled exact McNemar. allam-2-7b was replayed with the default sanitizer, the other models with the datamarking variant chosen on the development set.}
+\caption{Layout replay: success (\%) of 30 Tensor Trust attacks planted in each leaking application's outside text, shown as the application's original layout $\to$ the layout \TL{}'s fix-it produces. Success by Tensor Trust's rule; $p$: pooled exact McNemar. All models use the datamarking variant chosen on the development set.}
 \label{tab:replay}
 \centering\footnotesize
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lccc@{}}
 \toprule
-Application & allam-2-7b & llama-3.1-8b & gemma-4-26b \\
+Application & allam-7b & llama-3.1-8b & gemma-4-26b \\
 \midrule
 career-ops    & 66.7\,$\to$\,53.3 & 56.7\,$\to$\,37.9 & 13.3\,$\to$\,0.0 \\
 DeepTutor     & 73.3\,$\to$\,43.3 & 26.7\,$\to$\,20.0 & 13.3\,$\to$\,3.3 \\
