@@ -144,6 +144,29 @@ class OpenAICompatProvider(_HTTPProvider):
         return (choices[0].get("message") or {}).get("content") or ""
 
 
+class OpenRouterProvider(OpenAICompatProvider):
+    """OpenRouter, pinned to one upstream provider (and optionally one quantization)
+    with fallbacks disabled, so every reply of a run comes from the same host. The
+    provider name carries the pin, so its replies get their own cache keys."""
+
+    BASE_URL = "https://openrouter.ai/api/v1"
+
+    def __init__(self, model: str, route: str, quantization: str | None = None,
+                 key_env: str | None = None, **kwargs):
+        if not route:
+            raise ValueError("--route is required for openrouter (an upstream provider, e.g. groq or deepinfra)")
+        super().__init__(model, base_url=self.BASE_URL, key_env=key_env or "OPENROUTER_API_KEY", **kwargs)
+        self.route, self.quantization = route.lower(), quantization
+        self.name = f"openrouter-{self.route}" + (f"-{quantization}" if quantization else "")
+
+    def request(self, system: str, messages: list[dict], temperature: float, max_tokens: int) -> dict:
+        body = super().request(system, messages, temperature, max_tokens)
+        body["provider"] = {"only": [self.route], "allow_fallbacks": False}
+        if self.quantization:
+            body["provider"]["quantizations"] = [self.quantization]
+        return body
+
+
 _CANARY = re.compile(r"TLX-[0-9A-F]{6}")
 
 
@@ -259,6 +282,8 @@ def make_provider(name: str, model: str, base_url: str | None = None, key_env: s
         return GeminiProvider(model, key_env=key_env or "GEMINI_API_KEY", **kwargs)
     if name == "openai_compat":
         return OpenAICompatProvider(model, base_url=base_url, key_env=key_env, **kwargs)
+    if name == "openrouter":
+        return OpenRouterProvider(model, key_env=key_env, **kwargs)
     if name == "fake":
         return FakeProvider(model, obey=obey)
     raise ValueError(f"unknown provider {name!r}")

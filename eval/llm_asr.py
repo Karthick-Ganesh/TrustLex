@@ -402,8 +402,10 @@ def run(args, out: Path, provider=None, sleep=None) -> dict | None:
     trials = plan_trials(attacks, benign, conditions, args.repeats, args.model, args.seed, scenario)
 
     if provider is None:
+        extra = ({"route": args.route, "quantization": args.quantization}
+                 if args.provider == "openrouter" else {})
         provider = make_provider(args.provider, args.model, base_url=args.base_url, key_env=args.key_env,
-                                 obey=args.fake_obey)
+                                 obey=args.fake_obey, **extra)
     client_kwargs = {"sleep": sleep} if sleep is not None else {}
     rpm = 0 if provider.name == "fake" else args.rpm  # the offline fake needs no rate limit
     client = ReliableClient(provider, out / "cache.jsonl", rpm=rpm, **client_kwargs)
@@ -491,7 +493,9 @@ def run(args, out: Path, provider=None, sleep=None) -> dict | None:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Measure prompt-injection attack success against an LLM.")
-    p.add_argument("--provider", required=True, choices=("gemini", "openai_compat", "fake"))
+    p.add_argument("--provider", required=True, choices=("gemini", "openai_compat", "openrouter", "fake"))
+    p.add_argument("--route", help="openrouter: the one upstream provider to use, e.g. groq or deepinfra")
+    p.add_argument("--quantization", help="openrouter: require this quantization, e.g. bf16")
     p.add_argument("--model", required=True, help="exact model ID (required; free models change often)")
     p.add_argument("--base-url", help="openai_compat endpoint, e.g. https://api.groq.com/openai/v1")
     p.add_argument("--key-env", help="environment variable holding the API key "
