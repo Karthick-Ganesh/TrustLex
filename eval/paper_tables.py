@@ -21,9 +21,10 @@ from native_metrics import paired_p, replay_results, run_results  # noqa: E402
 from rejudge import REPLAY, RESULTS, load_labels, row_key  # noqa: E402
 
 SHARED = Path(__file__).resolve().parents[1] / "paper" / "ieee" / "shared"
-MODELS = [("allam-7b-instruct-q4", "allam-7b"), ("qwen/qwen3.8-27b", "qwen3.8-27b"), ("openai/gpt-oss-20b", "gpt-oss-20b"),
+MODELS = [("allam-7b-q4", "allam-7b"), ("qwen/qwen3.8-27b", "qwen3.8-27b"), ("openai/gpt-oss-20b", "gpt-oss-20b"),
           ("openai/gpt-oss-120b", "gpt-oss-120b"), ("gemma-4-26b-a4b-it", "gemma-4-26b"),
-          ("llama3.1:8b", "llama-3.1-8b"), ("mistral:7b", "mistral-7b")]
+          ("llama3.1:8b", "llama-3.1-8b"), ("mistral:7b", "mistral-7b"),
+          ("openai/gpt-4o-mini", "gpt-4o-mini"), ("google/gemini-3.1-flash-lite", "gemini-3.1-flash-lite")]
 LAYOUTS = ["A", "B", "Bt", "S"]
 
 
@@ -138,7 +139,7 @@ def write_direct(index: dict):
 
 
 def write_replay():
-    files = {"allam-7b": "replay_datamark_openai_compat_allam-7b-instruct-q4", "llama-3.1-8b": "replay_datamark_openai_compat_llama3.1_8b",
+    files = {"allam-7b": "replay_datamark_openai_compat_allam-7b-q4", "llama-3.1-8b": "replay_datamark_openai_compat_llama3.1_8b",
              "gemma-4-26b": "replay_datamark_gemini_gemma-4-26b-a4b-it"}
     res = {k: replay_results(REPLAY / f"{v}.jsonl")["by"] for k, v in files.items()}
     apps = [("career-ops", "career-ops"), ("deeptutor", "DeepTutor"), ("project-nomad", "project-nomad"),
